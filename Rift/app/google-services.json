@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "1011591812161",
+    "firebase_url": "https://rift-e5516.firebaseio.com",
+    "project_id": "rift-e5516",
+    "storage_bucket": "rift-e5516.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1011591812161:android:7d90c7ef58219cc1",
+        "android_client_info": {
+          "package_name": "com.np.rift"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1011591812161-vgl8pupsije7jjn3nmncutq2cjgehom7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.np.rift",
+            "certificate_hash": "c0ed51d9cd25498fb35ec1896b2f2721e0f828ec"
+          }
+        },
+        {
+          "client_id": "1011591812161-n7bpn51t7448d2q6lsmsmb50tsmpp3t8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBNMjKSS_nP_7t6vh4VpOa3-cPBUsrlPi8"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1011591812161-n7bpn51t7448d2q6lsmsmb50tsmpp3t8.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -21,8 +21,11 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.np.rift.AppController;
 import com.np.rift.R;
+import com.np.rift.fcm.Config;
+import com.np.rift.fcm.NotificationUtils;
 import com.np.rift.serverRequest.ServerGetRequest;
 import com.np.rift.util.SharedPrefUtil;
 import com.wang.avi.AVLoadingIndicatorView;
@@ -38,18 +41,17 @@ import it.sephiroth.android.library.bottomnavigation.BottomNavigation;
 
 public class HomeActivity extends AppCompatActivity implements ServerGetRequest.Response {
     final static int FRAGMENT_COUNT = 3;
+    private final String TAG = getClass().getSimpleName();
+
 
     TextView textView_user, textView_exp;
     View linearlayout_main;
     AVLoadingIndicatorView progress_primary;
-
     ViewPager viewPager;
     MainAdapter adapter;
     BottomNavigation bottomNavigation;
-
     List<Fragment> fragList = new ArrayList<>();
     Fragment[] array = new Fragment[FRAGMENT_COUNT];
-
     String userId, userName;
     SharedPrefUtil sharedPrefUtil;
 
@@ -64,6 +66,32 @@ public class HomeActivity extends AppCompatActivity implements ServerGetRequest.
         sharedPrefUtil = new SharedPrefUtil();
         userName = sharedPrefUtil.getSharedPreferenceString(AppController.getContext(), "userName", "user");
         userId = sharedPrefUtil.getSharedPreferenceString(AppController.getContext(), "userId", "000");
+
+        displayFirebaseRegId();
+
+        mRegistrationBroadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+
+                // checking for type intent filter
+                if (intent.getAction().equals(Config.REGISTRATION_COMPLETE)) {
+                    // gcm successfully registered
+                    // now subscribe to `global` topic to receive app wide notifications
+                    FirebaseMessaging.getInstance().subscribeToTopic(Config.TOPIC_GLOBAL);
+
+                    displayFirebaseRegId();
+
+                } else if (intent.getAction().equals(Config.PUSH_NOTIFICATION)) {
+                    // new push notification is received
+
+                    String message = intent.getStringExtra("message");
+
+                    Toast.makeText(getApplicationContext(), "Push notification: " + message, Toast.LENGTH_LONG).show();
+                    Log.e(TAG, "fcm message: " + message);
+
+                }
+            }
+        };
 
         linearlayout_main = findViewById(R.id.linearlayout_main);
         progress_primary = (AVLoadingIndicatorView) findViewById(R.id.progress_primary);
@@ -110,6 +138,35 @@ public class HomeActivity extends AppCompatActivity implements ServerGetRequest.
 
             }
         });
+    }
+
+    private void displayFirebaseRegId() {
+        SharedPreferences pref = getApplicationContext().getSharedPreferences(Config.SHARED_PREF, 0);
+        String regId = pref.getString("regId", null);
+
+        Log.e(TAG, "Firebase reg id: " + regId);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        // register GCM registration complete receiver
+        LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
+                new IntentFilter(Config.REGISTRATION_COMPLETE));
+
+        // register new push message receiver
+        // by doing this, the activity will be notified each time a new message arrives
+        LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
+                new IntentFilter(Config.PUSH_NOTIFICATION));
+        // clear the notification area when the app is opened
+        NotificationUtils.clearNotifications(getApplicationContext());
+    }
+
+    @Override
+    protected void onPause() {
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mRegistrationBroadcastReceiver);
+        super.onPause();
     }
 
 

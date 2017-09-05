@@ -39,4 +39,6 @@ dependencies {
     compile 'it.sephiroth.android.library.bottomnavigation:bottom-navigation:2.0.1-rc1'
     testCompile 'junit:junit:4.12'
     compile 'org.zakariya.stickyheaders:stickyheaders:0.7.6'
+    compile 'com.google.firebase:firebase-messaging:9.6.0'
 }
+apply plugin: 'com.google.gms.google-services'

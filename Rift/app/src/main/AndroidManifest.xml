@@ -24,6 +24,20 @@
         <activity android:name=".registration.UserRegistration"/>
         <activity android:name=".main.HomeActivity"/>
         <activity android:name=".main.AddExpenseActivity"/>
-    </application>
 
+        <!-- Firebase Notifications -->
+        <service android:name=".fcm.MyFirebaseMessagingService">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+
+        <service android:name=".fcm.MyFirebaseInstanceIDService">
+            <intent-filter>
+                <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
+            </intent-filter>
+        </service>
+        <!-- ./Firebase Notifications -->
+
+    </application>
 </manifest>
