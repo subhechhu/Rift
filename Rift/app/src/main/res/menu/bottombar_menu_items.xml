@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto"
+      android:background="@android:color/white"
+      app:bbn_rippleColor="#66000000"
+      app:bbn_itemColorActive="@color/white"
+      app:bbn_itemColorInactive="#66c9c9c9"
+      app:bbn_itemColorDisabled="#66c9c9c9">
+
+    <item
+        android:id="@+id/bbn_item2"
+        android:color="@color/color_tab_1"
+        android:icon="@drawable/user"
+        android:title="Personal" />
+    <item
+        android:id="@+id/bbn_item3"
+        android:color="@color/color_tab_2"
+        android:icon="@drawable/group"
+        android:title="Group" />
+    <item
+        android:id="@+id/action4"
+        android:color="@color/color_tab_3"
+        android:icon="@drawable/abc"
+        android:title="Tab 3" />
+</menu>

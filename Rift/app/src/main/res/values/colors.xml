@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#39bfc1</color>
+    <color name="colorPrimary_shade">#a639bfc1</color>
+    <color name="colorPrimaryDark">#32a2a4</color>
+    <color name="colorAccent">#e79625</color>
+    <color name="rounded_background_color">#fdfdfd</color>
+    <color name="feed_item_border">#c2c3c8</color>
+    <color name="feed_item_border_light">#eaeaea</color>
+    <color name="white">#FFFFFF</color>
+    <color name="white_shade">#f4f4f4</color>
+    <color name="blue">#2639b1</color>
+
+
+
+
+    <color name="colorInactive">#747474</color>
+    <color name="colorActiveSmall">#FFFFFF</color>
+    <color name="colorInactiveSmall">#50FFFFFF</color>
+
+    <color name="color_tab_1">#455C65</color>
+    <color name="color_tab_2">#00886A</color>
+    <color name="color_tab_3">#8B6B62</color>
+    <color name="color_tab_4">#6C4A42</color>
+    <color name="color_tab_5">#F63D2B</color>
+
+    <color name="color_notification_back">#ffcd33</color>
+    <color name="color_notification_text">#3E4757</color>
+
+    <array name="tab_colors">
+        <item name="tab_1">#455C65</item>
+        <item name="tab_2">#00886A</item>
+        <item name="tab_3">#8B6B62</item>
+        <item name="tab_4">#6C4A42</item>
+        <item name="tab_5">#F63D2B</item>
+    </array>
+
+
+    <color name="actionButton">#bbbbbb</color>
+    <color name="windowBackground">#fafafa</color>
+    <color name="textLight">#dddddd</color>
+    <color name="textMedium">#999999</color>
+    <color name="textColor">#444444</color>
+    <color name="divider">#dddddd</color>
+
+    <color name="tabTextDefault">#afff</color>
+    <color name="tabTextSelected">#fff</color>
+
+    <color name="headerBackground">#eeeeee</color>
+
+    <color name="selectedItemBackground">#aaaaaa</color>
+
+
+</resources>

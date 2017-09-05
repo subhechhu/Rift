@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:id="@+id/linearlayout_main"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/colorPrimary"
+                android:orientation="vertical"
+                android:padding="10dp">
+
+    <com.wang.avi.AVLoadingIndicatorView
+        android:id="@+id/progress_white"
+        style="@style/AVLoadingIndicatorView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:visibility="invisible"
+        app:indicatorColor="@color/white"
+        app:indicatorName="PacmanIndicator"/>
+
+    <ImageView
+        android:id="@+id/relativeLayout_icon"
+        android:layout_width="200dp"
+        android:layout_height="100dp"
+        android:layout_marginTop="20dp"
+        android:layout_gravity="center_horizontal"
+        android:background="@drawable/icon"
+        android:contentDescription="@string/app_name"/>
+
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:padding="10dp">
+
+        <EditText
+            android:id="@+id/editText_email"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="@drawable/border"
+            android:ems="10"
+            android:hint="@string/enter_email"
+            android:inputType="textEmailAddress"
+            android:padding="10dp"/>
+
+        <RelativeLayout
+            android:id="@+id/relative_remember"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_below="@id/editText_email"
+            android:layout_margin="10dp">
+
+            <com.hanks.library.AnimateCheckBox
+                android:id="@+id/checkBox_autoLogin"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:padding="3dp"
+                app:animDuration="200"
+                app:checkedColor="@color/white"
+                app:lineColor="#000"
+                app:unCheckColor="#5b5b59"/>
+
+            <TextView
+                android:id="@+id/texView_autoLogin"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_toEndOf="@id/checkBox_autoLogin"
+                android:text="@string/auto_login"
+                android:textColor="@color/white"/>
+        </RelativeLayout>
+
+        <Button
+            android:id="@+id/button_proceed"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorPrimaryDark"
+            android:text="@string/proceed"
+            android:layout_below="@id/relative_remember"
+            android:textAllCaps="false"
+            android:textColor="@color/white"/>
+    </RelativeLayout>
+</LinearLayout>

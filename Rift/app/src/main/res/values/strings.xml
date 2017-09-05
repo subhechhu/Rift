@@ -1,0 +1,26 @@
+<resources>
+    <string name="app_name">Rift</string>
+    <string name="enter_email">Enter Email</string>
+    <string name="proceed">Proceed</string>
+    <string name="auto_login">Auto Login</string>
+    <string name="domain">http://54.218.35.23</string>
+    <string name="something_went_wrong">Something went wrong. Please try again!!!</string>
+    <string name="enter_otp">Enter OTP</string>
+    <string name="check_your_email">Please check your email address for the OTP.</string>
+    <string name="user_name">Username</string>
+    <string name="email">Email</string>
+    <string name="currency_format">Current Format</string>
+    <string name="your_expense">Your Expense</string>
+    <string name="rs_0">Rs. 0</string>
+    <string name="add">add</string>
+    <string name="title_activity_main2">Main2Activity</string>
+    <string name="spent_on">Spent On?</string>
+    <string name="amount">Amount</string>
+
+    <string name="cab_selected_count">%1$d selected</string>
+    <string name="action_collapse">Collapse</string>
+    <string name="delete">Delete</string>
+
+    <string name="updating">Updating Expanses</string>
+    <string name="fetching">Fetching Expenses</string>
+</resources>
