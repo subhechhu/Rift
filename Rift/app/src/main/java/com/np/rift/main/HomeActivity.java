@@ -98,7 +98,6 @@ public class HomeActivity extends AppCompatActivity implements ServerGetRequest.
 
 //        GetTotalExpense();
 
-
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         setTitle("Home");
@@ -140,6 +139,10 @@ public class HomeActivity extends AppCompatActivity implements ServerGetRequest.
         });
     }
 
+    private void SetUpGraph() {
+
+    }
+
     private void displayFirebaseRegId() {
         SharedPreferences pref = getApplicationContext().getSharedPreferences(Config.SHARED_PREF, 0);
         String regId = pref.getString("regId", null);
@@ -151,7 +154,7 @@ public class HomeActivity extends AppCompatActivity implements ServerGetRequest.
     protected void onResume() {
         super.onResume();
 
-        // register GCM registration complete receiver
+        // register FCM registration complete receiver
         LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
                 new IntentFilter(Config.REGISTRATION_COMPLETE));
 

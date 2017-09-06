@@ -16,6 +16,7 @@ import com.hanks.library.AnimateCheckBox;
 import com.np.rift.AppController;
 import com.np.rift.R;
 import com.np.rift.main.HomeActivity;
+import com.np.rift.main.TestActivity;
 import com.np.rift.registration.UserRegistration;
 import com.np.rift.serverRequest.ServerGetRequest;
 import com.np.rift.util.SharedPrefUtil;
@@ -67,6 +68,7 @@ public class LoginActivity extends Activity implements ServerGetRequest.Response
                     .getSharedPreferenceString(AppController.getContext(),
                             "userEmail",
                             "Enter email"));
+//            startActivity(new Intent(this, TestActivity.class));
             startActivity(new Intent(this, HomeActivity.class));
             finish();
 

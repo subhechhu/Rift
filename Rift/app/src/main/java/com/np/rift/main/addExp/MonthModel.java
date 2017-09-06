@@ -1,4 +1,4 @@
-package com.np.rift.main;
+package com.np.rift.main.addExp;
 
 class MonthModel {
     private String name;

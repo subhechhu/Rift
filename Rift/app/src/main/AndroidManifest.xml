@@ -23,7 +23,8 @@
         <activity android:name=".init.OTPActivity"/>
         <activity android:name=".registration.UserRegistration"/>
         <activity android:name=".main.HomeActivity"/>
-        <activity android:name=".main.AddExpenseActivity"/>
+        <activity android:name=".main.addExp.AddExpenseActivity"/>
+        <activity android:name=".main.TestActivity"/>
 
         <!-- Firebase Notifications -->
         <service android:name=".fcm.MyFirebaseMessagingService">

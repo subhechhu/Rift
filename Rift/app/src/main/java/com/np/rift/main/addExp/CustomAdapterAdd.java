@@ -1,4 +1,4 @@
-package com.np.rift.main;
+package com.np.rift.main.addExp;
 
 import android.content.Context;
 import android.view.LayoutInflater;

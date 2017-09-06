@@ -1,4 +1,4 @@
-package com.np.rift.main;
+package com.np.rift.main.addExp;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
