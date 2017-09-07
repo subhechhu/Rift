@@ -1,0 +1,34 @@
+{
+  "chartObject": [
+    {
+      "expenses": 12410,
+      "memberName": "Subhechhu",
+      "membersId": "14523",
+      "groupMemebers": 6
+    },
+    {
+      "expenses": 7849,
+      "memberName": "Kritika",
+      "membersId": "85474",
+      "groupMemebers": 2
+    },
+    {
+      "expenses": 3374,
+      "memberName": "Priyanka",
+      "membersId": "55412",
+      "groupMemebers": 12
+    },
+    {
+      "expenses": 5525,
+      "memberName": "Sandeep",
+      "membersId": "95412",
+      "groupMemebers": 4
+    },
+    {
+      "expenses": 785,
+      "memberName": "Ashish",
+      "membersId": "85245",
+      "groupMemebers": 5
+    }
+  ]
+}

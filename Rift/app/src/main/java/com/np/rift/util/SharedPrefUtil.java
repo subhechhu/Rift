@@ -2,6 +2,7 @@ package com.np.rift.util;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
 
 /**
  * Created by subhechhu on 9/5/2017.
@@ -9,6 +10,8 @@ import android.content.SharedPreferences;
 
 public class SharedPrefUtil {
     private final static String PREF_FILE = "RIFT";
+    String name;
+
 
     public void setSharedPreferenceString(Context context, String key, String value) {
         SharedPreferences settings = context.getSharedPreferences(PREF_FILE, 0);

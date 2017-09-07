@@ -11,15 +11,15 @@
         android:id="@+id/bbn_item2"
         android:color="@color/color_tab_1"
         android:icon="@drawable/user"
-        android:title="Personal" />
+        android:title="@string/personal" />
     <item
         android:id="@+id/bbn_item3"
         android:color="@color/color_tab_2"
         android:icon="@drawable/group"
-        android:title="Group" />
+        android:title="@string/group" />
     <item
         android:id="@+id/action4"
         android:color="@color/color_tab_3"
-        android:icon="@drawable/abc"
-        android:title="Tab 3" />
+        android:icon="@drawable/about"
+        android:title="@string/about" />
 </menu>

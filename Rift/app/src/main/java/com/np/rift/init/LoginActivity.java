@@ -1,10 +1,11 @@
 package com.np.rift.init;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.BottomSheetDialogFragment;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -16,7 +17,6 @@ import com.hanks.library.AnimateCheckBox;
 import com.np.rift.AppController;
 import com.np.rift.R;
 import com.np.rift.main.HomeActivity;
-import com.np.rift.main.TestActivity;
 import com.np.rift.registration.UserRegistration;
 import com.np.rift.serverRequest.ServerGetRequest;
 import com.np.rift.util.SharedPrefUtil;
@@ -28,7 +28,7 @@ import org.json.JSONObject;
  * Created by subhechhu on 9/5/2017.
  */
 
-public class LoginActivity extends Activity implements ServerGetRequest.Response {
+public class LoginActivity extends AppCompatActivity implements ServerGetRequest.Response {
     String TAG = getClass().getSimpleName();
 
     AVLoadingIndicatorView progress_white;
@@ -39,6 +39,7 @@ public class LoginActivity extends Activity implements ServerGetRequest.Response
     View linearlayout_main;
 
     SharedPrefUtil sharedPrefUtil;
+    boolean fromUserReg;
 
 
     @Override
@@ -50,19 +51,27 @@ public class LoginActivity extends Activity implements ServerGetRequest.Response
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         setContentView(R.layout.activity_login);
-        progress_white = findViewById(R.id.progress_white);
+        progress_white = (AVLoadingIndicatorView) findViewById(R.id.progress_white);
 
         linearlayout_main = findViewById(R.id.linearlayout_main);
+        fromUserReg = getIntent().getBooleanExtra("fromUserReg", false);
+        if (fromUserReg) {
+            Bundle bundle = new Bundle();
+            bundle.putString("email", getIntent().getStringExtra("email"));
+            BottomSheetDialogFragment fragment = new OTPFragment();
+            fragment.setArguments(bundle);
+            fragment.show(getSupportFragmentManager(), fragment.getTag());
+        }
 
-        checkBox_autoLogin = findViewById(R.id.checkBox_autoLogin);
-        editText_email = findViewById(R.id.editText_email);
-        button_proceed = findViewById(R.id.button_proceed);
-        texView_autoLogin = findViewById(R.id.texView_autoLogin);
+        checkBox_autoLogin = (AnimateCheckBox) findViewById(R.id.checkBox_autoLogin);
+        editText_email = (EditText) findViewById(R.id.editText_email);
+        button_proceed = (Button) findViewById(R.id.button_proceed);
+        texView_autoLogin = (TextView) findViewById(R.id.texView_autoLogin);
 
         sharedPrefUtil = new SharedPrefUtil();
 
         if (sharedPrefUtil.getSharedPreferenceBoolean(AppController.getContext(), "rememberMe", false)
-                && sharedPrefUtil.getSharedPreferenceBoolean(AppController.getContext(), "verified", false)){
+                && sharedPrefUtil.getSharedPreferenceBoolean(AppController.getContext(), "verified", false)) {
             checkBox_autoLogin.setChecked(true);
             editText_email.setText(sharedPrefUtil
                     .getSharedPreferenceString(AppController.getContext(),
@@ -114,12 +123,12 @@ public class LoginActivity extends Activity implements ServerGetRequest.Response
             @Override
             public void onClick(View view) {
                 if ("Create".equals(action)) {
+                    Progress(false);
                     Intent intent = new Intent(LoginActivity.this, UserRegistration.class);
                     intent.putExtra("email", editText_email.getText().toString());
                     startActivity(intent);
                     finish();
                 }
-                _snackbar.dismiss();
             }
         }).show();
     }
@@ -132,6 +141,7 @@ public class LoginActivity extends Activity implements ServerGetRequest.Response
         }
     }
 
+
     @Override
     public void getGetResult(String response, String requestCode, int responseCode) {
         if (response != null && !response.isEmpty()) {
@@ -140,10 +150,16 @@ public class LoginActivity extends Activity implements ServerGetRequest.Response
                     JSONObject responseObject = new JSONObject(response);
                     String status = responseObject.getString("status");
                     if ("success".equalsIgnoreCase(status)) {
-                        Intent intent = new Intent(this, OTPActivity.class);
-                        intent.putExtra("email", editText_email.getText().toString());
-                        startActivity(intent);
-                        finish();
+                        Progress(false);
+                        Bundle bundle = new Bundle();
+                        bundle.putString("email", editText_email.getText().toString());
+                        BottomSheetDialogFragment fragment = new OTPFragment();
+                        fragment.setArguments(bundle);
+                        fragment.show(getSupportFragmentManager(), fragment.getTag());
+//                        Intent intent = new Intent(this, OTPActivity.class);
+//                        intent.putExtra("email", editText_email.getText().toString());
+//                        startActivity(intent);
+//                        finish();
                     } else {
                         Progress(false);
                         String errorMessage = responseObject.getString("errorMessage");
@@ -156,9 +172,9 @@ public class LoginActivity extends Activity implements ServerGetRequest.Response
                 } else if ("VERIFY_USER".equalsIgnoreCase(requestCode)) {
                     JSONObject responseObject = new JSONObject(response);
                     String status = responseObject.getString("status");
-                    if("success".equals(status)){
+                    if ("success".equals(status)) {
 
-                    }else {
+                    } else {
                         String errorMessage = responseObject.getString("errorMessage");
                         showSnackBar(errorMessage, "OK");
                     }

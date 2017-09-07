@@ -1,12 +1,21 @@
-package com.np.rift.main;
+package com.np.rift.main.personalFragment;
 
-import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.DashPathEffect;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.LineChart;
@@ -20,29 +29,90 @@ import com.github.mikephil.charting.listener.ChartTouchListener;
 import com.github.mikephil.charting.listener.OnChartGestureListener;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.np.rift.R;
-import com.np.rift.main.personal.MyMarkerView;
+import com.np.rift.main.personalFragment.addExp.AddPersonalExpenseActivity;
 
 import java.util.ArrayList;
 
 /**
- * Created by subhechhu on 9/6/2017.
+ * Created by subhechhu on 9/5/2017.
  */
 
-public class TestActivity extends Activity implements OnChartGestureListener,
+public class PersonalFragment extends Fragment implements OnChartGestureListener,
         OnChartValueSelectedListener {
+    protected FragmentActivity mActivity;
+    String TAG = getClass().getSimpleName();
+    int fragmentValue;
 
     TextView tv_remaining;
+
+    FloatingActionButton fab_add;
+    float dX;
+    float dY;
+    int lastAction;
     private LineChart mChart;
 
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
+    public void onAttach(Context context) {
+        Log.d(TAG, "onAttach()");
+        super.onAttach(context);
+        if (context instanceof FragmentActivity) {
+            mActivity = (FragmentActivity) context;
+        }
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        Log.d(TAG, "onActivityCreated()");
+
+        super.onActivityCreated(savedInstanceState);
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        fragmentValue = getArguments() != null ? getArguments().getInt("val") : 1;
+        Log.d("subhechhu", "A onCreate" + fragmentValue);
+    }
 
-        setContentView(R.layout.fragment_personal);
-        mChart = findViewById(R.id.chart1);
-        tv_remaining = findViewById(R.id.tv_remaining);
+    @Nullable
+    @Override
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View fragmentView = inflater.inflate(R.layout.fragment_personal, container, false);
+        fab_add = fragmentView.findViewById(R.id.fab_add);
 
-       initGraph();
+        tv_remaining = fragmentView.findViewById(R.id.tv_remaining);
+        mChart = fragmentView.findViewById(R.id.chart1);
+
+        initGraph();
+
+        fab_add.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getActionMasked()) {
+                    case MotionEvent.ACTION_DOWN:
+                        dX = v.getX() - event.getRawX();
+                        dY = v.getY() - event.getRawY();
+                        lastAction = MotionEvent.ACTION_DOWN;
+                        break;
+
+                    case MotionEvent.ACTION_MOVE:
+                        v.setY(event.getRawY() + dY);
+                        v.setX(event.getRawX() + dX);
+                        lastAction = MotionEvent.ACTION_MOVE;
+                        break;
+
+                    case MotionEvent.ACTION_UP:
+                        if (lastAction == MotionEvent.ACTION_DOWN)
+                            startActivity(new Intent(mActivity, AddPersonalExpenseActivity.class));
+                        break;
+
+                    default:
+                        return false;
+                }
+                return true;
+            }
+        });
+        return fragmentView;
     }
 
     private void initGraph() {
@@ -55,7 +125,7 @@ public class TestActivity extends Activity implements OnChartGestureListener,
         mChart.setScaleEnabled(true);
         mChart.setPinchZoom(true);
 
-        MyMarkerView mv = new MyMarkerView(this, R.layout.custom_marker_view);
+        MyMarkerView mv = new MyMarkerView(getActivity(), R.layout.custom_marker_view);
         mv.setChartView(mChart);
         mChart.setMarker(mv);
 
@@ -65,7 +135,7 @@ public class TestActivity extends Activity implements OnChartGestureListener,
         mChart.getViewPortHandler().setMaximumScaleX(2f);
 
         setData(30, 1000);
-        mChart.setVisibleXRange(0, 15);
+//        mChart.setVisibleXRange(0, 15);
         mChart.animateX(2500);
 
         Legend l = mChart.getLegend();
@@ -75,15 +145,17 @@ public class TestActivity extends Activity implements OnChartGestureListener,
 
     private void setData(int count, float range) {
         count = 30;
-        range = 800;
-
+        range = 1000;
+        float total = 0;
         ArrayList<Entry> values = new ArrayList<>();
         for (int i = 0; i < count; i++) {
 
             float val = (float) (Math.random() * range) + 3;
+            total += val;
             values.add(new Entry(i, val));
         }
 
+        tv_remaining.setText("Rs. " + total);
         LineDataSet set1;
 
         set1 = new LineDataSet(values, "Expenses");
@@ -105,17 +177,18 @@ public class TestActivity extends Activity implements OnChartGestureListener,
         set1.setFormSize(15.f);
 
         ArrayList<ILineDataSet> dataSets = new ArrayList<>();
+
+        Drawable drawable = ContextCompat.getDrawable(getActivity(), R.drawable.fade_blue);
+        set1.setFillDrawable(drawable);
+
         dataSets.add(set1);
 
         LineData data = new LineData(dataSets);
 
         mChart.setData(data);
+//        mChart.getData().setHighlightEnabled(!mChart.getData().isHighlightEnabled());
     }
 
-    @Override
-    public void onWindowFocusChanged(boolean hasFocus) {
-        super.onWindowFocusChanged(hasFocus);
-    }
 
     @Override
     public void onChartGestureStart(MotionEvent me, ChartTouchListener.ChartGesture lastPerformedGesture) {
@@ -171,4 +244,5 @@ public class TestActivity extends Activity implements OnChartGestureListener,
     public void onNothingSelected() {
         Log.i("Nothing selected", "Nothing selected.");
     }
+
 }

@@ -6,13 +6,14 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
 import com.np.rift.AppController;
 import com.np.rift.R;
-import com.np.rift.init.OTPActivity;
+import com.np.rift.init.LoginActivity;
 import com.np.rift.serverRequest.ServerPostRequest;
 import com.wang.avi.AVLoadingIndicatorView;
 
@@ -108,13 +109,20 @@ public class UserRegistration extends AppCompatActivity implements ServerPostReq
     public void getPostResult(String response, String requestCode, int responseCode) {
         if (response != null && !response.isEmpty()) {
             try {
+                Log.e("TAG", "114");
                 JSONObject responseObject = new JSONObject(response);
                 String status = responseObject.getString("status");
                 if ("success".equalsIgnoreCase(status)) {
-                    Intent intent = new Intent(this, OTPActivity.class);
-                    intent.putExtra("email", editText_userEmail.getText().toString());
+                    Log.e("TAG", "119");
+                    Intent intent = new Intent(this, LoginActivity.class);
+                    intent.putExtra("fromUserReg", true);
+                    intent.putExtra("email",editText_userEmail.getText().toString());
                     startActivity(intent);
                     finish();
+//                    Intent intent = new Intent(this, OTPActivity.class);
+//                    intent.putExtra("email", editText_userEmail.getText().toString());
+//                    startActivity(intent);
+//                    finish();
                 } else {
                     String errorMessage = responseObject.getString("errorMessage");
                     showSnackBar(errorMessage);

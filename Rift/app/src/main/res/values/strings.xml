@@ -24,4 +24,17 @@
     <string name="updating">Updating Expanses</string>
     <string name="fetching">Fetching Expenses</string>
     <string name="_0000">Rs. 0</string>
+    <string name="login">Login</string>
+    <string name="user_registration">User Registration</string>
+
+    <string name="join_group">Join Group</string>
+    <string name="add_group">Add Group</string>
+    <string name="groupName">Group Name</string>
+    <string name="group_purpose">Group Purpose</string>
+    <string name="group_registration">Group Registration</string>
+    <string name="about">About</string>
+    <string name="group">Group</string>
+    <string name="personal">Personal</string>
+    <string name="save">Save</string>
+    <string name="enter_new_email_username">Enter new email/ username</string>
 </resources>

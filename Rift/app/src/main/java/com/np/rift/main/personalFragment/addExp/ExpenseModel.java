@@ -1,4 +1,4 @@
-package com.np.rift.main.addExp;
+package com.np.rift.main.personalFragment.addExp;
 
 
 public class ExpenseModel {

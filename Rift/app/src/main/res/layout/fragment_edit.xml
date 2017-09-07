@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+              android:orientation="vertical"
+              android:padding="10dp">
+
+    <com.wang.avi.AVLoadingIndicatorView
+        android:id="@+id/progress_primary"
+        style="@style/AVLoadingIndicatorView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:visibility="visible"
+        app:indicatorColor="@color/colorPrimary"
+        app:indicatorName="PacmanIndicator"/>
+
+    <TextView
+        android:id="@+id/textView_message"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:gravity="center"
+        android:text="@string/enter_new_email_username"/>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <EditText
+            android:id="@+id/editText_userName"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="@drawable/border"
+            android:ems="10"
+            android:hint="@string/user_name"
+            android:inputType="textEmailAddress"
+            android:padding="10dp"
+            android:textColor="@android:color/tab_indicator_text"/>
+
+        <EditText
+            android:id="@+id/editText_userEmail"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_below="@+id/editText_userName"
+            android:layout_marginEnd="5dp"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/border"
+            android:ems="10"
+            android:hint="@string/email"
+            android:inputType="textEmailAddress"
+            android:padding="10dp"
+            android:textColor="@android:color/tab_indicator_text"/>
+    </RelativeLayout>
+
+    <Button
+        android:id="@+id/button_save"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:layout_marginTop="10sp"
+        android:background="@color/colorPrimaryDark"
+        android:text="@string/save"
+        android:textAllCaps="false"
+        android:textColor="@color/white"/>
+</LinearLayout>

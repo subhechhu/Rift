@@ -100,7 +100,7 @@ public class HomeActivity extends AppCompatActivity implements ServerGetRequest.
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        setTitle("Home");
+        setTitle("Rift");
 
         bottomNavigation = (BottomNavigation) findViewById(R.id.bottomNavigation);
 
@@ -208,7 +208,11 @@ public class HomeActivity extends AppCompatActivity implements ServerGetRequest.
 
     public void refreshViewpager() {
         int position = viewPager.getCurrentItem();
-        Toast.makeText(this, "This :" + position, Toast.LENGTH_SHORT).show();
+        if (0 == position) {
+            showSnackBar("Refreshing Your Expenses");
+        }else if(1== position){
+            showSnackBar("Refreshing Your Groups");
+        }
         viewPager.setAdapter(adapter);
         bottomNavigation.setSelectedIndex(position, true);
     }
@@ -227,5 +231,14 @@ public class HomeActivity extends AppCompatActivity implements ServerGetRequest.
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_refresh, menu);
         return true;
+    }
+
+    @Override
+    public void onBackPressed() {
+        if(0!=viewPager.getCurrentItem()){
+            viewPager.setCurrentItem(0);
+        }else {
+            finish();
+        }
     }
 }

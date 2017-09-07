@@ -51,7 +51,7 @@ public class NotificationUtils {
 
 
         // notification icon
-        final int icon = R.drawable.icon;
+        final int icon = R.drawable.logo;
 
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         final PendingIntent resultPendingIntent =

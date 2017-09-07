@@ -1,4 +1,4 @@
-package com.np.rift.main.addExp;
+package com.np.rift.main.personalFragment.addExp;
 
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
@@ -14,6 +14,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.np.rift.R;
+import com.np.rift.main.groupFragment.GroupActivity;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -36,12 +37,17 @@ public class AddExpFragment extends BottomSheetDialogFragment {
     DatePickerDialog datePickerDialog;
     JSONArray itemsArray = new JSONArray();
     View contentView;
+    boolean isSent = false;
+
+    String forActivity;
 
     @Override
     public void setupDialog(final Dialog dialog, int style) {
         super.setupDialog(dialog, style);
         contentView = View.inflate(getContext(), R.layout.fragment_add_exp, null);
         dialog.setContentView(contentView);
+
+        forActivity = getArguments().getString("for");
 
         editText_productName = contentView.findViewById(R.id.editText_productName);
         editText_productAmount = contentView.findViewById(R.id.editText_productAmount);
@@ -106,8 +112,14 @@ public class AddExpFragment extends BottomSheetDialogFragment {
     @Override
     public void onStop() {
         super.onStop();
-        if (itemsArray.length() > 0) {
-            ((AddExpenseActivity) getActivity()).AddItems(itemsArray);
+        if (itemsArray.length() > 0 && !isSent) {
+            if ("group".equalsIgnoreCase(forActivity)) {
+                isSent = true;
+                ((GroupActivity) getActivity()).AddItems(itemsArray);
+            } else {
+                isSent = true;
+                ((AddPersonalExpenseActivity) getActivity()).AddItems(itemsArray);
+            }
         }
     }
 
@@ -128,7 +140,13 @@ public class AddExpFragment extends BottomSheetDialogFragment {
                         editText_productName.setText("");
                         editText_productAmount.setText("");
                         dialog.dismiss();
-                        ((AddExpenseActivity) getActivity()).AddItems(itemsArray);
+                        if ("group".equalsIgnoreCase(forActivity)) {
+                            isSent = true;
+                            ((GroupActivity) getActivity()).AddItems(itemsArray);
+                        } else {
+                            isSent = true;
+                            ((AddPersonalExpenseActivity) getActivity()).AddItems(itemsArray);
+                        }
                         bottomDialog.dismiss();
 
                     }

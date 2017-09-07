@@ -1,4 +1,4 @@
-package com.np.rift.main.addExp;
+package com.np.rift.main.personalFragment.addExp;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -40,7 +40,7 @@ import java.util.List;
  * Created by subhechhu on 9/5/2017.
  */
 
-public class AddExpenseActivity extends AppCompatActivity implements
+public class AddPersonalExpenseActivity extends AppCompatActivity implements
         ServerPostRequest.Response, ServerGetRequest.Response{
 
     String TAG = getClass().getSimpleName();
@@ -174,7 +174,10 @@ public class AddExpenseActivity extends AppCompatActivity implements
             finish();
         }
         if (item.getItemId() == R.id.menu_add) {
+            Bundle bundle=new Bundle();
+            bundle.putString("for","individual");
             BottomSheetDialogFragment fragment = new AddExpFragment();
+            fragment.setArguments(bundle);
             fragment.show(getSupportFragmentManager(), fragment.getTag());
             return true;
         }
@@ -302,10 +305,10 @@ public class AddExpenseActivity extends AppCompatActivity implements
                     textView_title = view.findViewById(R.id.textView_title);
                     if (expandableListView.isGroupExpanded(i)) {
                         imageView_arrow.setImageResource(R.drawable.arrow_down);
-                        textView_title.setTextColor(ContextCompat.getColor(AddExpenseActivity.this,
+                        textView_title.setTextColor(ContextCompat.getColor(AddPersonalExpenseActivity.this,
                                 R.color.colorPrimaryDark));
                     } else {
-                        textView_title.setTextColor(ContextCompat.getColor(AddExpenseActivity.this,
+                        textView_title.setTextColor(ContextCompat.getColor(AddPersonalExpenseActivity.this,
                                 R.color.colorAccent));
                         imageView_arrow.setImageResource(R.drawable.arrow_up);
                     }

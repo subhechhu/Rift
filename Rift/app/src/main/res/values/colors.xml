@@ -11,9 +11,6 @@
     <color name="white_shade">#f4f4f4</color>
     <color name="blue">#2639b1</color>
 
-
-
-
     <color name="colorInactive">#747474</color>
     <color name="colorActiveSmall">#FFFFFF</color>
     <color name="colorInactiveSmall">#50FFFFFF</color>
@@ -35,7 +32,6 @@
         <item name="tab_5">#F63D2B</item>
     </array>
 
-
     <color name="actionButton">#bbbbbb</color>
     <color name="windowBackground">#fafafa</color>
     <color name="textLight">#dddddd</color>
@@ -47,8 +43,6 @@
     <color name="tabTextSelected">#fff</color>
 
     <color name="headerBackground">#eeeeee</color>
-
     <color name="selectedItemBackground">#aaaaaa</color>
-
-
+    <color name="RED">#e91919</color>
 </resources>

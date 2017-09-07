@@ -22,6 +22,17 @@ public class AppController extends Application {
         return mInstance;
     }
 
+    public static String getUserId() {
+        return sharedPrefUtil.getSharedPreferenceString(mContext, "userId", "0");
+    }
+
+    public static String getUserName() {
+        return sharedPrefUtil.getSharedPreferenceString(mContext, "userName", "0");
+    }
+
+    public static String getUserEmail() {
+        return sharedPrefUtil.getSharedPreferenceString(mContext, "userEmail", "0");
+    }
 
     @Override
     public void onCreate() {

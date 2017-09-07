@@ -45,7 +45,6 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
                 android:layout_margin="10dp"
-                android:visibility="invisible"
                 app:indicatorColor="@color/colorPrimary"
                 app:indicatorName="PacmanIndicator"/>
 

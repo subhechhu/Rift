@@ -5,7 +5,9 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.util.Log;
 
-import com.np.rift.main.personal.PersonalFragment;
+import com.np.rift.main.aboutFragment.AboutFragment;
+import com.np.rift.main.groupFragment.GroupFragment;
+import com.np.rift.main.personalFragment.PersonalFragment;
 
 import static com.np.rift.main.HomeActivity.FRAGMENT_COUNT;
 
@@ -27,11 +29,11 @@ public class MainAdapter extends FragmentPagerAdapter {
                 return new PersonalFragment();
 //                return PersonalFragment.init(position);
             case 1:
-                return new FragmentB();
-//                return FragmentB.init(position);
+                return new GroupFragment();
+//                return GroupFragment.init(position);
             case 2:
-                return new FragmentC();
-//                return FragmentC.init(position);
+                return new AboutFragment();
+//                return AboutFragment.init(position);
         }
         return null;
     }

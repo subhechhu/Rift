@@ -1,5 +1,5 @@
 
-package com.np.rift.main.personal;
+package com.np.rift.main.personalFragment;
 
 import android.content.Context;
 import android.widget.TextView;

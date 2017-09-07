@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+              android:orientation="vertical">
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/swipeRefreshLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/recycler_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_alignParentBottom="true"
+                android:background="@color/feed_item_border_light"
+                android:divider="@color/feed_item_border"/>
+
+            <com.wang.avi.AVLoadingIndicatorView
+                android:id="@+id/progress_default"
+                style="@style/AVLoadingIndicatorView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_margin="10dp"
+                android:visibility="invisible"
+                app:indicatorColor="@color/colorPrimary"
+                app:indicatorName="PacmanIndicator"/>
+
+            <io.github.yavski.fabspeeddial.FabSpeedDial
+                android:id="@+id/fab_shortcut"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentEnd="true"
+                app:fabGravity="bottom_end"
+                app:fabMenu="@menu/menu_group" />
+        </RelativeLayout>
+
+
+
+    </android.support.v4.widget.SwipeRefreshLayout>
+</LinearLayout>
