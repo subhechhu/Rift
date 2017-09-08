@@ -2,7 +2,9 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
-              android:orientation="vertical">
+              android:orientation="vertical"
+    android:id="@+id/linearlayout_main"
+    android:gravity="bottom">
 
     <android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/swipeRefreshLayout"
@@ -27,7 +29,7 @@
                     android:id="@+id/textView2_user"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_margin="10dp"
+                    android:layout_margin="5dp"
                     android:layout_weight="1"
                     android:text="TextView"
                     android:textColor="@color/white"/>
@@ -36,23 +38,21 @@
                     android:id="@+id/textView_expense"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_margin="10dp"
+                    android:layout_margin="5dp"
                     android:layout_weight="1"
                     android:text="TextView"
                     android:textAppearance="@style/TextAppearance.AppCompat.Display1"
                     android:textColor="@color/white"
                     android:textStyle="bold"/>
-            </LinearLayout>
 
-            <Button
-                android:id="@+id/button_more"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true"
-                android:text="Button"
-                android:textAllCaps="false"
-                android:textColor="@color/feed_item_border_light"
-                android:background="@color/colorPrimaryDark"/>
+                <TextView
+                    android:layout_gravity="bottom"
+                    android:id="@+id/textView_more"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:textColor="@color/white"/>
+            </LinearLayout>
         </RelativeLayout>
 
     </android.support.v4.widget.SwipeRefreshLayout>

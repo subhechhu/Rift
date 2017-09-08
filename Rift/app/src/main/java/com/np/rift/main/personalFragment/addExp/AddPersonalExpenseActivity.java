@@ -113,7 +113,7 @@ public class AddPersonalExpenseActivity extends AppCompatActivity implements
                     + "/addExpense";
             Log.e(TAG, "url: " + url);
             Log.e(TAG, "postObject: " + postObject.toString());
-//            new ServerPostRequest(this, "ADD_ITEM").execute(url, postObject.toString());
+            new ServerPostRequest(this, "ADD_ITEM").execute(url, postObject.toString());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -138,7 +138,7 @@ public class AddPersonalExpenseActivity extends AppCompatActivity implements
                 JSONObject responseObject = new JSONObject(response);
                 String status = responseObject.getString("status");
                 if ("success".equals(status)) {
-                    GetExpenseDetails();
+//                    GetExpenseDetails();
                     showSnackBar(AppController.getInstance().getString(R.string.fetching));
                 } else {
                     String errorMessage = responseObject.getString("errorMessage");

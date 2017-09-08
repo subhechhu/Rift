@@ -9,7 +9,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.TextView;
 
 import com.np.rift.R;
@@ -24,10 +23,9 @@ public class InnerGroupFragment extends Fragment {
 
     int fragmentValue;
 
-    Button button_more;
-    TextView textView_user, textView_expense;
-
+    TextView textView_user, textView_expense, textView_more;
     String userName, userId, userExpense, groupId;
+    View linearlayout_main;
 
 
     @Override
@@ -60,31 +58,30 @@ public class InnerGroupFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View fragmentView = inflater.inflate(R.layout.fragment_inner_group, container, false);
 
-        button_more = fragmentView.findViewById(R.id.button_more);
         textView_user = fragmentView.findViewById(R.id.textView2_user);
         textView_expense = fragmentView.findViewById(R.id.textView_expense);
+
+        textView_more = fragmentView.findViewById(R.id.textView_more);
+
+        linearlayout_main = fragmentView.findViewById(R.id.linearlayout_main);
 
         textView_user.setText(userName);
         textView_expense.setText(userExpense);
 
-        button_more.setText("View "+userName+"'s Expenses in details");
-        button_more.setOnClickListener(new View.OnClickListener() {
+        textView_more.setText("Check " + userName + "'s contribution in details here");
+        textView_more.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Bundle bundle=new Bundle();
-                bundle.putString("userName",userName);
-                bundle.putString("userId",userId);
-                bundle.putString("groupId",groupId);
-                bundle.putString("userExpense",userExpense);
+                Bundle bundle = new Bundle();
+                bundle.putString("userName", userName);
+                bundle.putString("userId", userId);
+                bundle.putString("groupId", groupId);
+                bundle.putString("userExpense", userExpense);
                 BottomSheetDialogFragment fragment = new GroupExpenseFragment();
                 fragment.setArguments(bundle);
                 fragment.show(getFragmentManager(), fragment.getTag());
-
             }
         });
-
-
         return fragmentView;
-
     }
 }
