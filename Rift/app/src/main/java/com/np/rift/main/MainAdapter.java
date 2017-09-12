@@ -6,8 +6,8 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.util.Log;
 
 import com.np.rift.main.aboutFragment.AboutFragment;
-import com.np.rift.main.groupFragment.GroupFragment;
-import com.np.rift.main.personalFragment.PersonalFragment;
+import com.np.rift.main.groupFragment.MainGroupFragment;
+import com.np.rift.main.personalFragment.MainPersonalFragment;
 
 import static com.np.rift.main.HomeActivity.FRAGMENT_COUNT;
 
@@ -26,11 +26,11 @@ public class MainAdapter extends FragmentPagerAdapter {
         Log.e("subhechhu", "MainAdapter int position: ");
         switch (position) {
             case 0:
-                return new PersonalFragment();
-//                return PersonalFragment.init(position);
+                return new MainPersonalFragment();
+//                return MainPersonalFragment.init(position);
             case 1:
-                return new GroupFragment();
-//                return GroupFragment.init(position);
+                return new MainGroupFragment();
+//                return MainGroupFragment.init(position);
             case 2:
                 return new AboutFragment();
 //                return AboutFragment.init(position);

@@ -1,13 +1,14 @@
 package com.np.rift.main.groupFragment;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetDialogFragment;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.SpannableString;
@@ -18,6 +19,10 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.github.mikephil.charting.animation.Easing;
 import com.github.mikephil.charting.charts.PieChart;
@@ -32,32 +37,30 @@ import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.github.mikephil.charting.utils.ColorTemplate;
 import com.np.rift.AppController;
 import com.np.rift.R;
+import com.np.rift.main.EditFragment;
 import com.np.rift.main.personalFragment.addExp.AddExpFragment;
 import com.np.rift.serverRequest.ServerGetRequest;
+import com.wang.avi.AVLoadingIndicatorView;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.List;
-
-import me.relex.circleindicator.CircleIndicator;
 
 
-public class GroupActivity extends AppCompatActivity implements OnChartValueSelectedListener,
+public class GroupPieActivity extends AppCompatActivity implements OnChartValueSelectedListener,
         ServerGetRequest.Response {
 
-    String group_name, group_id;
+    String group_name, group_id, group_expense;
     View linearlayout_main;
     ArrayList<GroupModel> pieCharList;
     float totalExpense;
-    ViewPager viewPager;
-    GroupAdapter groupAdapter;
+    TextView textView_groupName, textView_expense, textView_more;
+    RelativeLayout relative_more, relative_graph;
+    Button button_refresh;
+    AVLoadingIndicatorView progress_default;
     private PieChart mChart;
-
-    List<Fragment> fragments;
-    CircleIndicator indicator;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -67,6 +70,7 @@ public class GroupActivity extends AppCompatActivity implements OnChartValueSele
 
         group_name = getIntent().getStringExtra("group_name");
         group_id = getIntent().getStringExtra("group_id");
+        group_expense = getIntent().getStringExtra("group_expense");
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -74,23 +78,105 @@ public class GroupActivity extends AppCompatActivity implements OnChartValueSele
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
+        progress_default = (AVLoadingIndicatorView) findViewById(R.id.progress_default);
+
+        button_refresh = (Button) findViewById(R.id.button_refresh);
+
         linearlayout_main = findViewById(R.id.linearlayout_main);
-        indicator = (CircleIndicator) findViewById(R.id.indicator);
+        relative_more = (RelativeLayout) findViewById(R.id.relative_more);
+        relative_graph = (RelativeLayout) findViewById(R.id.relative_graph);
+
+        textView_groupName = (TextView) findViewById(R.id.textView_groupName);
+        textView_expense = (TextView) findViewById(R.id.textView_expense);
+        textView_more = (TextView) findViewById(R.id.textView_more);
+
+        textView_groupName.setText("Total Expense");
+        textView_expense.setText(group_expense);
+        textView_more.setText("View expenses in detail");
 
         mChart = (PieChart) findViewById(R.id.chart_pie);
+        mChart.setNoDataText("Please Add The Expenses To See The Pie Chart");
+        mChart.setNoDataTextColor(ContextCompat.getColor(this, R.color.colorPrimaryDark));
+
+        button_refresh.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                RequestGroupInfo(group_id);
+            }
+        });
+
+        relative_more.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(GroupPieActivity.this, GroupExpenseActivity.class);
+                intent.putExtra("groupId", group_id);
+                intent.putExtra("groupName", group_name);
+                startActivity(intent);
+            }
+        });
 
         Log.e("TAG", "onCreate grp name: " + group_name);
         RequestGroupInfo(group_id);
     }
 
+    private void progress(boolean show) {
+        if (show) {
+            progress_default.show();
+        } else {
+            progress_default.hide();
+        }
+    }
+
+    private void showSnackBar(String message) {
+        final Snackbar _snackbar = Snackbar.make(relative_graph, message, Snackbar.LENGTH_LONG);
+        _snackbar.setAction("Got it", new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                _snackbar.dismiss();
+            }
+        }).show();
+    }
+
+    public void createDialog(final String from) {
+        String title, body;
+        if ("Exit".equals(from)) {
+            title = "Exit Group";
+            body = "Are you sure you want to exit " + group_name + "?";
+        } else {
+            title = "Settle Expense";
+            body = "Are you sure you want to settle expenses on " + group_name + "?";
+        }
+
+        AlertDialog.Builder builder;
+
+        builder = new AlertDialog.Builder(this);
+        builder.setTitle(title)
+                .setMessage(body)
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        if ("Exit".equals(from)) {
+
+                        } else {
+
+                        }
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                })
+                .show();
+    }
+
     private void initPie(ArrayList<GroupModel> pieCharList) {
         mChart.setUsePercentValues(true);
         mChart.getDescription().setEnabled(false);
-        mChart.setExtraOffsets(5, 10, 5, 5);
+//        mChart.setExtraOffsets(5, 10, 5, 5);
 
-        mChart.setDragDecelerationFrictionCoef(0.95f);
+        mChart.setDragDecelerationFrictionCoef(0.99f);
 
-        mChart.setCenterText(generateCenterSpannableText());
+//        mChart.setCenterText(generateCenterSpannableText());
         mChart.setExtraOffsets(20.f, 0.f, 20.f, 0.f);
 
         mChart.setDrawHoleEnabled(true);
@@ -104,8 +190,9 @@ public class GroupActivity extends AppCompatActivity implements OnChartValueSele
 
         mChart.setDrawCenterText(true);
 
-        mChart.setRotationAngle(0);
+        mChart.setRotationAngle(0f);
         mChart.setRotationEnabled(true);
+
         mChart.setHighlightPerTapEnabled(true);
 
         mChart.setOnChartValueSelectedListener(this);
@@ -127,7 +214,8 @@ public class GroupActivity extends AppCompatActivity implements OnChartValueSele
     }
 
     private void RequestGroupInfo(String group_id) {
-        ParseResponse(getJSON());
+        progress(true);
+        parseResponse(getJSON());
         String url = "" + "/getGroupInfo?groupId=" + group_id;
 //        new ServerGetRequest(this, "GET_GROUP_INFO").execute(url);
     }
@@ -136,9 +224,7 @@ public class GroupActivity extends AppCompatActivity implements OnChartValueSele
     public void onValueSelected(Entry e, Highlight h) {
         if (e == null)
             return;
-        Log.e("VAL SELECTED",
-                "Value: " + e.getY() + ", xIndex: " + e.getX()
-                        + ", DataSet index: " + h.getDataSetIndex());
+        Toast.makeText(this, "Expense: " + e.getY(), Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -149,7 +235,7 @@ public class GroupActivity extends AppCompatActivity implements OnChartValueSele
     @Override
     public void getGetResult(String response, String requestCode, int responseCode) {
         if (response != null && !response.isEmpty()) {
-            ParseResponse(response);
+            parseResponse(response);
         } else {
             showSnackBar(AppController.getInstance().getString(R.string.something_went_wrong), "OK");
         }
@@ -167,19 +253,32 @@ public class GroupActivity extends AppCompatActivity implements OnChartValueSele
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
             finish();
-        }
-        if (item.getItemId() == R.id.menu_add) {
+        } else if (item.getItemId() == R.id.menu_add) {
             Bundle bundle = new Bundle();
             bundle.putString("for", "group");
             BottomSheetDialogFragment fragment = new AddExpFragment();
             fragment.setArguments(bundle);
             fragment.show(getSupportFragmentManager(), fragment.getTag());
             return true;
+        } else if (item.getItemId() == R.id.menu_edit) {
+            Bundle bundle = new Bundle();
+            bundle.putString("for", "group");
+            bundle.putString("groupName", group_name);
+            BottomSheetDialogFragment fragment = new EditFragment();
+            fragment.setArguments(bundle);
+            fragment.show(getSupportFragmentManager(), fragment.getTag());
+        } else if (item.getItemId() == R.id.menu_exit) {
+            createDialog("Exit");
+        } else if (item.getItemId() == R.id.menu_history) {
+            Toast.makeText(this, "History", Toast.LENGTH_SHORT).show();
+        } else if (item.getItemId() == R.id.menu_settle) {
+            Toast.makeText(this, "Settle", Toast.LENGTH_SHORT).show();
         }
         return false;
     }
 
-    private void ParseResponse(String response) {
+    private void parseResponse(String response) {
+        progress(false);
         try {
             Log.e("TAG", "parseResponse: " + response);
             pieCharList = new ArrayList<>();
@@ -197,7 +296,6 @@ public class GroupActivity extends AppCompatActivity implements OnChartValueSele
                 pieCharList.add(groupModel);
 
                 initPie(pieCharList);
-                initViewPager(pieCharList);
 
             }
         } catch (Exception e) {
@@ -205,54 +303,17 @@ public class GroupActivity extends AppCompatActivity implements OnChartValueSele
         }
     }
 
-    private void initViewPager(ArrayList<GroupModel> pieCharList) {
-        ArrayList<String> memberIds=new ArrayList<>();
-        ArrayList<String> memberNames=new ArrayList<>();
-        ArrayList<String> memberExpense=new ArrayList<>();
-
-        for(int i=0;i<pieCharList.size();i++){
-            memberIds.add(pieCharList.get(i).getMembersId());
-            memberNames.add(pieCharList.get(i).getGroupMembers());
-            memberExpense.add(String.valueOf(pieCharList.get(i).getExpenses()));
-        }
-
-        fragments = buildFragments(memberIds, memberNames, memberExpense);
-        viewPager = (ViewPager) findViewById(R.id.viewPager);
-        groupAdapter = new GroupAdapter(this, getSupportFragmentManager(), fragments, memberIds);
-        viewPager.setAdapter(groupAdapter);
-        indicator.setViewPager(viewPager);
-    }
-
-    private List<Fragment> buildFragments(ArrayList<String> memberIds,
-                                          ArrayList<String> memberNames,
-                                          ArrayList<String> memberExpense) {
-        List<android.support.v4.app.Fragment> fragments = new ArrayList<>();
-        for(int i = 0; i<memberIds.size(); i++) {
-            Bundle b = new Bundle();
-            b.putInt("position", i);
-            b.putString("memberId", memberIds.get(i));
-            b.putString("memberNames", memberNames.get(i));
-            b.putString("memberExpense", memberExpense.get(i));
-            b.putString("groupId", group_id);
-
-            InnerGroupFragment innerGroupFragment=new InnerGroupFragment();
-            innerGroupFragment.setArguments(b);
-            fragments.add(innerGroupFragment);
-        }
-        return fragments;
-    }
-
-
     private void RenderPieChart(ArrayList<GroupModel> pieCharList) {
         ArrayList<PieEntry> entries = new ArrayList<PieEntry>();
 
-        for (int i = 0; i < pieCharList.size(); i++) {
+        for (int i = 1; i < pieCharList.size(); i++) {
             entries.add(new PieEntry(pieCharList.get(i).getExpenses(),
                     pieCharList.get(i).getGroupMembers()));
         }
         PieDataSet dataSet = new PieDataSet(entries, group_name);
         dataSet.setSliceSpace(3f);
         dataSet.setSelectionShift(5f);
+        dataSet.getXValuePosition();
 
         // add a lot of colors
 
@@ -276,12 +337,13 @@ public class GroupActivity extends AppCompatActivity implements OnChartValueSele
             colors.add(c);
 
         dataSet.setColors(colors);
-//        dataSet.setSelectionShift(0f);
+        dataSet.setSelectionShift(12f);
 
 
         dataSet.setValueLinePart1OffsetPercentage(80.f);
         dataSet.setValueLinePart1Length(0.2f);
         dataSet.setValueLinePart2Length(0.4f);
+
         dataSet.setYValuePosition(PieDataSet.ValuePosition.OUTSIDE_SLICE);
 
         PieData data = new PieData(dataSet);
@@ -307,7 +369,7 @@ public class GroupActivity extends AppCompatActivity implements OnChartValueSele
     private String getJSON() {
         String json = null;
         try {
-            InputStream is = AppController.getContext().getAssets().open("get_group_details.json");
+            InputStream is = AppController.getContext().getAssets().open("group_details.json");
             int size = is.available();
             byte[] buffer = new byte[size];
             is.read(buffer);
@@ -340,5 +402,4 @@ public class GroupActivity extends AppCompatActivity implements OnChartValueSele
             e.printStackTrace();
         }
     }
-
 }

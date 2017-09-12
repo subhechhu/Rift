@@ -1,34 +1,36 @@
 {
+  "status":"success",
+  "groupId":"45617",
   "chartObject": [
     {
       "expenses": 12410,
       "memberName": "Subhechhu",
-      "membersId": "14523",
-      "groupMemebers": 6
+      "membersId": "14523"
     },
     {
       "expenses": 7849,
       "memberName": "Kritika",
-      "membersId": "85474",
-      "groupMemebers": 2
+      "membersId": "85474"
     },
     {
       "expenses": 3374,
       "memberName": "Priyanka",
-      "membersId": "55412",
-      "groupMemebers": 12
+      "membersId": "55412"
     },
     {
       "expenses": 5525,
       "memberName": "Sandeep",
-      "membersId": "95412",
-      "groupMemebers": 4
+      "membersId": "95412"
+    },
+    {
+      "expenses": 7849,
+      "memberName": "Vasanta",
+      "membersId": "58744"
     },
     {
       "expenses": 785,
       "memberName": "Ashish",
-      "membersId": "85245",
-      "groupMemebers": 5
+      "membersId": "85245"
     }
   ]
 }

@@ -14,7 +14,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.np.rift.R;
-import com.np.rift.main.groupFragment.GroupActivity;
+import com.np.rift.main.groupFragment.GroupPieActivity;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -115,10 +115,10 @@ public class AddExpFragment extends BottomSheetDialogFragment {
         if (itemsArray.length() > 0 && !isSent) {
             if ("group".equalsIgnoreCase(forActivity)) {
                 isSent = true;
-                ((GroupActivity) getActivity()).AddItems(itemsArray);
+                ((GroupPieActivity) getActivity()).AddItems(itemsArray);
             } else {
                 isSent = true;
-                ((AddPersonalExpenseActivity) getActivity()).AddItems(itemsArray);
+                ((PersonalExpenseActivity) getActivity()).AddItems(itemsArray);
             }
         }
     }
@@ -142,13 +142,12 @@ public class AddExpFragment extends BottomSheetDialogFragment {
                         dialog.dismiss();
                         if ("group".equalsIgnoreCase(forActivity)) {
                             isSent = true;
-                            ((GroupActivity) getActivity()).AddItems(itemsArray);
+                            ((GroupPieActivity) getActivity()).AddItems(itemsArray);
                         } else {
                             isSent = true;
-                            ((AddPersonalExpenseActivity) getActivity()).AddItems(itemsArray);
+                            ((PersonalExpenseActivity) getActivity()).AddItems(itemsArray);
                         }
                         bottomDialog.dismiss();
-
                     }
                 })
                 .show();

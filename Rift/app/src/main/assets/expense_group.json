@@ -1,0 +1,50 @@
+[
+  {
+    "month": "Subhechhu",
+    "userId":"12456",
+    "expenses": [
+      {
+        "expId": 8,
+        "spentOn": "food",
+        "amount": 1,
+        "date": "2017-2-18"
+      },
+      {
+        "expId": 9,
+        "spentOn": "electricity",
+        "amount": 5,
+        "date": "2017-2-12"
+      },
+      {
+        "expId": 9,
+        "spentOn": "water",
+        "amount": 7,
+        "date": "2017-2-8"
+      }
+    ]
+  },
+  {
+    "month": "Kritika",
+    "userId":"12456",
+    "expenses": [
+      {
+        "expId": 8,
+        "spentOn": "food",
+        "amount": 1,
+        "date": "2017-1-28"
+      },
+      {
+        "expId": 9,
+        "spentOn": "electricity",
+        "amount": 5,
+        "date": "2017-1-10"
+      },
+      {
+        "expId": 9,
+        "spentOn": "water",
+        "amount": 7,
+        "date": "2017-1-7"
+      }
+    ]
+  }
+]

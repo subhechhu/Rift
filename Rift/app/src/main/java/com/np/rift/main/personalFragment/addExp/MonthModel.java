@@ -1,6 +1,6 @@
 package com.np.rift.main.personalFragment.addExp;
 
-class MonthModel {
+public class MonthModel {
     private String name;
 
 

@@ -1,20 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               xmlns:app="http://schemas.android.com/apk/res-auto"
+              android:id="@+id/container"
               android:layout_width="match_parent"
-              android:layout_height="wrap_content"
+              android:layout_height="60dp"
               android:layout_marginBottom="3dp"
               android:layout_marginTop="3dp"
-              android:orientation="horizontal"
               android:background="@color/white_shade"
+              android:orientation="horizontal"
               android:padding="5dp">
 
     <TextView
-        android:id="@+id/textView_title"
+        android:id="@+id/grpfirst"
         android:layout_width="0dp"
         android:layout_height="50dp"
-        android:elevation="5dp"
         android:layout_weight="0.9"
+        android:elevation="5dp"
         android:gravity="center_vertical"
         android:padding="5dp"
         android:text="TextView"
@@ -22,14 +23,18 @@
         android:textSize="18sp"
         android:textStyle="bold"/>
 
-    <ImageView
-        android:id="@+id/imageView_arrow"
+    <RelativeLayout
         android:layout_width="0dp"
-        android:layout_height="15dp"
-        android:layout_gravity="center_vertical"
-        android:layout_marginStart="10dp"
+        android:layout_height="50dp"
+        android:padding="5dp"
         android:layout_weight="0.1"
-        app:srcCompat="@drawable/arrow_down"/>
+        android:gravity="center">
 
-
+        <ImageView
+            android:id="@+id/imageView_arrow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="10dp"/>
+    </RelativeLayout>
 </LinearLayout>

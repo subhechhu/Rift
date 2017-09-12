@@ -1,16 +1,21 @@
 package com.np.rift.main.groupFragment;
 
-import org.json.JSONArray;
-
-import java.util.List;
-
 /**
  * Created by subhechhu on 9/6/2017.
  */
 
 public class GroupModel {
-    String groupId, groupName, groupMembersCount, groupMembers, membersId;
+    String groupId, groupName, memberContribution, groupMembers, membersId, groupExpense;
     float expenses;
+    boolean isSettled;
+
+    public String getGroupExpense() {
+        return groupExpense;
+    }
+
+    public void setGroupExpense(String groupExpense) {
+        this.groupExpense = groupExpense;
+    }
 
     public String getGroupMembers() {
         return groupMembers;
@@ -44,12 +49,12 @@ public class GroupModel {
         this.groupName = groupName;
     }
 
-    public String getGroupMembersCount() {
-        return groupMembersCount;
+    public String getMemberContribution() {
+        return memberContribution;
     }
 
-    public void setGroupMembersCount(String groupMembersCount) {
-        this.groupMembersCount = groupMembersCount;
+    public void setMemberContribution(String memberContribution) {
+        this.memberContribution = memberContribution;
     }
 
     public String getMembersId() {
@@ -60,14 +65,25 @@ public class GroupModel {
         this.membersId = membersId;
     }
 
+    public boolean isSettled() {
+        return isSettled;
+    }
+
+    public void setSettled(boolean settled) {
+        isSettled = settled;
+    }
+
     @Override
     public String toString() {
         return "GroupModel{" +
                 "groupId='" + groupId + '\'' +
                 ", groupName='" + groupName + '\'' +
-                ", groupMembersCount='" + groupMembersCount + '\'' +
+                ", memberContribution='" + memberContribution + '\'' +
                 ", groupMembers='" + groupMembers + '\'' +
+                ", membersId='" + membersId + '\'' +
+                ", groupExpense='" + groupExpense + '\'' +
                 ", expenses=" + expenses +
+                ", isSettled=" + isSettled +
                 '}';
     }
 }

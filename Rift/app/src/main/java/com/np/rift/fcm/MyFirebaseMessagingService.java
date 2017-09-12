@@ -114,7 +114,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     }
 
     /**
-     * Showing notification with text only
+     * Showing notification with title only
      */
     private void showNotificationMessage(Context context, String title, String message, String timeStamp, Intent intent) {
         notificationUtils = new NotificationUtils(context);
@@ -123,7 +123,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     }
 
     /**
-     * Showing notification with text and image
+     * Showing notification with title and image
      */
     private void showNotificationMessageWithBigImage(Context context, String title, String message, String timeStamp, Intent intent, String imageUrl) {
         notificationUtils = new NotificationUtils(context);

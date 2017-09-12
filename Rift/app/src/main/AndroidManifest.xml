@@ -14,26 +14,26 @@
         <activity android:name=".init.LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
-
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
         <activity android:name=".init.OTPActivity"/>
         <activity android:name=".registration.UserRegistration"/>
         <activity android:name=".main.HomeActivity"/>
-        <activity android:name=".main.personalFragment.addExp.AddPersonalExpenseActivity"/>
-        <activity android:name=".main.groupFragment.GroupActivity"/>
-
+        <activity android:name=".main.groupFragment.GroupPieActivity"/>
+        <activity android:name=".main.personalFragment.addExp.PersonalExpenseActivity"/>
+        <activity android:name=".main.groupFragment.GroupExpenseActivity"/>
+        <activity android:name=".main.groupFragment.SettledActivity"/>
         <!-- Firebase Notifications -->
         <service android:name=".fcm.MyFirebaseMessagingService">
             <intent-filter>
-                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
             </intent-filter>
         </service>
 
         <service android:name=".fcm.MyFirebaseInstanceIDService">
             <intent-filter>
-                <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
+                <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
             </intent-filter>
         </service>
         <!-- ./Firebase Notifications -->

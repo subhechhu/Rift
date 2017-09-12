@@ -2,8 +2,8 @@ package com.np.rift.main.groupFragment;
 
 import android.content.Context;
 import android.content.Intent;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,13 +16,13 @@ import java.util.HashSet;
 import java.util.List;
 
 
-class CustomAdapterGroup extends RecyclerView.Adapter<CustomAdapterGroup.MyViewHolder> {
+class CustomAdapterListGroup extends RecyclerView.Adapter<CustomAdapterListGroup.MyViewHolder> {
     private final HashSet<String> checkSet;
     private final List<GroupModel> groupList;
     private final Context context;
     private String TAG = getClass().getSimpleName();
 
-    CustomAdapterGroup(Context context, List<GroupModel> groupList) {
+    CustomAdapterListGroup(Context context, List<GroupModel> groupList) {
         checkSet = new HashSet<>();
         this.groupList = groupList;
         this.context = context;
@@ -39,22 +39,29 @@ class CustomAdapterGroup extends RecyclerView.Adapter<CustomAdapterGroup.MyViewH
     public void onBindViewHolder(final MyViewHolder holder, int position) {
 
         final GroupModel details = groupList.get(position);
-        holder.textView_groupID.setText("#"+details.getGroupId());
-        if(Integer.parseInt(details.getGroupMembersCount())>1){
-            holder.textView_groupMembers.setText(details.getGroupMembersCount()+" members");
-        }else {
-            holder.textView_groupMembers.setText(details.getGroupMembersCount()+" member");
-        }
+        holder.textView_groupID.setText("#" + details.getGroupId());
+
+        holder.textView_userExpense.setText("Contribution \n " + details.getMemberContribution());
         holder.textView_groupName.setText(details.getGroupName());
+
+        if(details.isSettled){
+            holder.view_divider.setBackgroundColor(ContextCompat.getColor(context,R.color.colorPrimaryDark));
+        }else {
+            holder.view_divider.setBackgroundColor(ContextCompat.getColor(context,R.color.dark_red));
+        }
 
         holder.linearlayout_child.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.e(TAG,"id: "+details.getGroupId());
-                Log.e(TAG,"grp name: "+details.getGroupName());
-                Intent intent=new Intent(context,GroupActivity.class);
-                intent.putExtra("group_name",details.getGroupName());
-                intent.putExtra("group_id",details.getGroupId());
+                Intent intent;
+                if (details.isSettled) {
+                    intent = new Intent(context, SettledActivity.class);
+                } else {
+                    intent = new Intent(context, GroupPieActivity.class);
+                }
+                intent.putExtra("group_name", details.getGroupName());
+                intent.putExtra("group_id", details.getGroupId());
+                intent.putExtra("group_expense", details.getGroupExpense());
                 context.startActivity(intent);
             }
         });
@@ -67,9 +74,10 @@ class CustomAdapterGroup extends RecyclerView.Adapter<CustomAdapterGroup.MyViewH
 
     class MyViewHolder extends RecyclerView.ViewHolder {
         final TextView textView_groupID;
-        final TextView textView_groupMembers;
+        final TextView textView_userExpense;
         final TextView textView_groupName;
         final LinearLayout linearlayout_child;
+        View view_divider;
 
         MyViewHolder(View view) {
             super(view);
@@ -77,10 +85,11 @@ class CustomAdapterGroup extends RecyclerView.Adapter<CustomAdapterGroup.MyViewH
             this.setIsRecyclable(false);
 
             textView_groupID = view.findViewById(R.id.textView_groupID);
-            textView_groupMembers = itemView.findViewById(R.id.textView_groupMembers);
+            textView_userExpense = itemView.findViewById(R.id.textView_groupMembers);
             textView_groupName = itemView.findViewById(R.id.textView_groupName);
             linearlayout_child = itemView.findViewById(R.id.linearlayout_child);
 
+            view_divider = itemView.findViewById(R.id.view_divider);
         }
     }
 }

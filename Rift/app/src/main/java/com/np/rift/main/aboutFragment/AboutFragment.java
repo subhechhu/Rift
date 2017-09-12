@@ -15,6 +15,7 @@ import android.widget.TextView;
 
 import com.np.rift.AppController;
 import com.np.rift.R;
+import com.np.rift.main.EditFragment;
 
 /**
  * Created by subhechhu on 9/5/2017.
@@ -84,8 +85,7 @@ public class AboutFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 Bundle bundle = new Bundle();
-                Log.e("TAG","textView_userEmail.getText().toString(): "+textView_userEmail.getText().toString());
-                Log.e("TAG","textView_userEmail.getText().toString(): "+textView_userName.getText().toString());
+                bundle.putString("for", "profile");
                 bundle.putString("email", textView_userEmail.getText().toString());
                 bundle.putString("userName", textView_userName.getText().toString());
                 BottomSheetDialogFragment fragment = new EditFragment();
@@ -95,6 +95,5 @@ public class AboutFragment extends Fragment {
         });
 
         return fragmentView;
-
     }
 }

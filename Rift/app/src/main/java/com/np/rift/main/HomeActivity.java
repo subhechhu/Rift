@@ -210,7 +210,7 @@ public class HomeActivity extends AppCompatActivity implements ServerGetRequest.
         int position = viewPager.getCurrentItem();
         if (0 == position) {
             showSnackBar("Refreshing Your Expenses");
-        }else if(1== position){
+        } else if (1 == position) {
             showSnackBar("Refreshing Your Groups");
         }
         viewPager.setAdapter(adapter);
@@ -218,26 +218,10 @@ public class HomeActivity extends AppCompatActivity implements ServerGetRequest.
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (id == R.id.menu_refresh) {
-            refreshViewpager();
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_refresh, menu);
-        return true;
-    }
-
-    @Override
     public void onBackPressed() {
-        if(0!=viewPager.getCurrentItem()){
+        if (0 != viewPager.getCurrentItem()) {
             viewPager.setCurrentItem(0);
-        }else {
+        } else {
             finish();
         }
     }

@@ -37,4 +37,15 @@
     <string name="personal">Personal</string>
     <string name="save">Save</string>
     <string name="enter_new_email_username">Enter new email/ username</string>
+    <string name="exit">Exit</string>
+    <string name="settle_group">Settle Group</string>
+    <string name="avg_expense">Avg. Expense</string>
+    <string name="total_expense">Total Expense</string>
+    <string name="member_expense">Member Expense</string>
+    <string name="settled_expense">Settled Expense</string>
+    <string name="settled_by">Settled By</string>
+    <string name="history">Group History</string>
+    <string name="edit_group">Edit Group</string>
+    <string name="enter_new_group_name">Enter New Group Name</string>
+    <string name="fields_empty">Fields Cannot Be Empty</string>
 </resources>

@@ -10,4 +10,27 @@
         android:title="@string/add"
         app:showAsAction="always"/>
 
+    <item
+        android:id="@+id/menu_edit"
+        android:title="@string/edit_group"
+        app:showAsAction="never"/>
+
+
+    <item
+        android:id="@+id/menu_settle"
+        android:icon="@drawable/settle_white"
+        android:title="@string/settle_group"
+        app:showAsAction="never"/>
+
+    <item
+        android:id="@+id/menu_history"
+        android:title="@string/history"
+        app:showAsAction="never"/>
+
+    <item
+        android:id="@+id/menu_exit"
+        android:icon="@drawable/exit_white"
+        android:title="@string/exit"
+        app:showAsAction="never"/>
+
 </menu>

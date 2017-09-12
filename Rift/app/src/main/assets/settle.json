@@ -1,0 +1,51 @@
+{
+  "status": "success",
+  "settledBy": "Subhechhu",
+  "settledOn": "2017-9-15",
+  "totalExpense": "32587",
+  "averageExpense": "6100",
+  "membersExpense": [
+    {
+      "expenses": 12410,
+      "memberName": "Subhechhu",
+      "membersId": "14523"
+    },
+    {
+      "expenses": 7849,
+      "memberName": "Kritika",
+      "membersId": "85474"
+    },
+    {
+      "expenses": 3374,
+      "memberName": "Priyanka",
+      "membersId": "55412"
+    },
+    {
+      "expenses": 5525,
+      "memberName": "Sandeep",
+      "membersId": "95412"
+    },{
+      "expenses": 14525,
+      "memberName": "Vasanta",
+      "membersId": "14523"
+    }
+  ],
+  "settledExpense":[
+    {
+      "from":"Subhechhu",
+      "to":"Sandeep",
+      "amount":"575"
+
+    },
+    {
+      "from":"Kritika",
+      "to":"Subhechhu",
+      "amount":"143"
+    },
+    {
+      "from":"Sandeep",
+      "to":"-",
+      "amount":"-"
+    }
+  ]
+}

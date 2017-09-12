@@ -13,9 +13,12 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.np.rift.R;
 import com.np.rift.serverRequest.ServerGetRequest;
@@ -34,14 +37,14 @@ import io.github.yavski.fabspeeddial.SimpleMenuListenerAdapter;
  * Created by subhechhu on 9/5/2017.
  */
 
-public class GroupFragment extends Fragment implements ServerGetRequest.Response {
+public class MainGroupFragment extends Fragment implements ServerGetRequest.Response {
     protected FragmentActivity mActivity;
     String TAG = getClass().getSimpleName();
     int fragmentValue;
 
     ArrayList<GroupModel> groupArrayList;
     RecyclerView recycler_view;
-    CustomAdapterGroup customAdapterGroup;
+    CustomAdapterListGroup customAdapterGroup;
     SwipeRefreshLayout swipeRefreshLayout;
     AVLoadingIndicatorView progress_default;
     FabSpeedDial fabSpeedDial;
@@ -82,6 +85,18 @@ public class GroupFragment extends Fragment implements ServerGetRequest.Response
         mLayoutManager = new android.support.v7.widget.LinearLayoutManager(getActivity());
         recycler_view.setLayoutManager(mLayoutManager);
         recycler_view.setItemAnimator(new DefaultItemAnimator());
+
+        recycler_view.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                if (dy > 0 && fabSpeedDial.getVisibility() == View.VISIBLE) {
+                    fabSpeedDial.hide();
+                } else if (dy < 0 && fabSpeedDial.getVisibility() != View.INVISIBLE) {
+                    fabSpeedDial.show();
+                }
+            }
+        });
 
         swipeRefreshLayout = fragmentView.findViewById(R.id.swipeRefreshLayout);
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -124,18 +139,18 @@ public class GroupFragment extends Fragment implements ServerGetRequest.Response
 
     private void GetGroups() {
         String url = "";
-        ParsseResponse();
+        ParseResponse();
 //        new ServerGetRequest(this, "GET_GROUPS").execute(url);
     }
 
     @Override
     public void getGetResult(String response, String requestCode, int responseCode) {
         if (response != null && !response.isEmpty()) {
-            ParsseResponse();
+            ParseResponse();
         }
     }
 
-    private void ParsseResponse() {
+    private void ParseResponse() {
         try {
             groupArrayList = new ArrayList<>();
             String response = getJSON();
@@ -145,12 +160,14 @@ public class GroupFragment extends Fragment implements ServerGetRequest.Response
                 JSONObject groupObj = responseArray.getJSONObject(a);
                 groupModel.setGroupId(groupObj.getString("groupId"));
                 groupModel.setGroupName(groupObj.getString("groupName"));
-                groupModel.setGroupMembersCount(groupObj.getString("groupMemebers"));
+                groupModel.setMemberContribution(groupObj.getString("userExpense"));
+                groupModel.setGroupExpense(groupObj.getString("groupExpense"));
+                groupModel.setSettled(groupObj.getBoolean("settled"));
                 groupArrayList.add(groupModel);
             }
 
             if (customAdapterGroup == null) {
-                customAdapterGroup = new CustomAdapterGroup(getActivity(),
+                customAdapterGroup = new CustomAdapterListGroup(getActivity(),
                         groupArrayList);
                 recycler_view.setAdapter(customAdapterGroup);
                 customAdapterGroup.notifyDataSetChanged();
@@ -167,7 +184,7 @@ public class GroupFragment extends Fragment implements ServerGetRequest.Response
     private String getJSON() {
         String json = null;
         try {
-            InputStream is = getActivity().getAssets().open("get_group.json");
+            InputStream is = getActivity().getAssets().open("group_list.json");
             int size = is.available();
             byte[] buffer = new byte[size];
             is.read(buffer);

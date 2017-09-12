@@ -30,6 +30,14 @@ public class AppController extends Application {
         return sharedPrefUtil.getSharedPreferenceString(mContext, "userName", "0");
     }
 
+    public static void setUserName(String userName) {
+        sharedPrefUtil.setSharedPreferenceString(mContext, "userName", userName);
+    }
+
+    public static void setUserEmail(String email) {
+        sharedPrefUtil.setSharedPreferenceString(mContext, "userEmail", email);
+    }
+
     public static String getUserEmail() {
         return sharedPrefUtil.getSharedPreferenceString(mContext, "userEmail", "0");
     }

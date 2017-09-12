@@ -1,0 +1,128 @@
+{
+  "status": "success",
+  "totalExpense": "45617",
+  "maxAmount": "11000",
+  "minAmount": "0",
+  "graphPoints": [
+    {
+      "date": 1,
+      "amount": "2000"
+    },
+    {
+      "date": 2,
+      "amount": "700"
+    },
+    {
+      "date": 3,
+      "amount": "478"
+    },
+    {
+      "date": 4,
+      "amount": "854"
+    },
+    {
+      "date": 5,
+      "amount": "50"
+    },
+    {
+      "date": 6,
+      "amount": "30"
+    },
+    {
+      "date": 7,
+      "amount": "50"
+    },
+    {
+      "date": 8,
+      "amount": "0"
+    },
+    {
+      "date": 9,
+      "amount": "0"
+    },
+    {
+      "date": 10,
+      "amount": "43"
+    },
+    {
+      "date": 11,
+      "amount": "5000"
+    },
+    {
+      "date": 12,
+      "amount": "30"
+    },
+    {
+      "date": 13,
+      "amount": "158"
+    },
+    {
+      "date": 14,
+      "amount": "65"
+    },
+    {
+      "date": 15,
+      "amount": "13"
+    },
+    {
+      "date": 16,
+      "amount": "0"
+    },
+    {
+      "date": 17,
+      "amount": "0"
+    },
+    {
+      "date": 18,
+      "amount": "55"
+    },
+    {
+      "date": 19,
+      "amount": "50"
+    },
+    {
+      "date": 20,
+      "amount": "985"
+    },
+    {
+      "date": 21,
+      "amount": "76"
+    },
+    {
+      "date": 22,
+      "amount": "96"
+    },
+    {
+      "date": 23,
+      "amount": "12"
+    },
+    {
+      "date": 24,
+      "amount": "35"
+    },
+    {
+      "date": 25,
+      "amount": "12"
+    },
+    {
+      "date": 26,
+      "amount": "48"
+    },
+    {
+      "date": 27,
+      "amount": "55"
+    },
+    {
+      "date": 28,
+      "amount": "0"
+    },
+    {
+      "date": 29,
+      "amount": "0"
+    },
+    {
+      "date": 30,
+      "amount": "40"
+    }
+  ]
+}
