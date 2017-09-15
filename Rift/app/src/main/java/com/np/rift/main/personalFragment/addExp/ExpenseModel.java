@@ -2,59 +2,57 @@ package com.np.rift.main.personalFragment.addExp;
 
 
 public class ExpenseModel {
-    String name, price, description, productId;
-    boolean selected;
+    //    String name, price, description, productId; //to be deleted
+    String id, date, spentOn, amount;
+    Boolean selected;
+
+    public Boolean getSelected() {
+        return selected;
+    }
+
+    public void setSelected(Boolean selected) {
+        this.selected = selected;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
+    }
+
+    public String getSpentOn() {
+        return spentOn;
+    }
+
+    public void setSpentOn(String spentOn) {
+        this.spentOn = spentOn;
+    }
+
+    public String getAmount() {
+        return amount;
+    }
+
+    public void setAmount(String amount) {
+        this.amount = amount;
+    }
 
     @Override
     public String toString() {
         return "ExpenseModel{" +
-                "name='" + name + '\'' +
-                ", price='" + price + '\'' +
-                ", description='" + description + '\'' +
-                ", productId='" + productId + '\'' +
-                ", selected='" + selected + '\'' +
+                "id='" + id + '\'' +
+                ", date='" + date + '\'' +
+                ", spentOn='" + spentOn + '\'' +
+                ", amount='" + amount + '\'' +
                 '}';
     }
-
-    public boolean getSelected() {
-        return selected;
-    }
-
-    public void setSelected(boolean selected) {
-        this.selected = selected;
-    }
-
-    public String getProductId() {
-        return productId;
-    }
-
-    public void setProductId(String productId) {
-        this.productId = productId;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getPrice() {
-        return price;
-    }
-
-    public void setPrice(String price) {
-        this.price = price;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-
 }

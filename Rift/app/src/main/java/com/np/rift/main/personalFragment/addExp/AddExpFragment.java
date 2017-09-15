@@ -11,7 +11,6 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.np.rift.R;
 import com.np.rift.main.groupFragment.GroupPieActivity;
@@ -29,7 +28,8 @@ import java.util.Date;
 
 public class AddExpFragment extends BottomSheetDialogFragment {
 
-    private final SimpleDateFormat only_date_format = new SimpleDateFormat("dd-MM-yyyy");
+    private final SimpleDateFormat format_toSend = new SimpleDateFormat("MM-dd-yyyy");
+    private final SimpleDateFormat format_toshow = new SimpleDateFormat("MMM dd, yyyy");
     EditText editText_productName, editText_productAmount;
     TextView textView_date;
     Button proceed;
@@ -39,6 +39,7 @@ public class AddExpFragment extends BottomSheetDialogFragment {
     View contentView;
     boolean isSent = false;
 
+    String dateToSend, dateToShow;
     String forActivity;
 
     @Override
@@ -54,8 +55,9 @@ public class AddExpFragment extends BottomSheetDialogFragment {
         textView_date = contentView.findViewById(R.id.textView_date);
         proceed = contentView.findViewById(R.id.button_proceed);
 
-        String today = only_date_format.format(calendar.getTime());
-        textView_date.setText(today);
+        dateToShow = format_toshow.format(calendar.getTime());
+        dateToSend = format_toSend.format(calendar.getTime());
+        textView_date.setText(dateToShow);
 
         textView_date.setOnClickListener(new View.OnClickListener() {
             final long today_date = System.currentTimeMillis() + 3000;
@@ -73,16 +75,16 @@ public class AddExpFragment extends BottomSheetDialogFragment {
                             public void onDateSet(DatePicker view, int year,
                                                   int monthOfYear, int dayOfMonth) {
                                 calendar.set(year, monthOfYear, dayOfMonth);
-                                if (calendar.getTimeInMillis() > today_date) {
-                                    Toast.makeText(getActivity(), "Invalid date", Toast.LENGTH_SHORT).show();
-                                } else {
-                                    Date date = calendar.getTime();
-                                    String strDate = only_date_format.format(date);
-                                    datePickerDialog.getDatePicker().setMaxDate(new Date().getTime());
-                                    textView_date.setText(strDate);
-                                }
+
+                                Date date = calendar.getTime();
+                                dateToSend = format_toSend.format(date);
+                                dateToShow = format_toshow.format(date);
+
+                                datePickerDialog.getDatePicker().setMaxDate(new Date().getTime());
+                                textView_date.setText(dateToShow);
                             }
                         }, mYear, mMonth, mDay);
+                datePickerDialog.getDatePicker().setMaxDate(System.currentTimeMillis());
                 datePickerDialog.show();
             }
         });
@@ -96,8 +98,8 @@ public class AddExpFragment extends BottomSheetDialogFragment {
                 } else {
                     try {
                         JSONObject itemObject = new JSONObject();
-                        itemObject.put("date", textView_date.getText().toString());
-                        itemObject.put("spentOn", editText_productName.getText().toString());
+                        itemObject.put("date", dateToSend);
+                        itemObject.put("spentOn", editText_productName.getText().toString().toLowerCase());
                         itemObject.put("amount", editText_productAmount.getText().toString());
                         itemsArray.put(itemObject);
                     } catch (Exception e) {

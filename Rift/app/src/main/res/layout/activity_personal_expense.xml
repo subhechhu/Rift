@@ -23,11 +23,6 @@
             app:titleTextColor="@android:color/white"/>
     </android.support.design.widget.AppBarLayout>
 
-    <android.support.v4.widget.SwipeRefreshLayout
-        android:id="@+id/swipeRefreshLayout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
@@ -49,5 +44,4 @@
                 app:indicatorColor="@color/colorPrimary"
                 app:indicatorName="PacmanIndicator"/>
         </RelativeLayout>
-    </android.support.v4.widget.SwipeRefreshLayout>
 </LinearLayout>

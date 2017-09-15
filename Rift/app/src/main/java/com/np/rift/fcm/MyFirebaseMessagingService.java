@@ -26,10 +26,12 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
-        Log.e(TAG, "From: " + remoteMessage.getFrom());
-
+        Log.e("TAG", "message: " + remoteMessage);
         if (remoteMessage == null)
             return;
+
+        Log.e(TAG, "From: " + remoteMessage.getFrom());
+        Log.e(TAG, "To: " + remoteMessage.getTo());
 
         // Check if message contains a notification payload.
         if (remoteMessage.getNotification() != null) {
@@ -59,7 +61,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
             // play notification sound
             NotificationUtils notificationUtils = new NotificationUtils(getApplicationContext());
-        }else{
+        } else {
             // If the app is in background, firebase itself handles the notification
         }
     }

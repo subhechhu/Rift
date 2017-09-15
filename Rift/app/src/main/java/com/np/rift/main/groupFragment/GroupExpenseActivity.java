@@ -38,7 +38,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.h6ah4i.android.widget.advrecyclerview.expandable.ExpandableItemConstants;
 import com.h6ah4i.android.widget.advrecyclerview.expandable.RecyclerViewExpandableItemManager;
@@ -59,6 +58,7 @@ import com.wang.avi.AVLoadingIndicatorView;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -69,7 +69,7 @@ public class GroupExpenseActivity extends AppCompatActivity implements
     RecyclerViewExpandableItemManager expMgr;
     RecyclerView recyclerView;
     MyAdapter adapter;
-    ArrayList<MonthModel> parentArray;
+    ArrayList<MonthModel> monthParentArray;
     ArrayList<ExpenseModel> childArray;
     String userId;
     LinkedHashMap<String, List<ExpenseModel>> listDataChild;
@@ -78,6 +78,8 @@ public class GroupExpenseActivity extends AppCompatActivity implements
     View container;
     AVLoadingIndicatorView progress_default;
     SwipeRefreshLayout swipeRefreshLayout;
+
+    ArrayList<String> listToDelete = new ArrayList<>();
 
     String groupName, groupId;
     View.OnClickListener mItemOnClickListener = new View.OnClickListener() {
@@ -124,7 +126,25 @@ public class GroupExpenseActivity extends AppCompatActivity implements
         expMgr = new RecyclerViewExpandableItemManager(null);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        GetExpenseDetails();
+
+        ParseJson(getJSON());
+
+//        GetExpenseDetails();
+    }
+
+    private String getJSON() {
+        String json = null;
+        try {
+            InputStream is = AppController.getContext().getAssets().open("expense_persona;.json");
+            int size = is.available();
+            byte[] buffer = new byte[size];
+            is.read(buffer);
+            is.close();
+            json = new String(buffer, "UTF-8");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return json;
     }
 
     private void GetExpenseDetails() {
@@ -178,51 +198,107 @@ public class GroupExpenseActivity extends AppCompatActivity implements
         }
     }
 
-    public void ParseJson(String s) {
-        Log.e("Data.java", "data: " + s);
+//    public void ParseJson(String s) {
+//        Log.e("Data.java", "data: " + s);
+//        try {
+//            monthParentArray = new ArrayList<>();
+//            listDataChild = new LinkedHashMap<>();
+//
+//            monthParentArray.clear();
+//            listDataChild.clear();
+//
+//            JSONArray mainArray = new JSONArray(s);
+//            for (int i = 0; i < mainArray.length(); i++) {
+//                MonthModel month = new MonthModel();
+//                JSONObject subObject = mainArray.getJSONObject(i);
+//                month.setName(subObject.getString("name"));
+//                monthParentArray.add(month);
+//                JSONArray subArray = subObject.getJSONArray("sub_services");
+//                Log.e(getClass().getSimpleName(), i + "subArray. " + subArray);
+//
+//                childArray = new ArrayList<>();
+//                for (int j = 0; j < subArray.length(); j++) {
+//                    ExpenseModel childClass = new ExpenseModel();
+//                    JSONObject innerSubObj =
+//                            subArray.getJSONObject(j);
+//                    childClass.set(innerSubObj.getString("name"));
+//                    childClass.setDescription(innerSubObj.getString("duration"));
+//                    childClass.setPrice(innerSubObj.getString("price"));
+//                    childArray.add(childClass);
+//                }
+//                Log.d(getClass().getSimpleName(), "childCount: " + childArray.size());
+//                listDataChild.put(monthParentArray.get(i).getName(), childArray);
+//            }
+//
+//            if (adapter == null) {
+//                adapter = new MyAdapter();
+//                recyclerView.setAdapter(expMgr.createWrappedAdapter(adapter));
+////            recyclerView.setAdapter(expMgr.createWrappedAdapter(new MyAdapter()));
+//                ((SimpleItemAnimator) recyclerView.getItemAnimator()).setSupportsChangeAnimations(false);
+//                expMgr.attachRecyclerView(recyclerView);
+//            } else {
+//                adapter.notifyDataSetChanged();
+//            }
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//    }
+
+
+    private void ParseJson(String response) {
         try {
-            parentArray = new ArrayList<>();
-            listDataChild = new LinkedHashMap<>();
+            JSONObject responseObject = new JSONObject(response);
+            String status = responseObject.getString("status");
+            if ("success".equalsIgnoreCase(status)) {
+                JSONArray expenseDetailsArray = responseObject.getJSONArray("expenseDetails");
+//                ParseJson(expenseDetailsArray);
+                monthParentArray = new ArrayList<>();
+                listDataChild = new LinkedHashMap<>();
 
-            parentArray.clear();
-            listDataChild.clear();
+                monthParentArray.clear();
+                listDataChild.clear();
 
-            JSONArray mainArray = new JSONArray(s);
-            for (int i = 0; i < mainArray.length(); i++) {
-                MonthModel month = new MonthModel();
-                JSONObject subObject = mainArray.getJSONObject(i);
-                month.setName(subObject.getString("name"));
-                parentArray.add(month);
-                JSONArray subArray = subObject.getJSONArray("sub_services");
-                Log.e(getClass().getSimpleName(), i + "subArray. " + subArray);
-
-                childArray = new ArrayList<>();
-                for (int j = 0; j < subArray.length(); j++) {
-                    ExpenseModel childClass = new ExpenseModel();
-                    JSONObject innerSubObj =
-                            subArray.getJSONObject(j);
-                    childClass.setName(innerSubObj.getString("name"));
-                    childClass.setDescription(innerSubObj.getString("duration"));
-                    childClass.setPrice(innerSubObj.getString("price"));
-                    childArray.add(childClass);
+//            JSONArray mainArray = new JSONArray(s);
+                for (int i = 0; i < expenseDetailsArray.length(); i++) {
+                    MonthModel month = new MonthModel();
+                    JSONObject monthObject = expenseDetailsArray.getJSONObject(i);
+                    month.setName(monthObject.getString("month"));
+                    monthParentArray.add(month);
+                    JSONArray expensesSubArray = monthObject.getJSONArray("expenses");
+                    Log.e(getClass().getSimpleName(), i + "expensesSubArray. " + expensesSubArray);
+                    childArray = new ArrayList<>();
+                    for (int j = 0; j < expensesSubArray.length(); j++) {
+                        ExpenseModel expenseModel = new ExpenseModel();
+                        JSONObject innerSubObj =
+                                expensesSubArray.getJSONObject(j);
+                        expenseModel.setId(innerSubObj.getString("id"));
+                        expenseModel.setDate(innerSubObj.getString("date"));
+                        expenseModel.setSpentOn(innerSubObj.getString("spentOn"));
+                        expenseModel.setAmount(innerSubObj.getString("amount"));
+                        childArray.add(expenseModel);
+                    }
+                    Log.d(getClass().getSimpleName(), "childCount: " + childArray.size());
+                    listDataChild.put(monthParentArray.get(i).getName(), childArray);
                 }
-                Log.d(getClass().getSimpleName(), "childCount: " + childArray.size());
-                listDataChild.put(parentArray.get(i).getName(), childArray);
-            }
 
-            if (adapter == null) {
-                adapter = new MyAdapter();
-                recyclerView.setAdapter(expMgr.createWrappedAdapter(adapter));
+                if (adapter == null) {
+                    adapter = new MyAdapter();
+                    recyclerView.setAdapter(expMgr.createWrappedAdapter(adapter));
 //            recyclerView.setAdapter(expMgr.createWrappedAdapter(new MyAdapter()));
-                ((SimpleItemAnimator) recyclerView.getItemAnimator()).setSupportsChangeAnimations(false);
-                expMgr.attachRecyclerView(recyclerView);
+                    ((SimpleItemAnimator) recyclerView.getItemAnimator()).setSupportsChangeAnimations(false);
+                    expMgr.attachRecyclerView(recyclerView);
+                } else {
+                    adapter.notifyDataSetChanged();
+                }
             } else {
-                adapter.notifyDataSetChanged();
+                String errorMessage = responseObject.getString("errorMessage");
+                showSnackBar(errorMessage);
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
@@ -364,9 +440,9 @@ public class GroupExpenseActivity extends AppCompatActivity implements
         int childPosition = RecyclerViewExpandableItemManager.getPackedPositionChild(expandablePosition);
 //        Log.e("TAG","v.getID: "+v.getId());
         switch (v.getId()) {
-            case R.id.delete_btn:
-                Log.e("TAG", listDataChild.get(parentArray.get(groupPosition).getName()).get(childPosition).getName());
-                break;
+//            case R.id.linear_:
+//                Log.e("TAG", listDataChild.get(monthParentArray.get(groupPosition).getName()).get(childPosition).getId());
+//                break;
             default:
                 throw new IllegalStateException("Unexpected click event");
         }
@@ -422,10 +498,10 @@ public class GroupExpenseActivity extends AppCompatActivity implements
 
         public MyChildViewHolder(View itemView, View.OnClickListener clickListener) {
             super(itemView);
-            textView = (TextView) itemView.findViewById(R.id.first);
-            textView2 = (TextView) itemView.findViewById(R.id.second);
-            textView3 = (TextView) itemView.findViewById(R.id.third);
-            delete = (ImageView) itemView.findViewById(R.id.delete_btn);
+            textView = (TextView) itemView.findViewById(R.id.textView_date);
+            textView2 = (TextView) itemView.findViewById(R.id.textView_amount);
+            textView3 = (TextView) itemView.findViewById(R.id.textView_spentOn);
+//            delete = (ImageView) itemView.findViewById(R.id.delete_btn);
             delete.setOnClickListener(clickListener);
         }
     }
@@ -436,12 +512,12 @@ public class GroupExpenseActivity extends AppCompatActivity implements
         public MyAdapter() {
             setHasStableIds(true); // this is required for expandable feature.
             mItems = new ArrayList<>();
-            for (int i = 0; i < parentArray.size(); i++) {
-                MyGroupItem group = new MyGroupItem(i, parentArray.get(i).getName());
-                List<ExpenseModel> list = listDataChild.get(parentArray.get(i).getName());
+            for (int i = 0; i < monthParentArray.size(); i++) {
+                MyGroupItem group = new MyGroupItem(i, monthParentArray.get(i).getName());
+                List<ExpenseModel> list = listDataChild.get(monthParentArray.get(i).getName());
                 for (int j = 0; j < list.size(); j++) {
-                    group.children.add(new MyChildItem(j, list.get(j).getName(),
-                            list.get(j).getPrice(), list.get(j).getDescription()));
+                    group.children.add(new MyChildItem(j, list.get(j).getDate(),
+                            list.get(j).getSpentOn(), list.get(j).getAmount()));
                 }
                 mItems.add(group);
             }

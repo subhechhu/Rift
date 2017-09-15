@@ -1,8 +1,6 @@
 {
   "status": "success",
   "totalExpense": "45617",
-  "maxAmount": "11000",
-  "minAmount": "0",
   "graphPoints": [
     {
       "date": 1,

@@ -21,7 +21,6 @@ import android.os.Bundle;
 import android.support.design.widget.BottomSheetDialogFragment;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -35,6 +34,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.h6ah4i.android.widget.advrecyclerview.expandable.ExpandableItemConstants;
@@ -52,7 +52,10 @@ import com.wang.avi.AVLoadingIndicatorView;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.InputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -62,7 +65,7 @@ public class PersonalExpenseActivity extends AppCompatActivity implements
     RecyclerViewExpandableItemManager expMgr;
     RecyclerView recyclerView;
     MyAdapter adapter;
-    ArrayList<MonthModel> parentArray;
+    ArrayList<MonthModel> monthParentArray;
     ArrayList<ExpenseModel> childArray;
     String userId;
     LinkedHashMap<String, List<ExpenseModel>> listDataChild;
@@ -70,7 +73,11 @@ public class PersonalExpenseActivity extends AppCompatActivity implements
 
     View container;
     AVLoadingIndicatorView progress_default;
-    SwipeRefreshLayout swipeRefreshLayout;
+    int selected = 0;
+
+    ArrayList<String> deleteList = new ArrayList<>();
+
+    Snackbar _snackbar;
 
     View.OnClickListener mItemOnClickListener = new View.OnClickListener() {
         @Override
@@ -78,6 +85,18 @@ public class PersonalExpenseActivity extends AppCompatActivity implements
             onClickItemView(v);
         }
     };
+
+    public static String formatDate(String strdate) {
+        try {
+            SimpleDateFormat dt = new SimpleDateFormat("mm-dd-yyyy");
+            Date date = dt.parse(strdate);
+            SimpleDateFormat dt1 = new SimpleDateFormat("dd/mm");
+            strdate = (dt1.format(date));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return strdate;
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -91,16 +110,6 @@ public class PersonalExpenseActivity extends AppCompatActivity implements
         container = findViewById(R.id.container);
         progress_default = (AVLoadingIndicatorView) findViewById(R.id.progress_default);
 
-        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeRefreshLayout);
-        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                swipeRefreshLayout.setRefreshing(false);
-//                recyclerView.removeAllViews();
-                GetExpenseDetails();
-            }
-        });
-
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         setTitle("Expense");
@@ -109,45 +118,124 @@ public class PersonalExpenseActivity extends AppCompatActivity implements
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
-
-        // Setup expandable feature and RecyclerView
-        expMgr = new RecyclerViewExpandableItemManager(null);
-
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+//        ParseJson(getJSON());
         GetExpenseDetails();
     }
 
+    private String getJSON() {
+        String json = null;
+        try {
+            InputStream is = AppController.getContext().getAssets().open("expense_personal.json");
+            int size = is.available();
+            byte[] buffer = new byte[size];
+            is.read(buffer);
+            is.close();
+            json = new String(buffer, "UTF-8");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return json;
+    }
+
     private void GetExpenseDetails() {
-        showSnackBar("Updating expenses!!");
-        swipeRefreshLayout.setEnabled(false);
-//        String url = AppController.getInstance().getString(R.string.domain)
-//                + "/getExpense?userId=" + userId;
+//        showSnackBar("Updating expenses!!", "OK");
+        String url = AppController.getInstance().getString(R.string.domain)
+                + "/getPersonalExpense?userId=" + userId;
         progress(true);
-        String url = "http://www.mocky.io/v2/57cfde922600006f1c64ffec";
         new ServerGetRequest(this, "GET_EXPENSES").execute(url);
     }
 
     @Override
     public void getGetResult(String response, String requestCode, int responseCode) {
-        swipeRefreshLayout.setEnabled(true);
         if (response != null && !response.isEmpty()) {
-            try {
-                showSnackBar("Expenses Updated!!");
-                progress(false);
-                ParseJson(response);
-            } catch (Exception e) {
-                e.printStackTrace();
+            if ("GET_EXPENSES".equals(requestCode)) {
+                try {
+                    progress(false);
+                    ParseJson(response);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            } else if ("DELETE_REQUEST".equals(requestCode)) {
+                try {
+                    progress(false);
+                    JSONObject responseObject = new JSONObject(response);
+                    String status = responseObject.getString("status");
+                    if ("Success".equalsIgnoreCase(status)) {
+                        GetExpenseDetails();
+                        showSnackBar("Expenses has been deleted", "OK");
+                        GetExpenseDetails();
+                    } else {
+                        String errorMessage = responseObject.getString("errorMessage");
+                        showSnackBar(errorMessage, "OK");
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         } else {
             progress(false);
-//            showSnackBar(AppController.getInstance().getString(R.string.something_went_wrong));
+            showSnackBar(AppController.getInstance().getString(R.string.something_went_wrong), "OK");
+        }
+    }
+
+    private void ParseJson(String response) {
+        try {
+            JSONObject responseObject = new JSONObject(response);
+            String status = responseObject.getString("status");
+            if ("success".equalsIgnoreCase(status)) {
+//                showSnackBar("Expenses Updated!!", "OK");
+                JSONArray expenseDetailsArray = responseObject.getJSONArray("expenseDetails");
+//                ParseJson(expenseDetailsArray);
+                monthParentArray = new ArrayList<>();
+                listDataChild = new LinkedHashMap<>();
+
+                monthParentArray.clear();
+                listDataChild.clear();
+
+//            JSONArray mainArray = new JSONArray(s);
+                for (int i = 0; i < expenseDetailsArray.length(); i++) {
+                    MonthModel month = new MonthModel();
+                    JSONObject monthObject = expenseDetailsArray.getJSONObject(i);
+                    month.setName(monthObject.getString("month"));
+                    monthParentArray.add(month);
+                    JSONArray expensesSubArray = monthObject.getJSONArray("expenses");
+                    Log.e(getClass().getSimpleName(), "expensesSubArray. " + expensesSubArray);
+                    childArray = new ArrayList<>();
+                    for (int j = 0; j < expensesSubArray.length(); j++) {
+                        ExpenseModel expenseModel = new ExpenseModel();
+                        JSONObject innerSubObj =
+                                expensesSubArray.getJSONObject(j);
+                        expenseModel.setId(innerSubObj.getString("expId"));
+                        expenseModel.setDate(innerSubObj.getString("date"));
+                        expenseModel.setSpentOn(innerSubObj.getString("spentOn"));
+                        expenseModel.setAmount(innerSubObj.getString("amount"));
+                        expenseModel.setSelected(false);
+                        childArray.add(expenseModel);
+                    }
+                    listDataChild.put(monthParentArray.get(i).getName(), childArray);
+                }
+
+//                if (adapter == null) {
+//                Log.e("kritika", "adapter == null");
+                expMgr = new RecyclerViewExpandableItemManager(null);
+                adapter = new MyAdapter();
+                recyclerView.setAdapter(expMgr.createWrappedAdapter(adapter));
+                ((SimpleItemAnimator) recyclerView.getItemAnimator()).setSupportsChangeAnimations(false);
+                expMgr.attachRecyclerView(recyclerView);
+            } else {
+                String errorMessage = responseObject.getString("errorMessage");
+                showSnackBar(errorMessage, "OK");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
     @Override
     public void getPostResult(String response, String requestCode, int responseCode) {
         Log.e("TAG", "response:" + response);
-        swipeRefreshLayout.setEnabled(true);
         if (response != null && !response.isEmpty()) {
             try {
                 JSONObject responseObject = new JSONObject(response);
@@ -155,10 +243,10 @@ public class PersonalExpenseActivity extends AppCompatActivity implements
                 progress(false);
                 if ("success".equals(status)) {
                     GetExpenseDetails();
-                    showSnackBar(AppController.getInstance().getString(R.string.fetching));
+//                    showSnackBar(AppController.getInstance().getString(R.string.fetching), "OK");
                 } else {
                     String errorMessage = responseObject.getString("errorMessage");
-                    showSnackBar(errorMessage);
+                    showSnackBar(errorMessage, "OK");
                 }
             } catch (Exception e) {
                 progress(false);
@@ -166,53 +254,7 @@ public class PersonalExpenseActivity extends AppCompatActivity implements
             }
         } else {
             progress(false);
-            showSnackBar(AppController.getInstance().getString(R.string.something_went_wrong));
-        }
-    }
-
-    public void ParseJson(String s) {
-        Log.e("Data.java", "data: " + s);
-        try {
-            parentArray = new ArrayList<>();
-            listDataChild = new LinkedHashMap<>();
-
-            parentArray.clear();
-            listDataChild.clear();
-
-            JSONArray mainArray = new JSONArray(s);
-            for (int i = 0; i < mainArray.length(); i++) {
-                MonthModel month = new MonthModel();
-                JSONObject subObject = mainArray.getJSONObject(i);
-                month.setName(subObject.getString("name"));
-                parentArray.add(month);
-                JSONArray subArray = subObject.getJSONArray("sub_services");
-                Log.e(getClass().getSimpleName(), i + "subArray. " + subArray);
-
-                childArray = new ArrayList<>();
-                for (int j = 0; j < subArray.length(); j++) {
-                    ExpenseModel childClass = new ExpenseModel();
-                    JSONObject innerSubObj =
-                            subArray.getJSONObject(j);
-                    childClass.setName(innerSubObj.getString("name"));
-                    childClass.setDescription(innerSubObj.getString("duration"));
-                    childClass.setPrice(innerSubObj.getString("price"));
-                    childArray.add(childClass);
-                }
-                Log.d(getClass().getSimpleName(), "childCount: " + childArray.size());
-                listDataChild.put(parentArray.get(i).getName(), childArray);
-            }
-
-            if(adapter==null){
-                adapter=new MyAdapter();
-                recyclerView.setAdapter(expMgr.createWrappedAdapter(adapter));
-//            recyclerView.setAdapter(expMgr.createWrappedAdapter(new MyAdapter()));
-                ((SimpleItemAnimator) recyclerView.getItemAnimator()).setSupportsChangeAnimations(false);
-                expMgr.attachRecyclerView(recyclerView);
-            }else {
-                adapter.notifyDataSetChanged();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+            showSnackBar(AppController.getInstance().getString(R.string.something_went_wrong), "OK");
         }
     }
 
@@ -261,20 +303,59 @@ public class PersonalExpenseActivity extends AppCompatActivity implements
 
     public void AddItems(JSONArray items) {
         progress(true);
-        swipeRefreshLayout.setEnabled(false);
-        showSnackBar(AppController.getInstance().getString(R.string.updating));
+//        showSnackBar(AppController.getInstance().getString(R.string.updating), "OK");
         PostItems(items);
     }
 
-    private void showSnackBar(String message) {
-        final Snackbar _snackbar = Snackbar.make(container, message, Snackbar.LENGTH_LONG);
-        _snackbar.setAction("OK", new View.OnClickListener() {
+    private void showSnackBar(String message, final String action) {
+        _snackbar = Snackbar.make(container, message, Snackbar.LENGTH_INDEFINITE);
+        _snackbar.setAction(action, new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if ("Delete".equalsIgnoreCase(action)) {
+                    selected = 0;
+                    deleteRequest();
+                }
                 _snackbar.dismiss();
             }
         }).show();
     }
+
+    public void deleteRequest() {
+        try {
+            String idList = deleteList.toString();
+            idList = idList.replace("[", "");
+            idList = idList.replace("]", "");
+            idList = idList.replaceAll("\\s+", "");
+            String url = AppController.getInstance().getString(R.string.domain)
+                    + "/deletePersonalInfo?userId=" + AppController.getUserId()
+                    + "&expId=" + idList;
+            Log.e("TAG", "url: " + url);
+
+            new ServerGetRequest(this, "DELETE_REQUEST").execute(url);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+    }
+
+//======================================================================================================================================
+//======================================================================================================================================
+//======================================================================================================================================
+//======================================================================================================================================
+//=====================================                                                           ======================================
+//=====================================                    ADAPTER CLASS BELOW                    ======================================
+//=====================================                                                           ======================================
+//======================================================================================================================================
+//======================================================================================================================================
+//======================================================================================================================================
+//======================================================================================================================================
+//======================================================================================================================================
 
     private void PostItems(JSONArray itemsArray) {
         try {
@@ -292,22 +373,13 @@ public class PersonalExpenseActivity extends AppCompatActivity implements
         }
     }
 
-//======================================================================================================================================
-//======================================================================================================================================
-//======================================================================================================================================
-//======================================================================================================================================
-//=====================================                                                           ======================================
-//=====================================                    ADAPTER CLASS BELOW                    ======================================
-//=====================================                                                           ======================================
-//======================================================================================================================================
-//======================================================================================================================================
-//======================================================================================================================================
-//======================================================================================================================================
-//======================================================================================================================================
-
     void onClickItemView(View v) {
         RecyclerView.ViewHolder vh = RecyclerViewAdapterUtils.getViewHolder(v);
-        int flatPosition = vh.getAdapterPosition();
+        LinearLayout linearlayout_child = v.findViewById(R.id.linearlayout_child);
+        int flatPosition = 0;
+        if (vh != null) {
+            flatPosition = vh.getAdapterPosition();
+        }
 
         if (flatPosition == RecyclerView.NO_POSITION) {
             return;
@@ -316,10 +388,37 @@ public class PersonalExpenseActivity extends AppCompatActivity implements
         long expandablePosition = expMgr.getExpandablePosition(flatPosition);
         int groupPosition = RecyclerViewExpandableItemManager.getPackedPositionGroup(expandablePosition);
         int childPosition = RecyclerViewExpandableItemManager.getPackedPositionChild(expandablePosition);
-//        Log.e("TAG","v.getID: "+v.getId());
+
         switch (v.getId()) {
-            case R.id.delete_btn:
-                Log.e("TAG", listDataChild.get(parentArray.get(groupPosition).getName()).get(childPosition).getName());
+            case R.id.linearlayout_child:
+                Log.e("Pri", "before selected: " + selected);
+                if (listDataChild.get(monthParentArray.get(groupPosition).getName()).get(childPosition).getSelected()) {
+                    Log.e("TAG", "if");
+                    deleteList.remove(listDataChild.get(monthParentArray.get(groupPosition).getName()).get(childPosition).getId());
+                    listDataChild.get(monthParentArray.get(groupPosition).getName()).get(childPosition).setSelected(false);
+                    linearlayout_child.setBackgroundColor(ContextCompat.getColor(PersonalExpenseActivity.this, R.color.white));
+                    selected--;
+                    if (selected == 0) {
+                        _snackbar.dismiss();
+                    } else {
+                        _snackbar.setText(selected + " item(s) selected?");
+                    }
+                } else {
+                    Log.e("TAG", "else");
+                    deleteList.add(listDataChild.get(monthParentArray.get(groupPosition).getName()).get(childPosition).getId());
+                    listDataChild.get(monthParentArray.get(groupPosition).getName()).get(childPosition).setSelected(true);
+                    linearlayout_child.setBackgroundColor(ContextCompat.getColor(PersonalExpenseActivity.this, R.color.red_shade));
+                    if (selected == 0) {
+                        selected++;
+                        showSnackBar(selected + " item(s) selected?", "Delete");
+                    } else if (selected > 0) {
+                        selected++;
+                        _snackbar.setText(selected + " item(s) selected?");
+                    }
+                }
+//                Log.e("TAG", listDataChild.get(monthParentArray.get(groupPosition).getName()).get(childPosition).getId());
+//                Log.e("TAG", "delete list: " + deleteList.toString());
+                Log.e("Pri", "after selected: " + selected);
                 break;
             default:
                 throw new IllegalStateException("Unexpected click event");
@@ -327,78 +426,87 @@ public class PersonalExpenseActivity extends AppCompatActivity implements
     }
 
     private void handleOnClickChildItemRemoveButton(int groupPosition, int childPosition) {
-        Log.e("TAG", groupPosition + "\t" + childPosition);
+//        Log.e("TAG", groupPosition + "\t" + childPosition);
     }
-
 
     private interface Expandable extends ExpandableItemConstants {
     }
 
-    static class MyGroupItem {
-        public final List<MyChildItem> children;
+    private static class MyGroupItem {
+        final List<MyChildItem> children;
         public long id;
         public String text;
 
-        public MyGroupItem(long id, String text) {
+        MyGroupItem(long id, String text) {
             this.id = id;
             this.text = text;
             children = new ArrayList<>();
         }
     }
 
-    static class MyChildItem {
+    private static class MyChildItem {
         public long id;
-        public String text, text2, text3;
+        String date, spentOn, amount;
 
-        public MyChildItem(long id, String text, String text2, String text3) {
+        MyChildItem(long id, String date, String spentOn, String amount) {
+            Log.e("subhechhu", "date:" + date);
+
             this.id = id;
-            this.text = text;
-            this.text2 = text2;
-            this.text3 = text3;
+            this.date = formatDate(date);
+            this.spentOn = spentOn;
+            this.amount = amount;
         }
     }
-
 
     static class MyGroupViewHolder extends AbstractExpandableItemViewHolder {
         TextView textView;
         ImageView imageView_arrow;
 
-        public MyGroupViewHolder(View itemView) {
+
+        MyGroupViewHolder(View itemView) {
             super(itemView);
-            textView = (TextView) itemView.findViewById(R.id.grpfirst);
+            textView = itemView.findViewById(R.id.grpfirst);
             imageView_arrow = itemView.findViewById(R.id.imageView_arrow);
         }
     }
 
     static class MyChildViewHolder extends AbstractExpandableItemViewHolder {
-        TextView textView, textView2, textView3;
+        TextView textView_date, textView_amount, textView_spentOn;
         ImageView delete;
+        LinearLayout linearlayout_child;
 
-        public MyChildViewHolder(View itemView, View.OnClickListener clickListener) {
+        MyChildViewHolder(View itemView, View.OnClickListener clickListener) {
             super(itemView);
-            textView = (TextView) itemView.findViewById(R.id.first);
-            textView2 = (TextView) itemView.findViewById(R.id.second);
-            textView3 = (TextView) itemView.findViewById(R.id.third);
-            delete = (ImageView) itemView.findViewById(R.id.delete_btn);
-            delete.setOnClickListener(clickListener);
+            textView_date = itemView.findViewById(R.id.textView_date);
+            textView_amount = itemView.findViewById(R.id.textView_amount);
+            textView_spentOn = itemView.findViewById(R.id.textView_spentOn);
+//            delete = itemView.findViewById(R.id.delete_btn);
+            linearlayout_child = itemView.findViewById(R.id.linearlayout_child);
+//            delete.setOnClickListener(clickListener);
+            linearlayout_child.setOnClickListener(clickListener);
         }
     }
 
-    class MyAdapter extends AbstractExpandableItemAdapter<MyGroupViewHolder, MyChildViewHolder> {
+    private class MyAdapter extends AbstractExpandableItemAdapter<MyGroupViewHolder, MyChildViewHolder> {
         List<MyGroupItem> mItems;
 
-        public MyAdapter() {
+        MyAdapter() {
             setHasStableIds(true); // this is required for expandable feature.
             mItems = new ArrayList<>();
-            for (int i = 0; i < parentArray.size(); i++) {
-                MyGroupItem group = new MyGroupItem(i, parentArray.get(i).getName());
-                List<ExpenseModel> list = listDataChild.get(parentArray.get(i).getName());
+            for (int i = 0; i < monthParentArray.size(); i++) {
+                MyGroupItem group = new MyGroupItem(i, monthParentArray.get(i).getName());
+                List<ExpenseModel> list = listDataChild.get(monthParentArray.get(i).getName());
                 for (int j = 0; j < list.size(); j++) {
-                    group.children.add(new MyChildItem(j, list.get(j).getName(),
-                            list.get(j).getPrice(), list.get(j).getDescription()));
+                    group.children.add(new MyChildItem(j, list.get(j).getDate(),
+                            list.get(j).getSpentOn(), list.get(j).getAmount()));
                 }
                 mItems.add(group);
             }
+        }
+
+        public void refresh() {
+            Log.e("kritika", "refresh()");
+            this.notifyDataSetChanged();
         }
 
         @Override
@@ -462,9 +570,9 @@ public class PersonalExpenseActivity extends AppCompatActivity implements
         @Override
         public void onBindChildViewHolder(MyChildViewHolder holder, int groupPosition, int childPosition, int viewType) {
             MyChildItem child = mItems.get(groupPosition).children.get(childPosition);
-            holder.textView.setText(child.text);
-            holder.textView2.setText(child.text2);
-            holder.textView3.setText(child.text3);
+            holder.textView_date.setText(child.date);
+            holder.textView_amount.setText(child.amount);
+            holder.textView_spentOn.setText(child.spentOn);
         }
 
         @Override

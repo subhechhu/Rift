@@ -48,4 +48,5 @@
     <string name="edit_group">Edit Group</string>
     <string name="enter_new_group_name">Enter New Group Name</string>
     <string name="fields_empty">Fields Cannot Be Empty</string>
+    <string name="calendar">calendar</string>
 </resources>

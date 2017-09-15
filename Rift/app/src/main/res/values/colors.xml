@@ -46,4 +46,5 @@
     <color name="headerBackground">#eeeeee</color>
     <color name="selectedItemBackground">#aaaaaa</color>
     <color name="RED">#e91919</color>
+    <color name="red_shade">#40e91919</color>
 </resources>
