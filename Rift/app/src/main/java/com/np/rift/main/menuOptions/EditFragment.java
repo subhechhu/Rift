@@ -1,4 +1,4 @@
-package com.np.rift.main;
+package com.np.rift.main.menuOptions;
 
 import android.app.Dialog;
 import android.support.design.widget.BottomSheetDialogFragment;

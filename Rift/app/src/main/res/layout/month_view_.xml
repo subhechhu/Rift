@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:app="http://schemas.android.com/apk/res-auto"
               android:id="@+id/container"
               android:layout_width="match_parent"
               android:layout_height="60dp"
@@ -10,14 +9,27 @@
               android:orientation="horizontal"
               android:padding="5dp">
 
+    <RelativeLayout
+        android:layout_width="0dp"
+        android:layout_height="50dp"
+        android:layout_weight="0.1"
+        android:gravity="start|center_vertical">
+
+        <ImageView
+            android:id="@+id/imageView_arrow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="10dp"
+            android:contentDescription="@string/arrow"/>
+    </RelativeLayout>
+
     <TextView
         android:id="@+id/grpfirst"
         android:layout_width="0dp"
         android:layout_height="50dp"
-        android:layout_weight="0.9"
-        android:elevation="5dp"
+        android:layout_weight="0.6"
         android:gravity="center_vertical"
-        android:padding="5dp"
         android:text="TextView"
         android:textColor="@color/colorPrimaryDark"
         android:textSize="18sp"
@@ -25,16 +37,20 @@
 
     <RelativeLayout
         android:layout_width="0dp"
-        android:layout_height="50dp"
-        android:padding="5dp"
-        android:layout_weight="0.1"
-        android:gravity="center">
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_weight="0.3"
+        android:gravity="center_vertical|end">
 
-        <ImageView
-            android:id="@+id/imageView_arrow"
+        <TextView
+            android:id="@+id/grpAmount"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_marginStart="10dp"/>
+            android:gravity="center_vertical"
+            android:padding="5dp"
+            android:layout_marginEnd="5dp"
+            android:text="TextView"
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="16sp"/>
     </RelativeLayout>
 </LinearLayout>

@@ -2,7 +2,6 @@ package com.np.rift.util;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.util.Log;
 
 /**
  * Created by subhechhu on 9/5/2017.

@@ -2,7 +2,6 @@ package com.np.rift.init;
 
 import android.app.Dialog;
 import android.content.Intent;
-import android.graphics.Color;
 import android.support.design.widget.BottomSheetDialogFragment;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
@@ -13,6 +12,7 @@ import android.widget.TextView;
 
 import com.np.rift.AppController;
 import com.np.rift.R;
+import com.np.rift.connection.NetworkCheck;
 import com.np.rift.main.HomeActivity;
 import com.np.rift.serverRequest.ServerGetRequest;
 import com.np.rift.util.SharedPrefUtil;
@@ -54,9 +54,14 @@ public class OTPFragment extends BottomSheetDialogFragment implements ServerGetR
         proceed.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (!editText_otp.getText().toString().isEmpty()) {
-                    Progress(true);
-                    VerifyOTP(editText_otp.getText().toString(), email);
+                if (NetworkCheck.isInternetAvailable()) {
+                    if (!editText_otp.getText().toString().isEmpty()) {
+                        Progress(true);
+                        VerifyOTP(editText_otp.getText().toString(), email);
+                    }
+                }else {
+                    textView_error.setText("No Internet.");
+                    textView_error.setTextColor(ContextCompat.getColor(getActivity(), R.color.RED));
                 }
             }
         });

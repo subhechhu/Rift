@@ -22,7 +22,6 @@
             app:popupTheme="@style/AppTheme.PopupOverlay"
             app:titleTextColor="@android:color/white"/>
     </android.support.design.widget.AppBarLayout>
-
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
@@ -31,7 +30,18 @@
                 android:id="@+id/recycler_view"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:padding="10dp"/>
+                android:visibility="gone"/>
+
+            <TextView
+                android:id="@+id/textView_empty"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:clickable="true"
+                android:text="@string/refresh"
+                android:textColor="@color/colorPrimaryDark"
+                android:textStyle="bold"
+                android:visibility="gone"/>
 
 
             <com.wang.avi.AVLoadingIndicatorView

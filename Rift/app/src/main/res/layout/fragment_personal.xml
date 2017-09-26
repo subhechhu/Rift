@@ -7,29 +7,26 @@
                 android:orientation="vertical">
 
     <LinearLayout
+        android:id="@+id/linear_main"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:visibility="gone">
 
 
-        <RelativeLayout
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="0.5">
-
-            <Button
-                android:id="@+id/button_refresh"
-                android:layout_width="25dp"
-                android:layout_height="25dp"
-                android:layout_alignParentEnd="true"
-                android:layout_margin="20dp"
-                android:background="@drawable/refresh_green"/>
+            android:layout_weight="0.5"
+            android:baselineAligned="false"
+            android:orientation="horizontal">
 
             <LinearLayout
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_gravity="center"
                 android:layout_margin="15dp"
+                android:layout_weight="1"
                 android:background="@drawable/bg_parent_curvy_corner"
                 android:gravity="center"
                 android:orientation="vertical"
@@ -42,7 +39,6 @@
                 android:visibility="visible">
 
                 <TextView
-                    android:id="@+id/textView9"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
@@ -57,7 +53,41 @@
                     android:textSize="25sp"
                     android:textStyle="bold"/>
             </LinearLayout>
-        </RelativeLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:layout_margin="15dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_parent_curvy_corner"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:paddingBottom="10dp"
+                android:paddingEnd="15dp"
+                android:paddingLeft="15dp"
+                android:paddingRight="15dp"
+                android:paddingStart="15dp"
+                android:paddingTop="10dp"
+                android:visibility="visible">
+                <TextView
+                    android:id="@+id/texrView_month"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="@string/recent_expense"/>
+
+                <TextView
+                    android:id="@+id/textView_recent"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="@string/_0000"
+                    android:textSize="25sp"
+                    android:textStyle="bold"/>
+            </LinearLayout>
+
+        </LinearLayout>
 
         <com.github.mikephil.charting.charts.LineChart
             android:id="@+id/chart_line"
@@ -74,5 +104,35 @@
         android:layout_alignParentEnd="true"
         android:layout_margin="16dp"
         app:srcCompat="@drawable/add"/>
+
+    <RelativeLayout
+        android:id="@+id/relative_error"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        android:layout_centerInParent="true">
+
+        <TextView
+            android:id="@+id/textView_error"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_centerInParent="true"
+            android:gravity="center"
+            android:text="@string/refresh"
+            android:textColor="@color/colorPrimaryDark"
+            android:textStyle="bold"/>
+
+    </RelativeLayout>
+
+    <com.wang.avi.AVLoadingIndicatorView
+        android:id="@+id/progress_default"
+        style="@style/AVLoadingIndicatorView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:visibility="visible"
+        app:indicatorColor="@color/colorPrimary"
+        app:indicatorName="PacmanIndicator"/>
+
 
 </RelativeLayout>

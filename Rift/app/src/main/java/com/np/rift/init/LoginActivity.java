@@ -6,6 +6,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetDialogFragment;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -16,6 +17,8 @@ import android.widget.TextView;
 import com.hanks.library.AnimateCheckBox;
 import com.np.rift.AppController;
 import com.np.rift.R;
+import com.np.rift.connection.ConnectionLost;
+import com.np.rift.connection.NetworkCheck;
 import com.np.rift.main.HomeActivity;
 import com.np.rift.registration.UserRegistration;
 import com.np.rift.serverRequest.ServerGetRequest;
@@ -55,6 +58,7 @@ public class LoginActivity extends AppCompatActivity implements ServerGetRequest
 
         linearlayout_main = findViewById(R.id.linearlayout_main);
         fromUserReg = getIntent().getBooleanExtra("fromUserReg", false);
+
         if (fromUserReg) {
             Bundle bundle = new Bundle();
             bundle.putString("email", getIntent().getStringExtra("email"));
@@ -77,10 +81,15 @@ public class LoginActivity extends AppCompatActivity implements ServerGetRequest
                     .getSharedPreferenceString(AppController.getContext(),
                             "userEmail",
                             "Enter email"));
-//            startActivity(new Intent(this, TestActivity.class));
             startActivity(new Intent(this, HomeActivity.class));
             finish();
 
+        }else {
+            checkBox_autoLogin.setChecked(false);
+            editText_email.setText(sharedPrefUtil
+                    .getSharedPreferenceString(AppController.getContext(),
+                            "userEmail",
+                            "Enter email"));
         }
         texView_autoLogin.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -96,18 +105,27 @@ public class LoginActivity extends AppCompatActivity implements ServerGetRequest
         button_proceed.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (editText_email.getText().toString().isEmpty()) {
-                    showSnackBar("Invalid email.", "OK");
-                } else if (!android.util.Patterns.EMAIL_ADDRESS.matcher(editText_email.getText().toString()).matches()) {
-                    showSnackBar("Invalid email.", "OK");
-                } else {
-                    if (checkBox_autoLogin.isChecked()) {
-                        sharedPrefUtil.setSharedPreferenceBoolean(AppController.getContext(), "rememberMe", true);
+                if (NetworkCheck.isInternetAvailable()) {
+                    if (editText_email.getText().toString().isEmpty()) {
+                        showSnackBar("Invalid email.", "OK");
+                    } else if (!android.util.Patterns.EMAIL_ADDRESS.matcher(editText_email.getText().toString()).matches()) {
+                        showSnackBar("Invalid email.", "OK");
+                    } else {
+                        if (checkBox_autoLogin.isChecked()) {
+                            sharedPrefUtil.setSharedPreferenceBoolean(AppController.getContext(), "rememberMe", true);
+                        }
+                        GenerateOTP(editText_email.getText().toString());
                     }
-                    GenerateOTP(editText_email.getText().toString());
+                } else {
+                    NoInternet();
                 }
             }
         });
+    }
+
+    private void NoInternet() {
+        ConnectionLost connectionLostFragment = new ConnectionLost();
+        connectionLostFragment.show(getFragmentManager(), "dialogFragment");
     }
 
     private void GenerateOTP(String email) {
@@ -156,10 +174,6 @@ public class LoginActivity extends AppCompatActivity implements ServerGetRequest
                         BottomSheetDialogFragment fragment = new OTPFragment();
                         fragment.setArguments(bundle);
                         fragment.show(getSupportFragmentManager(), fragment.getTag());
-//                        Intent intent = new Intent(this, OTPActivity.class);
-//                        intent.putExtra("email", editText_email.getText().toString());
-//                        startActivity(intent);
-//                        finish();
                     } else {
                         Progress(false);
                         String errorMessage = responseObject.getString("errorMessage");
@@ -173,7 +187,7 @@ public class LoginActivity extends AppCompatActivity implements ServerGetRequest
                     JSONObject responseObject = new JSONObject(response);
                     String status = responseObject.getString("status");
                     if ("success".equals(status)) {
-
+                        Log.e("TAG", "success");
                     } else {
                         String errorMessage = responseObject.getString("errorMessage");
                         showSnackBar(errorMessage, "OK");

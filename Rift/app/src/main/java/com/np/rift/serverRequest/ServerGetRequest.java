@@ -19,7 +19,6 @@ public class ServerGetRequest extends AsyncTask<String, Void, String> {
     private String httpResultString;
     private int responseCode;
     private StringBuffer resultBuffer;
-    private String result;
 
     public ServerGetRequest(Response response, String requestCode) {
         this.response = response;
@@ -40,6 +39,7 @@ public class ServerGetRequest extends AsyncTask<String, Void, String> {
         String stgUrl = params[0];
 
         Log.e(TAG, "url: " + stgUrl);
+        String result;
         try {
             URL url = new URL(stgUrl);
 

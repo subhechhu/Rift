@@ -17,13 +17,12 @@ import java.util.List;
 
 
 class CustomAdapterListGroup extends RecyclerView.Adapter<CustomAdapterListGroup.MyViewHolder> {
-    private final HashSet<String> checkSet;
     private final List<GroupModel> groupList;
     private final Context context;
     private String TAG = getClass().getSimpleName();
 
     CustomAdapterListGroup(Context context, List<GroupModel> groupList) {
-        checkSet = new HashSet<>();
+        HashSet<String> checkSet = new HashSet<>();
         this.groupList = groupList;
         this.context = context;
     }

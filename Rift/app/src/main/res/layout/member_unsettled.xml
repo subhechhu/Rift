@@ -29,6 +29,7 @@
                 android:id="@+id/imageView_arrowRight"
                 android:layout_width="match_parent"
                 android:layout_height="30dp"
+                android:contentDescription="@string/arrow"
                 android:src="@drawable/arrow_right"/>
 
             <TextView
@@ -73,6 +74,7 @@
             <ImageView
                 android:layout_width="match_parent"
                 android:layout_height="30dp"
+                android:contentDescription="@string/clear"
                 android:src="@drawable/settle_ok"/>
         </RelativeLayout>
 

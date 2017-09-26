@@ -1,6 +1,9 @@
-package com.np.rift.main.aboutFragment;
+package com.np.rift.main.notificationFragment;
 
 import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetDialogFragment;
@@ -12,25 +15,26 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.np.rift.AppController;
 import com.np.rift.R;
-import com.np.rift.main.EditFragment;
+import com.np.rift.main.menuOptions.EditFragment;
 
 /**
  * Created by subhechhu on 9/5/2017.
  */
 
-public class AboutFragment extends Fragment {
+public class NotificationFragment extends Fragment {
     protected FragmentActivity mActivity;
     String TAG = getClass().getSimpleName();
     int fragmentValue;
 
-    TextView textView_userEmail, textView_userName;
-    Button button_edit;
+    TextView textView_userEmail, textView_userName, textView_version;
+    Button button_editusername, button_editemail, button_share;
 
-    public static AboutFragment init(int position) {
-        AboutFragment frndsInviteFragment = new AboutFragment();
+    public static NotificationFragment init(int position) {
+        NotificationFragment frndsInviteFragment = new NotificationFragment();
         Bundle args = new Bundle();
         args.putInt("val", position);
         frndsInviteFragment.setArguments(args);
@@ -72,27 +76,7 @@ public class AboutFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View fragmentView = inflater.inflate(R.layout.fragment_about, container, false);
-
-        textView_userEmail = fragmentView.findViewById(R.id.textView_userEmail);
-        textView_userName = fragmentView.findViewById(R.id.textView_userName);
-        button_edit = fragmentView.findViewById(R.id.button_edit);
-
-        textView_userName.setText(AppController.getUserName());
-        textView_userEmail.setText(AppController.getUserEmail());
-
-        button_edit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Bundle bundle = new Bundle();
-                bundle.putString("for", "profile");
-                bundle.putString("email", textView_userEmail.getText().toString());
-                bundle.putString("userName", textView_userName.getText().toString());
-                BottomSheetDialogFragment fragment = new EditFragment();
-                fragment.setArguments(bundle);
-                fragment.show(getFragmentManager(), fragment.getTag());
-            }
-        });
+        View fragmentView = inflater.inflate(R.layout.fragment_notification, container, false);
 
         return fragmentView;
     }

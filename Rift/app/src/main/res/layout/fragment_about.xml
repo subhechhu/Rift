@@ -1,50 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical"
               android:layout_width="match_parent"
-              android:layout_height="match_parent">
+              android:layout_height="match_parent"
+              android:orientation="vertical"
+              android:padding="10dp">
 
-    <RelativeLayout
+    <Button
+        android:id="@+id/button_close"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_gravity="end"
+        android:background="@drawable/delete"/>
+
+    <TextView
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="0.2"
-        android:layout_margin="15dp"
-        android:padding="10dp"
-        android:background="@drawable/bg_parent_curvy_corner">
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:text="@string/about_app"/>
 
-        <Button
-            android:id="@+id/button_edit"
+    <TextView
+        android:id="@+id/textView_version"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_marginTop="5dp"
+        android:text="qweqwe"
+        android:textColor="@color/colorPrimaryDark"/>
+    <LinearLayout
+        android:id="@+id/relative_copyleft"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
+        android:layout_marginTop="2dp"
+        android:gravity="center">
+
+        <ImageView
+            android:id="@+id/imageView_copyleft"
             android:layout_width="20dp"
             android:layout_height="20dp"
-            android:layout_alignParentEnd="true"
-            android:background="@drawable/edit"/>
-
+            android:contentDescription="@string/app_name"
+            android:src="@drawable/copyleft"/>
         <TextView
-            android:id="@+id/textView_userName"
-            android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:gravity="center_vertical"
-            android:text="TextView"
-            android:textColor="@color/colorPrimaryDark"
-            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-            android:layout_toStartOf="@+id/button_edit"/>
-
-        <TextView
-            android:id="@+id/textView_userEmail"
-            android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:layout_below="@id/textView_userName"
-            android:gravity="center_vertical"
-            android:text="TextView"
-            android:textColor="@color/colorPrimaryDark"
-            android:textAppearance="@style/TextAppearance.AppCompat.Medium"/>
-    </RelativeLayout>
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="0.8">
-
-    </RelativeLayout>
-
+            android:id="@+id/textView_rift"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:layout_marginEnd="5dp"
+            android:text="@string/rift_2017"
+            android:textColor="@color/colorPrimaryDark"/>
+    </LinearLayout>
 </LinearLayout>

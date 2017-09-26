@@ -18,8 +18,8 @@
         android:icon="@drawable/group"
         android:title="@string/group" />
     <item
-        android:id="@+id/action4"
+        android:id="@+id/action_notification"
         android:color="@color/color_tab_3"
-        android:icon="@drawable/about"
-        android:title="@string/about" />
+        android:icon="@drawable/notification"
+        android:title="@string/notification" />
 </menu>

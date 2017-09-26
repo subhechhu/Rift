@@ -36,6 +36,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:visibility="visible"
+            app:bbn_badgeProvider="it.sephiroth.android.library.bottomnavigation.BadgeProvider"
             app:bbn_entries="@menu/bottombar_menu_items"/>
     </RelativeLayout>
 </LinearLayout>

@@ -8,7 +8,7 @@ android {
         minSdkVersion 21
         targetSdkVersion 26
         versionCode 1
-        versionName "1.0"
+        versionName "1.0.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -46,6 +46,8 @@ dependencies {
     compile ('com.h6ah4i.android.widget.advrecyclerview:advrecyclerview:0.10.6@aar'){
         transitive=true
     }
+    compile 'com.pacioianu.david:ink-page-indicator:1.2.0'
+    compile 'pl.droidsonroids.gif:android-gif-drawable:1.2.+'
 
 }
 apply plugin: 'com.google.gms.google-services'

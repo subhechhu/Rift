@@ -1,10 +1,22 @@
 package com.np.rift.main.personalFragment.addExp;
 
 
+import java.util.Date;
+
 public class ExpenseModel {
     //    String name, price, description, productId; //to be deleted
-    String id, date, spentOn, amount;
+    String id, date, spentOn, amount, type;
     Boolean selected;
+    Date realDate;
+
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
 
     public Boolean getSelected() {
         return selected;
@@ -46,6 +58,14 @@ public class ExpenseModel {
         this.amount = amount;
     }
 
+    public Date getRealDate() {
+        return realDate;
+    }
+
+    public void setRealDate(Date realDate) {
+        this.realDate = realDate;
+    }
+
     @Override
     public String toString() {
         return "ExpenseModel{" +
@@ -53,6 +73,9 @@ public class ExpenseModel {
                 ", date='" + date + '\'' +
                 ", spentOn='" + spentOn + '\'' +
                 ", amount='" + amount + '\'' +
+                ", type='" + type + '\'' +
+                ", selected=" + selected +
+                ", realDate=" + realDate +
                 '}';
     }
 }

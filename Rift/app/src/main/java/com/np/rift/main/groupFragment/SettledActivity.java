@@ -18,7 +18,7 @@ import android.widget.Toast;
 
 import com.np.rift.AppController;
 import com.np.rift.R;
-import com.np.rift.main.EditFragment;
+import com.np.rift.main.menuOptions.EditFragment;
 import com.np.rift.serverRequest.ServerGetRequest;
 
 import org.json.JSONArray;
@@ -171,7 +171,7 @@ public class SettledActivity extends AppCompatActivity implements ServerGetReque
             is.close();
             json = new String(buffer, "UTF-8");
         } catch (Exception e) {
-
+            e.printStackTrace();
         }
         return json;
     }

@@ -37,9 +37,11 @@ import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.github.mikephil.charting.utils.ColorTemplate;
 import com.np.rift.AppController;
 import com.np.rift.R;
-import com.np.rift.main.EditFragment;
+import com.np.rift.main.HomeActivity;
+import com.np.rift.main.menuOptions.EditFragment;
 import com.np.rift.main.personalFragment.addExp.AddExpFragment;
 import com.np.rift.serverRequest.ServerGetRequest;
+import com.np.rift.serverRequest.ServerPostRequest;
 import com.wang.avi.AVLoadingIndicatorView;
 
 import org.json.JSONArray;
@@ -50,7 +52,7 @@ import java.util.ArrayList;
 
 
 public class GroupPieActivity extends AppCompatActivity implements OnChartValueSelectedListener,
-        ServerGetRequest.Response {
+        ServerGetRequest.Response, ServerPostRequest.Response {
 
     String group_name, group_id, group_expense;
     View linearlayout_main;
@@ -60,6 +62,7 @@ public class GroupPieActivity extends AppCompatActivity implements OnChartValueS
     RelativeLayout relative_more, relative_graph;
     Button button_refresh;
     AVLoadingIndicatorView progress_default;
+    int totalMembers;
     private PieChart mChart;
 
     @Override
@@ -121,9 +124,9 @@ public class GroupPieActivity extends AppCompatActivity implements OnChartValueS
 
     private void progress(boolean show) {
         if (show) {
-            progress_default.show();
+            progress_default.setVisibility(View.VISIBLE);
         } else {
-            progress_default.hide();
+            progress_default.setVisibility(View.INVISIBLE);
         }
     }
 
@@ -141,7 +144,12 @@ public class GroupPieActivity extends AppCompatActivity implements OnChartValueS
         String title, body;
         if ("Exit".equals(from)) {
             title = "Exit Group";
-            body = "Are you sure you want to exit " + group_name + "?";
+            if (totalMembers == 1) {
+                body = "Are you sure you want to exit " + group_name + "?";
+            } else {
+                body = "Are you sure you want to exit and delete " + group_name + "?";
+            }
+
         } else {
             title = "Settle Expense";
             body = "Are you sure you want to settle expenses on " + group_name + "?";
@@ -155,7 +163,11 @@ public class GroupPieActivity extends AppCompatActivity implements OnChartValueS
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         if ("Exit".equals(from)) {
+//                            RequestExit();
+                            HomeActivity.isDeleted = true;
+                            dialog.dismiss();
 
+                            finish();
                         } else {
 
                         }
@@ -167,6 +179,14 @@ public class GroupPieActivity extends AppCompatActivity implements OnChartValueS
                     }
                 })
                 .show();
+    }
+
+    private void RequestExit() {
+        progress(true);
+        String url = AppController.getInstance().getString(R.string.domain) +
+                "/removeUser?userId=" + AppController.getUserId() +
+                "&groupId=" + group_id;
+        new ServerGetRequest(this, "REQUEST_EXIT").execute(url);
     }
 
     private void initPie(ArrayList<GroupModel> pieCharList) {
@@ -216,7 +236,7 @@ public class GroupPieActivity extends AppCompatActivity implements OnChartValueS
     private void RequestGroupInfo(String group_id) {
         progress(true);
         parseResponse(getJSON());
-        String url = "" + "/getGroupInfo?groupId=" + group_id;
+        String url = "" + "/getGroupDetails?groupId=" + group_id;
 //        new ServerGetRequest(this, "GET_GROUP_INFO").execute(url);
     }
 
@@ -283,18 +303,17 @@ public class GroupPieActivity extends AppCompatActivity implements OnChartValueS
             Log.e("TAG", "parseResponse: " + response);
             pieCharList = new ArrayList<>();
             JSONObject responseObject = new JSONObject(response);
+            totalMembers = responseObject.getInt("totalMembers");
             JSONArray chartArray = responseObject.getJSONArray("chartObject");
 
             for (int i = 0; i < chartArray.length(); i++) {
                 GroupModel groupModel = new GroupModel();
-
                 JSONObject membersObject = chartArray.getJSONObject(i);
-                groupModel.setMembersId(membersObject.getString("membersId"));
-                groupModel.setGroupMembers(membersObject.getString("memberName"));
+                groupModel.setMembersId(membersObject.getString("userId"));
+                groupModel.setGroupMembers(membersObject.getString("userName"));
                 groupModel.setExpenses((float) membersObject.getInt("expenses"));
                 totalExpense += totalExpense + (float) membersObject.getInt("expenses");
                 pieCharList.add(groupModel);
-
                 initPie(pieCharList);
 
             }
@@ -304,7 +323,7 @@ public class GroupPieActivity extends AppCompatActivity implements OnChartValueS
     }
 
     private void RenderPieChart(ArrayList<GroupModel> pieCharList) {
-        ArrayList<PieEntry> entries = new ArrayList<PieEntry>();
+        ArrayList<PieEntry> entries = new ArrayList<>();
 
         for (int i = 1; i < pieCharList.size(); i++) {
             entries.add(new PieEntry(pieCharList.get(i).getExpenses(),
@@ -317,7 +336,7 @@ public class GroupPieActivity extends AppCompatActivity implements OnChartValueS
 
         // add a lot of colors
 
-        ArrayList<Integer> colors = new ArrayList<Integer>();
+        ArrayList<Integer> colors = new ArrayList<>();
 
         colors.add(ColorTemplate.getHoloBlue());
 
@@ -397,9 +416,50 @@ public class GroupPieActivity extends AppCompatActivity implements OnChartValueS
                     + "/addExpense";
             Log.e("TAG", "url: " + url);
             Log.e("TAG", "postObject: " + postObject.toString());
-//            new ServerPostRequest(this, "ADD_ITEM").execute(url, postObject.toString());
+            new ServerPostRequest(this, "ADD_ITEM").execute(url, postObject.toString());
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void getPostResult(String response, String requestCode, int responseCode) {
+        progress(false);
+        if (response != null && !response.isEmpty()) {
+            if ("REQUEST_EXIT".equalsIgnoreCase(requestCode)) {
+                try {
+                    JSONObject responseObject = new JSONObject(response);
+                    String status = responseObject.getString("status");
+                    if ("success".equalsIgnoreCase(status)) {
+                        HomeActivity.isDeleted = true;
+                        finish();
+                    } else {
+                        String errorMessage = responseObject.getString("errorMessage");
+                        showSnackBar(errorMessage);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+            } else if ("GET_GROUP_INFO".equalsIgnoreCase(requestCode)) {
+                try {
+                    JSONObject responseObject = new JSONObject(response);
+                    String status = responseObject.getString("status");
+                    progress(false);
+                    if ("success".equals(status)) {
+                        parseResponse(response);
+                    } else {
+                        String errorMessage = responseObject.getString("errorMessage");
+                        showSnackBar(errorMessage, "OK");
+                    }
+                } catch (Exception e) {
+                    progress(false);
+                    e.printStackTrace();
+                }
+            }
+        } else {
+            progress(false);
+            showSnackBar(AppController.getInstance().getString(R.string.something_went_wrong), "OK");
         }
     }
 }

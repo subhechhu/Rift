@@ -46,7 +46,7 @@ import com.h6ah4i.android.widget.advrecyclerview.utils.AbstractExpandableItemVie
 import com.h6ah4i.android.widget.advrecyclerview.utils.RecyclerViewAdapterUtils;
 import com.np.rift.AppController;
 import com.np.rift.R;
-import com.np.rift.main.EditFragment;
+import com.np.rift.main.menuOptions.EditFragment;
 import com.np.rift.main.personalFragment.addExp.AddExpFragment;
 import com.np.rift.main.personalFragment.addExp.ExpenseModel;
 import com.np.rift.main.personalFragment.addExp.MonthModel;
@@ -456,23 +456,23 @@ public class GroupExpenseActivity extends AppCompatActivity implements
     private interface Expandable extends ExpandableItemConstants {
     }
 
-    static class MyGroupItem {
-        public final List<MyChildItem> children;
+    private static class MyGroupItem {
+        final List<MyChildItem> children;
         public long id;
         public String text;
 
-        public MyGroupItem(long id, String text) {
+        MyGroupItem(long id, String text) {
             this.id = id;
             this.text = text;
             children = new ArrayList<>();
         }
     }
 
-    static class MyChildItem {
+    private static class MyChildItem {
         public long id;
-        public String text, text2, text3;
+        String text, text2, text3;
 
-        public MyChildItem(long id, String text, String text2, String text3) {
+        MyChildItem(long id, String text, String text2, String text3) {
             this.id = id;
             this.text = text;
             this.text2 = text2;
@@ -485,9 +485,9 @@ public class GroupExpenseActivity extends AppCompatActivity implements
         TextView textView;
         ImageView imageView_arrow;
 
-        public MyGroupViewHolder(View itemView) {
+        MyGroupViewHolder(View itemView) {
             super(itemView);
-            textView = (TextView) itemView.findViewById(R.id.grpfirst);
+            textView = itemView.findViewById(R.id.grpfirst);
             imageView_arrow = itemView.findViewById(R.id.imageView_arrow);
         }
     }
@@ -496,20 +496,20 @@ public class GroupExpenseActivity extends AppCompatActivity implements
         TextView textView, textView2, textView3;
         ImageView delete;
 
-        public MyChildViewHolder(View itemView, View.OnClickListener clickListener) {
+        MyChildViewHolder(View itemView, View.OnClickListener clickListener) {
             super(itemView);
-            textView = (TextView) itemView.findViewById(R.id.textView_date);
-            textView2 = (TextView) itemView.findViewById(R.id.textView_amount);
-            textView3 = (TextView) itemView.findViewById(R.id.textView_spentOn);
+            textView = itemView.findViewById(R.id.textView_date);
+            textView2 = itemView.findViewById(R.id.textView_amount);
+            textView3 = itemView.findViewById(R.id.textView_spentOn);
 //            delete = (ImageView) itemView.findViewById(R.id.delete_btn);
             delete.setOnClickListener(clickListener);
         }
     }
 
-    class MyAdapter extends AbstractExpandableItemAdapter<MyGroupViewHolder, MyChildViewHolder> {
+    private class MyAdapter extends AbstractExpandableItemAdapter<MyGroupViewHolder, MyChildViewHolder> {
         List<MyGroupItem> mItems;
 
-        public MyAdapter() {
+        MyAdapter() {
             setHasStableIds(true); // this is required for expandable feature.
             mItems = new ArrayList<>();
             for (int i = 0; i < monthParentArray.size(); i++) {

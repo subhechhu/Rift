@@ -13,6 +13,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.np.rift.R;
+import com.np.rift.connection.NetworkCheck;
 import com.np.rift.main.groupFragment.GroupPieActivity;
 
 import org.json.JSONArray;
@@ -92,21 +93,30 @@ public class AddExpFragment extends BottomSheetDialogFragment {
         proceed.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (editText_productAmount.getText().toString().isEmpty() ||
-                        editText_productName.getText().toString().isEmpty()) {
-                    showSnackBar("Fields cannot be empty");
-                } else {
-                    try {
-                        JSONObject itemObject = new JSONObject();
-                        itemObject.put("date", dateToSend);
-                        itemObject.put("spentOn", editText_productName.getText().toString().toLowerCase());
-                        itemObject.put("amount", editText_productAmount.getText().toString());
-                        itemsArray.put(itemObject);
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                if (NetworkCheck.isInternetAvailable()) {
+                    if (editText_productAmount.getText().toString().isEmpty() ||
+                            editText_productName.getText().toString().isEmpty()) {
+                        showSnackBar("Fields cannot be empty");
+                    } else {
+                        try {
+                            JSONObject itemObject = new JSONObject();
+                            itemObject.put("date", dateToSend);
+                            itemObject.put("spentOn", editText_productName.getText().toString().toLowerCase());
+                            itemObject.put("amount", editText_productAmount.getText().toString());
+                            itemsArray.put(itemObject);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        createDialog(dialog);
                     }
-                    createDialog(dialog);
+                } else {
+                    if ("group".equalsIgnoreCase(forActivity)) {
+
+                    } else {
+                        ((PersonalExpenseActivity) getActivity()).noInternet();
+                    }
                 }
+
             }
         });
     }
@@ -164,4 +174,5 @@ public class AddExpFragment extends BottomSheetDialogFragment {
             }
         }).show();
     }
+
 }

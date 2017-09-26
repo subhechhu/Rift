@@ -12,13 +12,12 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AnimationUtils;
-import android.widget.Button;
 import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.LineChart;
@@ -33,29 +32,41 @@ import com.github.mikephil.charting.listener.OnChartGestureListener;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.np.rift.AppController;
 import com.np.rift.R;
+import com.np.rift.connection.NetworkCheck;
+import com.np.rift.main.HomeActivity;
 import com.np.rift.main.personalFragment.addExp.PersonalExpenseActivity;
 import com.np.rift.serverRequest.ServerGetRequest;
+import com.np.rift.util.SharedPrefUtil;
+import com.wang.avi.AVLoadingIndicatorView;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-
-/**
- * Created by subhechhu on 9/5/2017.
- */
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.TreeMap;
 
 public class MainPersonalFragment extends Fragment implements OnChartGestureListener,
         OnChartValueSelectedListener, ServerGetRequest.Response {
+
+    private final SimpleDateFormat format_toGet = new SimpleDateFormat("yyyy-MM-dd");
+    private final SimpleDateFormat format_month = new SimpleDateFormat("MMM");
+
     protected FragmentActivity mActivity;
     String TAG = getClass().getSimpleName();
     int fragmentValue;
 
-    TextView textView_total;
-    View relative_main;
+    TextView textView_total, textView_recent, texrView_month, textView_error;
+    View relative_main,relative_error, linear_main;
+    AVLoadingIndicatorView progress_default;
 
-    Button button_refresh;
     ArrayList<Entry> values;
     ArrayList<ILineDataSet> dataSets;
     MyMarkerView mv;
@@ -64,6 +75,10 @@ public class MainPersonalFragment extends Fragment implements OnChartGestureList
     float dX;
     float dY;
     int lastAction;
+    HashSet<String> filteredSet = new HashSet<>();
+    HashMap<Integer, Integer> filteredMap = new HashMap<>();
+    Date date = new Date();
+    SharedPrefUtil sharedPrefUtil;
     private LineChart mChart;
 
     @Override
@@ -87,6 +102,7 @@ public class MainPersonalFragment extends Fragment implements OnChartGestureList
         super.onCreate(savedInstanceState);
         fragmentValue = getArguments() != null ? getArguments().getInt("val") : 1;
         Log.d("subhechhu", "A onCreate" + fragmentValue);
+        sharedPrefUtil = new SharedPrefUtil();
     }
 
     @Nullable
@@ -95,54 +111,123 @@ public class MainPersonalFragment extends Fragment implements OnChartGestureList
         View fragmentView = inflater.inflate(R.layout.fragment_personal, container, false);
         fab_add = fragmentView.findViewById(R.id.fab_add);
 
+        String currentMonth = format_month.format(date);
+        getTotalMonthDate();
+
+        progress_default = fragmentView.findViewById(R.id.progress_default);
         relative_main = fragmentView.findViewById(R.id.relative_main);
-        button_refresh = fragmentView.findViewById(R.id.button_refresh);
+        relative_error = fragmentView.findViewById(R.id.relative_error);
+        linear_main = fragmentView.findViewById(R.id.linear_main);
+        textView_error = fragmentView.findViewById(R.id.textView_error);
         textView_total = fragmentView.findViewById(R.id.textView_total);
+        textView_recent = fragmentView.findViewById(R.id.textView_recent);
+        texrView_month = fragmentView.findViewById(R.id.texrView_month);
+        texrView_month.setText(currentMonth + " Expense");
+
         mChart = fragmentView.findViewById(R.id.chart_line);
         mChart.setNoDataText("Please Add The Expenses To See The Graph");
+        mChart.setNoDataTextColor(ContextCompat.getColor(getActivity(),R.color.colorPrimaryDark));
 
-        button_refresh.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                values.clear();
-                dataSets.clear();
-
-                button_refresh.startAnimation(
-                        AnimationUtils.loadAnimation(getActivity(), R.anim.rotate_indefinitely));
-//                GetPersonalExpense();
-
-                parseJson(getJSON());
-            }
-        });
-
-//        GetPersonalExpense();
 
         values = new ArrayList<>();
         dataSets = new ArrayList<>();
-        parseJson(getJSON());
+
+        if (NetworkCheck.isInternetAvailable()) {
+            GetPersonalExpense();
+//            parseJson(getJSON());
+        } else {
+            showSnackBarInternet("No Internet");
+            ((HomeActivity) getActivity()).noInternet();
+        }
 
         fab_add.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(mActivity, PersonalExpenseActivity.class));
+                if (NetworkCheck.isInternetAvailable()) {
+                    startActivity(new Intent(mActivity, PersonalExpenseActivity.class));
+                } else {
+                    showSnackBarInternet("No Internet");
+                    ((HomeActivity) getActivity()).noInternet();
+                }
             }
         });
+
+        textView_error.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (NetworkCheck.isInternetAvailable()) {
+                    GetPersonalExpense();
+                } else {
+                    showSnackBarInternet("No Internet");
+                    ((HomeActivity) getActivity()).noInternet();
+                }
+            }
+        });
+
         return fragmentView;
     }
 
-    private void showSnackBar(String message) {
-        final Snackbar _snackbar = Snackbar.make(relative_main, message, Snackbar.LENGTH_LONG);
-        _snackbar.setAction("OK", new View.OnClickListener() {
+    private void getTotalMonthDate() {
+        filteredMap.clear();
+        filteredSet.clear();
+        int lastDay = Calendar.getInstance().getActualMaximum(Calendar.DAY_OF_MONTH);
+        Log.e("TAG", "lasatDay: " + lastDay);
+
+        for (int i = 1; i <= lastDay; i++) {
+            if (filteredSet.add(String.valueOf(i))) {
+                filteredMap.put(i, 0);
+            }
+        }
+    }
+
+    private void showSnackBar(String message, final String action) {
+        final Snackbar _snackbar = Snackbar.make(relative_main, message, Snackbar.LENGTH_INDEFINITE);
+        _snackbar.setAction(action, new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if ("ReTry".equalsIgnoreCase(action)) {
+                    GetPersonalExpense();
+                }
                 _snackbar.dismiss();
             }
         }).show();
     }
 
+    private void showSnackBarInternet(String message) {
+        final Snackbar _snackbar = Snackbar.make(relative_main, message, Snackbar.LENGTH_LONG);
+        _snackbar.setAction("Retry", new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (NetworkCheck.isInternetAvailable()) {
+                    GetPersonalExpense();
+//                    parseJson(getJSON());
+                } else {
+                    showSnackBarInternet("No Internet");
+                    ((HomeActivity) getActivity()).noInternet();
+                }
+            }
+        }).show();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.e("TAG", "onResume mainPersonal");
+        if (sharedPrefUtil.getSharedPreferenceBoolean(AppController.getContext(), "refreshGraph", false)) {
+            showSnackBar("Updating The Expense", "OK");
+            values.clear();
+            dataSets.clear();
+            getTotalMonthDate();
+            sharedPrefUtil.setSharedPreferenceBoolean(AppController.getContext(), "refreshGraph", false);
+            GetPersonalExpense();
+        }
+    }
+
     private void GetPersonalExpense() {
+        progress(true);
         String url = AppController.getInstance().getString(R.string.domain)
-                + "/detailGraph?userId=" + AppController.getUserId();
+                + "/getGraphData?userId=" + AppController.getUserId();
+        Log.e("TAG", "url: " + url);
         new ServerGetRequest(this, "PERSONAL_EXP").execute(url);
     }
 
@@ -156,7 +241,7 @@ public class MainPersonalFragment extends Fragment implements OnChartGestureList
         mChart.setScaleEnabled(true);
         mChart.setPinchZoom(true);
 
-        if(mv==null){
+        if (mv == null) {
             mv = new MyMarkerView(getActivity(), R.layout.custom_marker_view);
         }
         mv.setChartView(mChart);
@@ -167,13 +252,33 @@ public class MainPersonalFragment extends Fragment implements OnChartGestureList
         mChart.getViewPortHandler().setMaximumScaleY(2f);
         mChart.getViewPortHandler().setMaximumScaleX(2f);
 
+
         try {
             for (int i = 0; i < graphArray.length(); i++) {
                 JSONObject graphObject = graphArray.getJSONObject(i);
-//                setData(Float.parseFloat(graphObject.getString("date")),
-//                        Float.parseFloat(graphObject.getString("amount")));
-                values.add(new Entry(Float.parseFloat(graphObject.getString("date")),
-                        Float.parseFloat(graphObject.getString("amount"))));
+                String date_str = graphObject.getString("date");
+                Date date = format_toGet.parse(date_str);
+                SimpleDateFormat dt1 = new SimpleDateFormat("dd");
+                int strdate = Integer.parseInt(dt1.format(date));
+
+                int price = graphObject.getInt("amount");
+
+                if (filteredSet.add(String.valueOf(strdate))) {
+                    filteredMap.put(strdate, price);
+                } else {
+                    int currentValue = filteredMap.get(strdate);
+                    currentValue += graphObject.getInt("amount");
+                    filteredMap.put(strdate, currentValue);
+                }
+            }
+
+            TreeMap filterMap = new TreeMap<>(filteredMap);
+            Iterator it = filterMap.entrySet().iterator();
+            while (it.hasNext()) {
+                Map.Entry pair = (Map.Entry) it.next();
+                values.add(new Entry(Float.parseFloat(pair.getKey().toString()),
+                        Float.parseFloat(pair.getValue().toString())));
+                it.remove();
             }
             LineDataSet set1;
 
@@ -181,11 +286,10 @@ public class MainPersonalFragment extends Fragment implements OnChartGestureList
             set1.setMode(LineDataSet.Mode.HORIZONTAL_BEZIER);
             set1.setDrawIcons(false);
 
-            // set the line to be drawn like this "- - - - - -"
             set1.enableDashedLine(10f, 5f, 0f);
             set1.enableDashedHighlightLine(10f, 5f, 0f);
             set1.setColor(Color.BLACK);
-            set1.setCircleColor(Color.BLACK);
+            set1.setCircleColor(ContextCompat.getColor(getActivity(), R.color.colorPrimaryDark));
             set1.setLineWidth(1f);
             set1.setCircleRadius(3f);
             set1.setDrawCircleHole(false);
@@ -214,28 +318,18 @@ public class MainPersonalFragment extends Fragment implements OnChartGestureList
         l.setForm(Legend.LegendForm.LINE);
     }
 
-
-    private void setData(float i, float val) {
-//        float total = 0;
-//        float val = (float) (Math.random() * range) + 3;
-//        total += val;
-//        values.add(new Entry(i, val));
-//        for (int i = 0; i < count; i++) {
-//
-//            float val = (float) (Math.random() * range) + 3;
-//            total += val;
-//            values.add(new Entry(i, val));
-//        }
-
-
-
-//        mChart.getData().setHighlightEnabled(!mChart.getData().isHighlightEnabled());
+    public void progress(boolean show) {
+        if (show) {
+            progress_default.setVisibility(View.VISIBLE);
+        } else {
+            progress_default.setVisibility(View.INVISIBLE);
+        }
     }
 
     private String getJSON() {
         String json = null;
         try {
-            InputStream is = AppController.getContext().getAssets().open("personalgraph.json");
+            InputStream is = AppController.getContext().getAssets().open("p.json"); //personalgraph
             int size = is.available();
             byte[] buffer = new byte[size];
             is.read(buffer);
@@ -304,25 +398,30 @@ public class MainPersonalFragment extends Fragment implements OnChartGestureList
 
     @Override
     public void getGetResult(String response, String requestCode, int responseCode) {
+        progress(false);
         if (response != null && !response.isEmpty()) {
+            linear_main.setVisibility(View.VISIBLE);
+            relative_error.setVisibility(View.GONE);
             parseJson(response);
         } else {
-            showSnackBar(AppController.getInstance().getString(R.string.something_went_wrong));
+            linear_main.setVisibility(View.GONE);
+            relative_error.setVisibility(View.VISIBLE);
+            showSnackBar(AppController.getInstance().getString(R.string.something_went_wrong), "OK");
         }
     }
 
     private void parseJson(String response) {
         try {
-            button_refresh.clearAnimation();
             JSONObject responseObject = new JSONObject(response);
             String status = responseObject.getString("status");
             if ("success".equalsIgnoreCase(status)) {
                 textView_total.setText(responseObject.getString("totalExpense"));
+                textView_recent.setText(responseObject.getString("monthExpense"));
                 JSONArray graphArray = responseObject.getJSONArray("graphPoints");
                 initGraph(graphArray);
             } else {
                 String errorMessage = responseObject.getString("errorMessage");
-                showSnackBar(errorMessage);
+                showSnackBar(errorMessage, "ReTry");
             }
         } catch (Exception e) {
             e.printStackTrace();

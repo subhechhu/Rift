@@ -1,12 +1,13 @@
 package com.np.rift.fcm;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.FirebaseInstanceIdService;
+import com.np.rift.AppController;
+import com.np.rift.util.SharedPrefUtil;
 
 /**
  * Created by subhechhu on 9/5/2017.
@@ -14,6 +15,7 @@ import com.google.firebase.iid.FirebaseInstanceIdService;
 
 public class MyFirebaseInstanceIDService extends FirebaseInstanceIdService {
     private static final String TAG = MyFirebaseInstanceIDService.class.getSimpleName();
+    SharedPrefUtil sharedPrefUtil = new SharedPrefUtil();
 
     @Override
     public void onTokenRefresh() {
@@ -33,14 +35,14 @@ public class MyFirebaseInstanceIDService extends FirebaseInstanceIdService {
     }
 
     private void sendRegistrationToServer(final String token) {
-        // sending gcm token to server
         Log.e(TAG, "sendRegistrationToServer: " + token);
     }
 
     private void storeRegIdInPref(String token) {
-        SharedPreferences pref = getApplicationContext().getSharedPreferences(Config.SHARED_PREF, 0);
-        SharedPreferences.Editor editor = pref.edit();
-        editor.putString("regId", token);
-        editor.commit();
+//        SharedPreferences pref = getApplicationContext().getSharedPreferences(Config.SHARED_PREF, 0);
+//        SharedPreferences.Editor editor = pref.edit();
+//        editor.putString("regId", token);
+//        editor.apply();
+        sharedPrefUtil.setSharedPreferenceString(AppController.getContext(),"regId",token);
     }
 }

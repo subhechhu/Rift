@@ -44,6 +44,8 @@ import com.h6ah4i.android.widget.advrecyclerview.utils.AbstractExpandableItemVie
 import com.h6ah4i.android.widget.advrecyclerview.utils.RecyclerViewAdapterUtils;
 import com.np.rift.AppController;
 import com.np.rift.R;
+import com.np.rift.connection.ConnectionLost;
+import com.np.rift.connection.NetworkCheck;
 import com.np.rift.serverRequest.ServerGetRequest;
 import com.np.rift.serverRequest.ServerPostRequest;
 import com.np.rift.util.SharedPrefUtil;
@@ -53,23 +55,29 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.InputStream;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 
 public class PersonalExpenseActivity extends AppCompatActivity implements
         ServerGetRequest.Response, ServerPostRequest.Response {
+
+    private final SimpleDateFormat format_toGet = new SimpleDateFormat("yyyy-MM-dd");
+    private final SimpleDateFormat format_justMonth = new SimpleDateFormat("MM");
 
     RecyclerViewExpandableItemManager expMgr;
     RecyclerView recyclerView;
     MyAdapter adapter;
     ArrayList<MonthModel> monthParentArray;
-    ArrayList<ExpenseModel> childArray;
+    ArrayList<ExpenseModel> expenseArray;
     String userId;
     LinkedHashMap<String, List<ExpenseModel>> listDataChild;
     SharedPrefUtil sharedPrefUtil;
+    TextView textView_empty;
 
     View container;
     AVLoadingIndicatorView progress_default;
@@ -90,7 +98,7 @@ public class PersonalExpenseActivity extends AppCompatActivity implements
         try {
             SimpleDateFormat dt = new SimpleDateFormat("mm-dd-yyyy");
             Date date = dt.parse(strdate);
-            SimpleDateFormat dt1 = new SimpleDateFormat("dd/mm");
+            SimpleDateFormat dt1 = new SimpleDateFormat("mm/dd");
             strdate = (dt1.format(date));
         } catch (Exception e) {
             e.printStackTrace();
@@ -118,11 +126,26 @@ public class PersonalExpenseActivity extends AppCompatActivity implements
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+        textView_empty = (TextView) findViewById(R.id.textView_empty);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
 //        ParseJson(getJSON());
         GetExpenseDetails();
+
+
+        textView_empty.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                GetExpenseDetails();
+            }
+        });
     }
+
+    public void noInternet() {
+        ConnectionLost connectionLostFragment = new ConnectionLost();
+        connectionLostFragment.show(getFragmentManager(), "dialogFragment");
+    }
+
 
     private String getJSON() {
         String json = null;
@@ -140,11 +163,15 @@ public class PersonalExpenseActivity extends AppCompatActivity implements
     }
 
     private void GetExpenseDetails() {
-//        showSnackBar("Updating expenses!!", "OK");
-        String url = AppController.getInstance().getString(R.string.domain)
-                + "/getPersonalExpense?userId=" + userId;
-        progress(true);
-        new ServerGetRequest(this, "GET_EXPENSES").execute(url);
+        if (NetworkCheck.isInternetAvailable()) {
+            String url = AppController.getInstance().getString(R.string.domain)
+                    + "/getPersonalExpense?userId=" + userId;
+            progress(true);
+            new ServerGetRequest(this, "GET_EXPENSES").execute(url);
+        } else {
+            showSnackBar("No Internet!!", "ReTry");
+            noInternet();
+        }
     }
 
     @Override
@@ -153,6 +180,8 @@ public class PersonalExpenseActivity extends AppCompatActivity implements
             if ("GET_EXPENSES".equals(requestCode)) {
                 try {
                     progress(false);
+                    textView_empty.setVisibility(View.GONE);
+                    recyclerView.setVisibility(View.VISIBLE);
                     ParseJson(response);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -176,49 +205,82 @@ public class PersonalExpenseActivity extends AppCompatActivity implements
             }
         } else {
             progress(false);
+            textView_empty.setVisibility(View.VISIBLE);
+            recyclerView.setVisibility(View.GONE);
             showSnackBar(AppController.getInstance().getString(R.string.something_went_wrong), "OK");
+        }
+    }
+
+    private void progress(boolean b) {
+        if (b) {
+            progress_default.setVisibility(View.VISIBLE);
+        } else {
+            progress_default.setVisibility(View.INVISIBLE);
         }
     }
 
     private void ParseJson(String response) {
         try {
+            String date;
             JSONObject responseObject = new JSONObject(response);
             String status = responseObject.getString("status");
             if ("success".equalsIgnoreCase(status)) {
-//                showSnackBar("Expenses Updated!!", "OK");
                 JSONArray expenseDetailsArray = responseObject.getJSONArray("expenseDetails");
-//                ParseJson(expenseDetailsArray);
                 monthParentArray = new ArrayList<>();
                 listDataChild = new LinkedHashMap<>();
 
                 monthParentArray.clear();
                 listDataChild.clear();
 
+                if (expenseDetailsArray.length() == 0) {
+                    showSnackBar("Add Expenses!!", "Add");
+                }
+
 //            JSONArray mainArray = new JSONArray(s);
                 for (int i = 0; i < expenseDetailsArray.length(); i++) {
                     MonthModel month = new MonthModel();
                     JSONObject monthObject = expenseDetailsArray.getJSONObject(i);
+
+                    String mMonth = monthObject.getString("month");
+                    mMonth = mMonth.substring(0, 3);
+
+                    DateFormat format = new SimpleDateFormat("MMM");
+                    Date date_ = format.parse(mMonth);
+                    Log.e("TAG", "mMonth: " + date_);
+
                     month.setName(monthObject.getString("month"));
-                    monthParentArray.add(month);
+
+
                     JSONArray expensesSubArray = monthObject.getJSONArray("expenses");
-                    Log.e(getClass().getSimpleName(), "expensesSubArray. " + expensesSubArray);
-                    childArray = new ArrayList<>();
+                    expenseArray = new ArrayList<>();
+                    float monthTotal = 0;
                     for (int j = 0; j < expensesSubArray.length(); j++) {
                         ExpenseModel expenseModel = new ExpenseModel();
                         JSONObject innerSubObj =
                                 expensesSubArray.getJSONObject(j);
+                        expenseModel.setRealDate(format_toGet.parse(innerSubObj.getString("date")));
                         expenseModel.setId(innerSubObj.getString("expId"));
                         expenseModel.setDate(innerSubObj.getString("date"));
                         expenseModel.setSpentOn(innerSubObj.getString("spentOn"));
                         expenseModel.setAmount(innerSubObj.getString("amount"));
+//                            expenseModel.setType(innerSubObj.getString("type"));
+                        if (j % 2 == 0) {
+                            expenseModel.setType("personal");
+                        } else {
+                            expenseModel.setType("group");
+                        }
+
                         expenseModel.setSelected(false);
-                        childArray.add(expenseModel);
+                        monthTotal += Float.parseFloat(innerSubObj.getString("amount"));
+                        expenseArray.add(expenseModel);
                     }
-                    listDataChild.put(monthParentArray.get(i).getName(), childArray);
+
+                    month.setMonthExpense(String.valueOf(monthTotal));
+                    monthParentArray.add(month);
+
+                    listDataChild.put(monthParentArray.get(i).getName(), expenseArray);
                 }
 
-//                if (adapter == null) {
-//                Log.e("kritika", "adapter == null");
                 expMgr = new RecyclerViewExpandableItemManager(null);
                 adapter = new MyAdapter();
                 recyclerView.setAdapter(expMgr.createWrappedAdapter(adapter));
@@ -233,6 +295,7 @@ public class PersonalExpenseActivity extends AppCompatActivity implements
         }
     }
 
+
     @Override
     public void getPostResult(String response, String requestCode, int responseCode) {
         Log.e("TAG", "response:" + response);
@@ -242,8 +305,8 @@ public class PersonalExpenseActivity extends AppCompatActivity implements
                 String status = responseObject.getString("status");
                 progress(false);
                 if ("success".equals(status)) {
+                    sharedPrefUtil.setSharedPreferenceBoolean(AppController.getContext(), "refreshGraph", true);
                     GetExpenseDetails();
-//                    showSnackBar(AppController.getInstance().getString(R.string.fetching), "OK");
                 } else {
                     String errorMessage = responseObject.getString("errorMessage");
                     showSnackBar(errorMessage, "OK");
@@ -293,17 +356,17 @@ public class PersonalExpenseActivity extends AppCompatActivity implements
         return super.onPrepareOptionsMenu(menu);
     }
 
-    private void progress(boolean show) {
-        if (show) {
-            progress_default.show();
-        } else {
-            progress_default.hide();
-        }
-    }
+//    private void progress(boolean show) {
+//        if (show) {
+//            progress_default.show();
+//        } else {
+//            progress_default.hide();
+//        }
+//    }
 
     public void AddItems(JSONArray items) {
         progress(true);
-//        showSnackBar(AppController.getInstance().getString(R.string.updating), "OK");
+        showSnackBar("Updating You Expense", "OK");
         PostItems(items);
     }
 
@@ -313,8 +376,24 @@ public class PersonalExpenseActivity extends AppCompatActivity implements
             @Override
             public void onClick(View view) {
                 if ("Delete".equalsIgnoreCase(action)) {
-                    selected = 0;
-                    deleteRequest();
+                    if (NetworkCheck.isInternetAvailable()) {
+                        selected = 0;
+                        deleteRequest();
+                    } else {
+                        noInternet();
+                    }
+                } else if ("Add".equalsIgnoreCase(action)) {
+                    if (NetworkCheck.isInternetAvailable()) {
+                        Bundle bundle = new Bundle();
+                        bundle.putString("for", "individual");
+                        BottomSheetDialogFragment fragment = new AddExpFragment();
+                        fragment.setArguments(bundle);
+                        fragment.show(getSupportFragmentManager(), fragment.getTag());
+                    } else {
+                        noInternet();
+                    }
+                } else if ("ReTry".equalsIgnoreCase(action)) {
+                    GetExpenseDetails();
                 }
                 _snackbar.dismiss();
             }
@@ -332,6 +411,7 @@ public class PersonalExpenseActivity extends AppCompatActivity implements
                     + "&expId=" + idList;
             Log.e("TAG", "url: " + url);
 
+            deleteList.clear();
             new ServerGetRequest(this, "DELETE_REQUEST").execute(url);
 
         } catch (Exception e) {
@@ -343,19 +423,6 @@ public class PersonalExpenseActivity extends AppCompatActivity implements
     public void onBackPressed() {
         super.onBackPressed();
     }
-
-//======================================================================================================================================
-//======================================================================================================================================
-//======================================================================================================================================
-//======================================================================================================================================
-//=====================================                                                           ======================================
-//=====================================                    ADAPTER CLASS BELOW                    ======================================
-//=====================================                                                           ======================================
-//======================================================================================================================================
-//======================================================================================================================================
-//======================================================================================================================================
-//======================================================================================================================================
-//======================================================================================================================================
 
     private void PostItems(JSONArray itemsArray) {
         try {
@@ -372,6 +439,19 @@ public class PersonalExpenseActivity extends AppCompatActivity implements
             e.printStackTrace();
         }
     }
+
+//======================================================================================================================================
+//======================================================================================================================================
+//======================================================================================================================================
+//======================================================================================================================================
+//=====================================                                                           ======================================
+//=====================================                    ADAPTER CLASS BELOW                    ======================================
+//=====================================                                                           ======================================
+//======================================================================================================================================
+//======================================================================================================================================
+//======================================================================================================================================
+//======================================================================================================================================
+//======================================================================================================================================
 
     void onClickItemView(View v) {
         RecyclerView.ViewHolder vh = RecyclerViewAdapterUtils.getViewHolder(v);
@@ -391,42 +471,36 @@ public class PersonalExpenseActivity extends AppCompatActivity implements
 
         switch (v.getId()) {
             case R.id.linearlayout_child:
-                Log.e("Pri", "before selected: " + selected);
                 if (listDataChild.get(monthParentArray.get(groupPosition).getName()).get(childPosition).getSelected()) {
-                    Log.e("TAG", "if");
                     deleteList.remove(listDataChild.get(monthParentArray.get(groupPosition).getName()).get(childPosition).getId());
                     listDataChild.get(monthParentArray.get(groupPosition).getName()).get(childPosition).setSelected(false);
                     linearlayout_child.setBackgroundColor(ContextCompat.getColor(PersonalExpenseActivity.this, R.color.white));
                     selected--;
                     if (selected == 0) {
                         _snackbar.dismiss();
+                    } else if (selected == 1) {
+                        _snackbar.setText(selected + " item");
                     } else {
-                        _snackbar.setText(selected + " item(s) selected?");
+                        _snackbar.setText(selected + " items");
                     }
                 } else {
-                    Log.e("TAG", "else");
                     deleteList.add(listDataChild.get(monthParentArray.get(groupPosition).getName()).get(childPosition).getId());
                     listDataChild.get(monthParentArray.get(groupPosition).getName()).get(childPosition).setSelected(true);
                     linearlayout_child.setBackgroundColor(ContextCompat.getColor(PersonalExpenseActivity.this, R.color.red_shade));
                     if (selected == 0) {
                         selected++;
-                        showSnackBar(selected + " item(s) selected?", "Delete");
+                        showSnackBar(selected + " item", "Delete");
                     } else if (selected > 0) {
                         selected++;
-                        _snackbar.setText(selected + " item(s) selected?");
+                        _snackbar.setText(selected + " items");
                     }
                 }
 //                Log.e("TAG", listDataChild.get(monthParentArray.get(groupPosition).getName()).get(childPosition).getId());
 //                Log.e("TAG", "delete list: " + deleteList.toString());
-                Log.e("Pri", "after selected: " + selected);
                 break;
             default:
                 throw new IllegalStateException("Unexpected click event");
         }
-    }
-
-    private void handleOnClickChildItemRemoveButton(int groupPosition, int childPosition) {
-//        Log.e("TAG", groupPosition + "\t" + childPosition);
     }
 
     private interface Expandable extends ExpandableItemConstants {
@@ -435,54 +509,56 @@ public class PersonalExpenseActivity extends AppCompatActivity implements
     private static class MyGroupItem {
         final List<MyChildItem> children;
         public long id;
-        public String text;
+        String month, expense;
 
-        MyGroupItem(long id, String text) {
+        MyGroupItem(long id, String month, String expense) {
             this.id = id;
-            this.text = text;
+            this.month = month;
+            this.expense = expense;
+
             children = new ArrayList<>();
         }
     }
 
     private static class MyChildItem {
         public long id;
-        String date, spentOn, amount;
+        String date, spentOn, amount, type;
 
-        MyChildItem(long id, String date, String spentOn, String amount) {
-            Log.e("subhechhu", "date:" + date);
-
+        MyChildItem(long id, String date, String spentOn, String amount, String type) {
             this.id = id;
             this.date = formatDate(date);
             this.spentOn = spentOn;
             this.amount = amount;
+            this.type = type;
         }
     }
 
     static class MyGroupViewHolder extends AbstractExpandableItemViewHolder {
-        TextView textView;
+        TextView textView_monthName, textView_monthAmt;
         ImageView imageView_arrow;
 
 
         MyGroupViewHolder(View itemView) {
             super(itemView);
-            textView = itemView.findViewById(R.id.grpfirst);
+            textView_monthName = itemView.findViewById(R.id.grpfirst);
+            textView_monthAmt = itemView.findViewById(R.id.grpAmount);
             imageView_arrow = itemView.findViewById(R.id.imageView_arrow);
         }
     }
 
     static class MyChildViewHolder extends AbstractExpandableItemViewHolder {
         TextView textView_date, textView_amount, textView_spentOn;
-        ImageView delete;
         LinearLayout linearlayout_child;
+        ImageView imageView_type;
 
         MyChildViewHolder(View itemView, View.OnClickListener clickListener) {
             super(itemView);
             textView_date = itemView.findViewById(R.id.textView_date);
             textView_amount = itemView.findViewById(R.id.textView_amount);
             textView_spentOn = itemView.findViewById(R.id.textView_spentOn);
-//            delete = itemView.findViewById(R.id.delete_btn);
             linearlayout_child = itemView.findViewById(R.id.linearlayout_child);
-//            delete.setOnClickListener(clickListener);
+            imageView_type = itemView.findViewById(R.id.imageView_type);
+            ;
             linearlayout_child.setOnClickListener(clickListener);
         }
     }
@@ -494,19 +570,16 @@ public class PersonalExpenseActivity extends AppCompatActivity implements
             setHasStableIds(true); // this is required for expandable feature.
             mItems = new ArrayList<>();
             for (int i = 0; i < monthParentArray.size(); i++) {
-                MyGroupItem group = new MyGroupItem(i, monthParentArray.get(i).getName());
+                MyGroupItem group = new MyGroupItem(i, monthParentArray.get(i).getName(),
+                        monthParentArray.get(i).getMonthExpense());
                 List<ExpenseModel> list = listDataChild.get(monthParentArray.get(i).getName());
                 for (int j = 0; j < list.size(); j++) {
                     group.children.add(new MyChildItem(j, list.get(j).getDate(),
-                            list.get(j).getSpentOn(), list.get(j).getAmount()));
+                            list.get(j).getSpentOn(), list.get(j).getAmount(),
+                            list.get(j).getType()));
                 }
                 mItems.add(group);
             }
-        }
-
-        public void refresh() {
-            Log.e("kritika", "refresh()");
-            this.notifyDataSetChanged();
         }
 
         @Override
@@ -544,13 +617,12 @@ public class PersonalExpenseActivity extends AppCompatActivity implements
         @Override
         public void onBindGroupViewHolder(MyGroupViewHolder holder, int groupPosition, int viewType) {
             MyGroupItem group = mItems.get(groupPosition);
-            holder.textView.setText(group.text);
+            holder.textView_monthName.setText(group.month);
+            holder.textView_monthAmt.setText(group.expense);
 
             holder.itemView.setClickable(true);
 
-            // set background resource (target view ID: container)
             final int expandState = holder.getExpandStateFlags();
-
             if ((expandState & Expandable.STATE_FLAG_IS_UPDATED) != 0) {
                 int textColor;
                 Drawable img_arrow;
@@ -562,7 +634,8 @@ public class PersonalExpenseActivity extends AppCompatActivity implements
                     textColor = ContextCompat.getColor(PersonalExpenseActivity.this, R.color.colorPrimaryDark);
                     img_arrow = ContextCompat.getDrawable(PersonalExpenseActivity.this, R.drawable.arrow_down);
                 }
-                holder.textView.setTextColor(textColor);
+                holder.textView_monthName.setTextColor(textColor);
+                holder.textView_monthAmt.setTextColor(textColor);
                 holder.imageView_arrow.setBackground(img_arrow);
             }
         }
@@ -573,6 +646,11 @@ public class PersonalExpenseActivity extends AppCompatActivity implements
             holder.textView_date.setText(child.date);
             holder.textView_amount.setText(child.amount);
             holder.textView_spentOn.setText(child.spentOn);
+            if (child.type.equalsIgnoreCase("personal")) {
+                holder.imageView_type.setImageResource(R.drawable.user_default);
+            } else {
+                holder.imageView_type.setImageResource(R.drawable.group_default);
+            }
         }
 
         @Override

@@ -5,7 +5,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.util.Log;
 
-import com.np.rift.main.aboutFragment.AboutFragment;
+import com.np.rift.main.notificationFragment.NotificationFragment;
 import com.np.rift.main.groupFragment.MainGroupFragment;
 import com.np.rift.main.personalFragment.MainPersonalFragment;
 
@@ -32,8 +32,8 @@ public class MainAdapter extends FragmentPagerAdapter {
                 return new MainGroupFragment();
 //                return MainGroupFragment.init(position);
             case 2:
-                return new AboutFragment();
-//                return AboutFragment.init(position);
+                return new NotificationFragment();
+//                return NotificationFragment.init(position);
         }
         return null;
     }

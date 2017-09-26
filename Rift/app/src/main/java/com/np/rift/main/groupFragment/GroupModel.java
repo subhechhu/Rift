@@ -7,6 +7,7 @@ package com.np.rift.main.groupFragment;
 public class GroupModel {
     String groupId, groupName, memberContribution, groupMembers, membersId, groupExpense;
     float expenses;
+    int memberCount;
     boolean isSettled;
 
     public String getGroupExpense() {
@@ -73,6 +74,14 @@ public class GroupModel {
         isSettled = settled;
     }
 
+    public int getMemberCount() {
+        return memberCount;
+    }
+
+    public void setMemberCount(int memberCount) {
+        this.memberCount = memberCount;
+    }
+
     @Override
     public String toString() {
         return "GroupModel{" +
@@ -83,6 +92,7 @@ public class GroupModel {
                 ", membersId='" + membersId + '\'' +
                 ", groupExpense='" + groupExpense + '\'' +
                 ", expenses=" + expenses +
+                ", memberCount=" + memberCount +
                 ", isSettled=" + isSettled +
                 '}';
     }

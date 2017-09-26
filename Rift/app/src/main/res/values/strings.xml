@@ -10,7 +10,7 @@
     <string name="user_name">Username</string>
     <string name="email">Email</string>
     <string name="currency_format">Current Format</string>
-    <string name="your_expense">Your Expense</string>
+    <string name="your_expense">Total Expense</string>
     <string name="rs_0">Rs. 0</string>
     <string name="add">add</string>
     <string name="title_activity_main2">Main2Activity</string>
@@ -49,4 +49,24 @@
     <string name="enter_new_group_name">Enter New Group Name</string>
     <string name="fields_empty">Fields Cannot Be Empty</string>
     <string name="calendar">calendar</string>
+    <string name="arrow">arrow</string>
+    <string name="recent_expense">Month Expense</string>
+    <string name="clear">clear</string>
+    <string name="ok">OK</string>
+    <string name="ooops">Oops!!</string>
+    <string name="no_internet_connection_found_please_check_your_connection">No Internet Connection Found\n Please Check Your Connection &amp; Try Again</string>
+
+    <string name="personal_data">Tracking the personal expenses is easy with Rift.\nAdd the simple details and enjoy while Rift takes care of your expenses.</string>
+    <string name="group_data">Create groups and add your mates, enter your expenses.\nNo more calculation hassle.\nRift handles it for you</string>
+    <string name="graph_data">No more stressing out while you track the expenses\nThe graph and pie chart will ease it for you.</string>
+    <string name="lets_rift">"Let's Rift !!"</string>
+    <string name="rift_2017">Rift 2017</string>
+    <string name="edit_profile">Edit Profile</string>
+    <string name="share">Share</string>
+    <string name="logout">Logout</string>
+    <string name="about_app">RIFT, an Expense Tracking application, helps you to track your expenses. It too lets you settle the expenses among your friends automatically.</string>
+    <string name="refresh_here"><u>Refresh Here!!</u></string>
+    <string name="notification">Notification</string>
+    <string name="refresh">Tap to Refresh !!</string>
+    <string name="swipe_and_refresh">Swipe and Refresh !!!</string>
 </resources>

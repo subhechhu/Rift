@@ -1,72 +1,75 @@
-[
-  {
-    "groupId": 22328,
-    "groupName": "Goa Trip",
-    "groupExpense": 17574,
-    "userExpense": 1574,
-    "settled":false
-  },
-  {
-    "groupId": 11439,
-    "groupName": "Shiv Parvathi Nilayam",
-    "groupExpense": 45210,
-    "userExpense": 13085,
-    "settled":false
-  },
-  {
-    "groupId": 15560,
-    "groupName": "Simplify360",
-    "groupExpense": 96874,
-    "userExpense": 574,
-    "settled":false
-  },
-  {
-    "groupId": 71153,
-    "groupName": "Pondy",
-    "groupExpense": 62014,
-    "userExpense": 6520,
-    "settled":true
-  },
-  {
-    "groupId": 19832,
-    "groupName": "FrndQ",
-    "groupExpense": 54121,
-    "userExpense": 47,
-    "settled":true
-  },
-  {
-    "groupId": 86213,
-    "groupName": "LunchGroup",
-    "groupExpense": 85214,
-    "userExpense": 9855,
-    "settled":true
-  },
-  {
-    "groupId": 16224,
-    "groupName": "Carpool",
-    "groupExpense": 98521,
-    "userExpense": 245,
-    "settled":true
-  },
-  {
-    "groupId": 23958,
-    "groupName": "Vacation",
-    "groupExpense": 98741,
-    "userExpense": 652,
-    "settled":true
-  },
-  {
-    "groupId": 77549,
-    "groupName": "Weekend",
-    "groupExpense": 45612,
-    "userExpense": 147,
-    "settled":false
-  },
-  {
-    "groupId": 71320,
-    "groupName": "Apartment",
-    "groupExpense": 35716,
-    "userExpense": 325,
-    "settled":true
-  }
-]
+{
+  "status": "success",
+  "groupList": [
+    {
+      "groupId": 22328,
+      "groupName": "Goa Trip",
+      "groupExpense": 17574,
+      "userExpense": 1574,
+      "settled": false
+    },
+    {
+      "groupId": 11439,
+      "groupName": "Shiv Parvathi Nilayam",
+      "groupExpense": 45210,
+      "userExpense": 13085,
+      "settled": false
+    },
+    {
+      "groupId": 15560,
+      "groupName": "Simplify360",
+      "groupExpense": 96874,
+      "userExpense": 574,
+      "settled": false
+    },
+    {
+      "groupId": 71153,
+      "groupName": "Pondy",
+      "groupExpense": 62014,
+      "userExpense": 6520,
+      "settled": true
+    },
+    {
+      "groupId": 19832,
+      "groupName": "FrndQ",
+      "groupExpense": 54121,
+      "userExpense": 47,
+      "settled": true
+    },
+    {
+      "groupId": 86213,
+      "groupName": "LunchGroup",
+      "groupExpense": 85214,
+      "userExpense": 9855,
+      "settled": true
+    },
+    {
+      "groupId": 16224,
+      "groupName": "Carpool",
+      "groupExpense": 98521,
+      "userExpense": 245,
+      "settled": true
+    },
+    {
+      "groupId": 23958,
+      "groupName": "Vacation",
+      "groupExpense": 98741,
+      "userExpense": 652,
+      "settled": true
+    },
+    {
+      "groupId": 77549,
+      "groupName": "Weekend",
+      "groupExpense": 45612,
+      "userExpense": 147,
+      "settled": false
+    },
+    {
+      "groupId": 71320,
+      "groupName": "Apartment",
+      "groupExpense": 35716,
+      "userExpense": 325,
+      "settled": true
+    }
+  ]
+}

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="splashBG">#e7ebeb</color>
     <color name="colorPrimary">#32a2a4</color>
     <color name="colorPrimary_shade">#e537b3b6</color>
     <color name="colorPrimary_shade_">#3a267e80</color>
@@ -11,6 +12,7 @@
     <color name="white">#FFFFFF</color>
     <color name="white_shade">#f4f4f4</color>
     <color name="blue">#2639b1</color>
+    <color name="refresh">#00ffffff</color>
 
     <color name="colorInactive">#747474</color>
     <color name="colorActiveSmall">#FFFFFF</color>
