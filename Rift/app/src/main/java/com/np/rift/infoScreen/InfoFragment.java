@@ -53,7 +53,7 @@ public class InfoFragment extends Fragment {
         int position = getArguments().getInt(Position);
         String messageHeader = getArguments().getString(AboutAppHeader);
 
-        View view = inflater.inflate(R.layout.info_fragment_layout, container, false); //Link the fragment with layout
+        View view = inflater.inflate(R.layout.fragment_info, container, false); //Link the fragment with layout
         LinearLayout linearLayout = view.findViewById(R.id.background_layout);
         TextView messageTV = view.findViewById(R.id.textView_body);
         TextView textView_letsrift = view.findViewById(R.id.textView_letsrift);

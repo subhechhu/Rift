@@ -7,6 +7,7 @@ import android.support.design.widget.BottomSheetDialogFragment;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -36,6 +37,7 @@ public class SettledActivity extends AppCompatActivity implements ServerGetReque
 
     TextView textView_total, textView_average, textView_settledOn, textView_settledBy;
     LinearLayout linearlayout_body, linearlayout_end, linearlayout_main;
+    String response;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -43,6 +45,9 @@ public class SettledActivity extends AppCompatActivity implements ServerGetReque
 
         setContentView(R.layout.activity_settled);
 
+        Log.e("TAG","onCreate Settled()");
+
+        response = getIntent().getStringExtra("response");
         group_name = getIntent().getStringExtra("group_name");
         group_id = getIntent().getStringExtra("group_id");
         group_expense = getIntent().getStringExtra("group_expense");
@@ -63,8 +68,8 @@ public class SettledActivity extends AppCompatActivity implements ServerGetReque
         textView_settledBy = (TextView) findViewById(R.id.textView_settledBy);
 
         textView_total.setText(group_expense);
-
-        GetSettledInfo();
+        ParseJson(response);
+//        GetSettledInfo();
 
     }
 
@@ -110,7 +115,6 @@ public class SettledActivity extends AppCompatActivity implements ServerGetReque
     }
 
     private void GetSettledInfo() {
-        ParseJson(getJSON());
         String url = AppController.getInstance().getString(R.string.domain) +
                 "/getSettledInfo?groupId" + group_id;
 //        new ServerGetRequest(this, "GET_SETTLED").execute(url);
@@ -119,6 +123,7 @@ public class SettledActivity extends AppCompatActivity implements ServerGetReque
 
     private void ParseJson(String json) {
         try {
+            Log.e("TAG","json: "+json);
             JSONObject responseObject = new JSONObject(json);
             String status = responseObject.getString("status");
             if ("success".equals(status)) {
@@ -131,6 +136,9 @@ public class SettledActivity extends AppCompatActivity implements ServerGetReque
                 JSONArray membersExpense = responseObject.getJSONArray("membersExpense");
                 JSONArray settledExpense = responseObject.getJSONArray("settledExpense");
 
+                Log.e("TAG","settledBy:"+settledBy);
+                Log.e("TAG","settledOn:"+settledOn);
+
                 textView_settledBy.setText(settledBy);
                 textView_settledOn.setText(settledOn);
 
@@ -139,8 +147,8 @@ public class SettledActivity extends AppCompatActivity implements ServerGetReque
 
                 for (int i = 0; i < membersExpense.length(); i++) {
                     JSONObject memberExpenseObject = membersExpense.getJSONObject(i);
-                    String member = memberExpenseObject.getString("memberName");
-                    String expense = memberExpenseObject.getString("expenses");
+                    String member = memberExpenseObject.getString("userName");
+                    String expense = memberExpenseObject.getString("userExpense");
                     RenderExpense(member, expense);
                 }
 
@@ -188,7 +196,7 @@ public class SettledActivity extends AppCompatActivity implements ServerGetReque
 
     private void RenderSettled(String from, String amount, String to) {
         View memberExpense = LayoutInflater.from(this)
-                .inflate(R.layout.member_unsettled, null, false);
+                .inflate(R.layout.view_member_unsettled, null, false);
         TextView textView_to = memberExpense.findViewById(R.id.textView_to);
         TextView textView_from = memberExpense.findViewById(R.id.textView_from);
         TextView textView_from_settle = memberExpense.findViewById(R.id.textView_from_settle);
@@ -215,7 +223,7 @@ public class SettledActivity extends AppCompatActivity implements ServerGetReque
 
     private void RenderExpense(String member, String expense) {
         View memberExpense = LayoutInflater.from(this)
-                .inflate(R.layout.member_expense, null, false);
+                .inflate(R.layout.view_member_expense, null, false);
         TextView textView_member = memberExpense.findViewById(R.id.textView_member);
         TextView textView_expense = memberExpense.findViewById(R.id.textView_expense);
 

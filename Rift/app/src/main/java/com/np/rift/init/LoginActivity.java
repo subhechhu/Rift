@@ -73,23 +73,30 @@ public class LoginActivity extends AppCompatActivity implements ServerGetRequest
         texView_autoLogin = (TextView) findViewById(R.id.texView_autoLogin);
 
         sharedPrefUtil = new SharedPrefUtil();
+        String userName= sharedPrefUtil
+                .getSharedPreferenceString(AppController.getContext(),
+                        "userEmail",
+                        "Enter email");
 
         if (sharedPrefUtil.getSharedPreferenceBoolean(AppController.getContext(), "rememberMe", false)
                 && sharedPrefUtil.getSharedPreferenceBoolean(AppController.getContext(), "verified", false)) {
             checkBox_autoLogin.setChecked(true);
-            editText_email.setText(sharedPrefUtil
-                    .getSharedPreferenceString(AppController.getContext(),
-                            "userEmail",
-                            "Enter email"));
+            if("Enter email".equalsIgnoreCase(userName)){
+                editText_email.setHint(userName);
+            }else {
+                editText_email.setText(userName);
+            }
             startActivity(new Intent(this, HomeActivity.class));
             finish();
 
         }else {
             checkBox_autoLogin.setChecked(false);
-            editText_email.setText(sharedPrefUtil
-                    .getSharedPreferenceString(AppController.getContext(),
-                            "userEmail",
-                            "Enter email"));
+            if("Enter email".equalsIgnoreCase(userName)){
+                editText_email.setHint(userName);
+            }else {
+                editText_email.setText(userName);
+            }
+
         }
         texView_autoLogin.setOnClickListener(new View.OnClickListener() {
             @Override

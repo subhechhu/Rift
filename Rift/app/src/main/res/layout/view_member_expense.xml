@@ -4,13 +4,15 @@
               android:layout_height="match_parent"
               android:layout_margin="2.5dp"
               android:orientation="horizontal"
-              android:padding="10dp">
+              android:padding="10dp"
+    android:layout_centerHorizontal="true">
 
     <TextView
         android:id="@+id/textView_member"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
+        android:gravity="center"
         android:text="TextView"/>
 
     <TextView
@@ -18,5 +20,6 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
+        android:gravity="center"
         android:text="TextView"/>
 </LinearLayout>

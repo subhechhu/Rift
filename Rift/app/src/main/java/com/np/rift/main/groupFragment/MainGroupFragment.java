@@ -23,6 +23,7 @@ import android.widget.TextView;
 
 import com.np.rift.AppController;
 import com.np.rift.R;
+import com.np.rift.main.HomeActivity;
 import com.np.rift.serverRequest.ServerGetRequest;
 import com.wang.avi.AVLoadingIndicatorView;
 
@@ -59,7 +60,6 @@ public class MainGroupFragment extends Fragment implements ServerGetRequest.Resp
 
     @Override
     public void onAttach(Context context) {
-        Log.d(TAG, "onAttach()");
         super.onAttach(context);
         if (context instanceof FragmentActivity) {
             mActivity = (FragmentActivity) context;
@@ -68,8 +68,6 @@ public class MainGroupFragment extends Fragment implements ServerGetRequest.Resp
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
-        Log.d(TAG, "onActivityCreated()");
-//        ((HomeActivity) getActivityReference()).fragmentOnCreateSuccess(this, fragmentValue);
         super.onActivityCreated(savedInstanceState);
     }
 
@@ -77,7 +75,6 @@ public class MainGroupFragment extends Fragment implements ServerGetRequest.Resp
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         fragmentValue = getArguments() != null ? getArguments().getInt("val") : 1;
-        Log.d("subhechhu", "B onCreate" + fragmentValue);
     }
 
     @Nullable
@@ -86,8 +83,6 @@ public class MainGroupFragment extends Fragment implements ServerGetRequest.Resp
         View fragmentView = inflater.inflate(R.layout.fragment_group, container, false);
 
         progress_default = fragmentView.findViewById(R.id.progress_default);
-        progress(false);
-
         linearlayout_main = fragmentView.findViewById(R.id.linearlayout_main);
 
         recycler_view = fragmentView.findViewById(R.id.recycler_view);
@@ -126,6 +121,8 @@ public class MainGroupFragment extends Fragment implements ServerGetRequest.Resp
             }
         });
 
+        getGroups();
+
         fabSpeedDial = fragmentView.findViewById(R.id.fab_shortcut);
         fabSpeedDial.setMenuListener(new SimpleMenuListenerAdapter() {
             @Override
@@ -160,6 +157,7 @@ public class MainGroupFragment extends Fragment implements ServerGetRequest.Resp
         String url = AppController.getInstance().getString(R.string.domain)
                 + "/GetGrouplist?userId=" + AppController.getUserId();
         new ServerGetRequest(this, "GET_GROUPS").execute(url);
+        Log.e("TAG", "url: " + url);
     }
 
 
@@ -174,7 +172,7 @@ public class MainGroupFragment extends Fragment implements ServerGetRequest.Resp
 
     @Override
     public void getGetResult(String response, String requestCode, int responseCode) {
-        Log.e("TAG", "response: " + response);
+        Log.e("TAG", "175 response: " + response);
         progress(false);
         try {
             if (response != null && !response.isEmpty()) {
@@ -192,6 +190,7 @@ public class MainGroupFragment extends Fragment implements ServerGetRequest.Resp
     }
 
     private void ParseResponse(String response) {
+        ViewPager vp = getActivity().findViewById(R.id.viewPager);
         try {
             customAdapterGroup = null;
             JSONObject responseObject = new JSONObject(response);
@@ -225,14 +224,17 @@ public class MainGroupFragment extends Fragment implements ServerGetRequest.Resp
                 } else {
                     customAdapterGroup.notifyDataSetChanged();
                 }
-                ViewPager vp = getActivity().findViewById(R.id.viewPager);
+
                 if (1 == vp.getCurrentItem()) {
                     showSnackBar("Groups Updated");
                 }
             } else {
+                Log.e("TAG", "vp.getCurrentItem(): " + vp.getCurrentItem());
                 textView_empty.setVisibility(View.VISIBLE);
                 String errorMessage = responseObject.getString("errorMessage");
-                showSnackBar(errorMessage);
+                if (1 == vp.getCurrentItem()) {
+                    showSnackBar(errorMessage);
+                }
             }
 
         } catch (Exception e) {
@@ -270,6 +272,10 @@ public class MainGroupFragment extends Fragment implements ServerGetRequest.Resp
     public void onResume() {
         super.onResume();
         Log.e("TAG", "onResume mainGrpFragment");
-        getGroups();
+        if (HomeActivity.isDeleted) {
+            showSnackBar("Exiting Group");
+            HomeActivity.isDeleted = false;
+            getGroups();
+        }
     }
 }

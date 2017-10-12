@@ -16,17 +16,11 @@ import java.net.URL;
 public class ServerPostRequest extends AsyncTask<String, Void, String> {
 
     private final String TAG = getClass().getSimpleName();
-
-    private Response response = null;
     private final String requestCode;
+    private Response response = null;
     private StringBuffer resultBuffer;
     private int responseCode;
     private String result;
-
-    //Interface is used to Send the response back to the calling activity
-    public interface Response {
-        void getPostResult(String response, String requestCode, int responseCode);
-    }
 
     public ServerPostRequest(Response response, String requestCode) {
         this.response = response;
@@ -45,7 +39,7 @@ public class ServerPostRequest extends AsyncTask<String, Void, String> {
         String data = params[1]; //2nd parameter passed while creating new Object of ServerPostRequest class, body parameter
 
         try {
-        //HTTPConnection starts here
+            //HTTPConnection starts here
             URL url = new URL(stgUrl);
             HttpURLConnection urlconnection = (HttpURLConnection) url.openConnection();
 
@@ -93,5 +87,10 @@ public class ServerPostRequest extends AsyncTask<String, Void, String> {
         super.onPostExecute(s);
         Log.e(TAG, "post post response: " + s);
         response.getPostResult(s, requestCode, responseCode); //link the response to the interface method
+    }
+
+    //Interface is used to Send the response back to the calling activity
+    public interface Response {
+        void getPostResult(String response, String requestCode, int responseCode);
     }
 }

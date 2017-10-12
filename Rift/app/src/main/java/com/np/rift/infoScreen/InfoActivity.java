@@ -57,8 +57,6 @@ public class InfoActivity extends AppCompatActivity {
 
             }
         });
-
-
     }
 
     private List<Fragment> getFragments() {

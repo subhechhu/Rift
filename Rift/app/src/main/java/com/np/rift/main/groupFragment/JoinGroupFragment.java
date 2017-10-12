@@ -69,6 +69,7 @@ public class JoinGroupFragment extends BottomSheetDialogFragment implements Serv
                             jsonObject.put("groupName", editText_groupName.getText().toString());
                             jsonObject.put("groupId", editText_groupPurpose.getText().toString());
                             jsonObject.put("userId", AppController.getUserId());
+                            jsonObject.put("userName", AppController.getUserName());
                             RequestJoin("JOIN_GROUP", url, jsonObject);
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -81,6 +82,7 @@ public class JoinGroupFragment extends BottomSheetDialogFragment implements Serv
                             jsonObject.put("groupName", editText_groupName.getText().toString());
                             jsonObject.put("groupPurpose", editText_groupPurpose.getText().toString());
                             jsonObject.put("userId", AppController.getUserId());
+                            jsonObject.put("userName", AppController.getUserName());
                             jsonObject.put("settled", false);
 
                             RequestJoin("ADD_GROUP", url, jsonObject);

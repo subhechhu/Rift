@@ -37,7 +37,7 @@
     <string name="personal">Personal</string>
     <string name="save">Save</string>
     <string name="enter_new_email_username">Enter new email/ username</string>
-    <string name="exit">Exit</string>
+    <string name="exit">Exit Group</string>
     <string name="settle_group">Settle Group</string>
     <string name="avg_expense">Avg. Expense</string>
     <string name="total_expense">Total Expense</string>

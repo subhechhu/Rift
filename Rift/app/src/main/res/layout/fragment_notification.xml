@@ -1,8 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+              android:id="@+id/linearlayout_main"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
+              android:layout_marginBottom="2dp"
               android:orientation="vertical">
 
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/swipeRefreshLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/recycler_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_alignParentBottom="true"
+                android:divider="@color/feed_item_border"
+                android:visibility="visible"/>
+
+            <TextView
+                android:id="@+id/textView_empty"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clickable="true"
+                android:gravity="center"
+                android:text="@string/refresh"
+                android:textColor="@color/colorPrimaryDark"
+                android:textStyle="bold"
+                android:visibility="gone"/>
+
+
+            <com.wang.avi.AVLoadingIndicatorView
+                android:id="@+id/progress_default"
+                style="@style/AVLoadingIndicatorView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_margin="10dp"
+                android:visibility="visible"
+                app:indicatorColor="@color/colorPrimary"
+                app:indicatorName="PacmanIndicator"/>
+
+        </RelativeLayout>
+    </android.support.v4.widget.SwipeRefreshLayout>
 </LinearLayout>

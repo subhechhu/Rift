@@ -22,6 +22,12 @@
             app:popupTheme="@style/AppTheme.PopupOverlay"
             app:titleTextColor="@android:color/white"/>
     </android.support.design.widget.AppBarLayout>
+
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/swipeRefreshLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
@@ -36,8 +42,8 @@
                 android:id="@+id/textView_empty"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:gravity="center"
                 android:clickable="true"
+                android:gravity="center"
                 android:text="@string/refresh"
                 android:textColor="@color/colorPrimaryDark"
                 android:textStyle="bold"
@@ -54,4 +60,5 @@
                 app:indicatorColor="@color/colorPrimary"
                 app:indicatorName="PacmanIndicator"/>
         </RelativeLayout>
+    </android.support.v4.widget.SwipeRefreshLayout>
 </LinearLayout>

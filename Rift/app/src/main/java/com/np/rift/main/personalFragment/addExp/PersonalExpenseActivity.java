@@ -21,6 +21,7 @@ import android.os.Bundle;
 import android.support.design.widget.BottomSheetDialogFragment;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -36,6 +37,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.h6ah4i.android.widget.advrecyclerview.expandable.ExpandableItemConstants;
 import com.h6ah4i.android.widget.advrecyclerview.expandable.RecyclerViewExpandableItemManager;
@@ -55,26 +57,25 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.InputStream;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Locale;
 
 public class PersonalExpenseActivity extends AppCompatActivity implements
         ServerGetRequest.Response, ServerPostRequest.Response {
 
     private final SimpleDateFormat format_toGet = new SimpleDateFormat("yyyy-MM-dd");
-    private final SimpleDateFormat format_justMonth = new SimpleDateFormat("MM");
 
     RecyclerViewExpandableItemManager expMgr;
     RecyclerView recyclerView;
     MyAdapter adapter;
     ArrayList<MonthModel> monthParentArray;
     ArrayList<ExpenseModel> expenseArray;
-    String userId;
+    String userId,userName;
     LinkedHashMap<String, List<ExpenseModel>> listDataChild;
     SharedPrefUtil sharedPrefUtil;
     TextView textView_empty;
@@ -114,6 +115,7 @@ public class PersonalExpenseActivity extends AppCompatActivity implements
 
         sharedPrefUtil = new SharedPrefUtil();
         userId = sharedPrefUtil.getSharedPreferenceString(AppController.getContext(), "userId", "000");
+        userName = sharedPrefUtil.getSharedPreferenceString(AppController.getContext(), "userName", "000");
 
         container = findViewById(R.id.container);
         progress_default = (AVLoadingIndicatorView) findViewById(R.id.progress_default);
@@ -124,6 +126,9 @@ public class PersonalExpenseActivity extends AppCompatActivity implements
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
+
+        SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeRefreshLayout);
+        swipeRefreshLayout.setEnabled(false);
 
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         textView_empty = (TextView) findViewById(R.id.textView_empty);
@@ -240,40 +245,28 @@ public class PersonalExpenseActivity extends AppCompatActivity implements
                 for (int i = 0; i < expenseDetailsArray.length(); i++) {
                     MonthModel month = new MonthModel();
                     JSONObject monthObject = expenseDetailsArray.getJSONObject(i);
-
-                    String mMonth = monthObject.getString("month");
-                    mMonth = mMonth.substring(0, 3);
-
-                    DateFormat format = new SimpleDateFormat("MMM");
-                    Date date_ = format.parse(mMonth);
-                    Log.e("TAG", "mMonth: " + date_);
-
                     month.setName(monthObject.getString("month"));
-
-
                     JSONArray expensesSubArray = monthObject.getJSONArray("expenses");
                     expenseArray = new ArrayList<>();
                     float monthTotal = 0;
                     for (int j = 0; j < expensesSubArray.length(); j++) {
                         ExpenseModel expenseModel = new ExpenseModel();
-                        JSONObject innerSubObj =
-                                expensesSubArray.getJSONObject(j);
+                        JSONObject innerSubObj = expensesSubArray.getJSONObject(j);
                         expenseModel.setRealDate(format_toGet.parse(innerSubObj.getString("date")));
                         expenseModel.setId(innerSubObj.getString("expId"));
                         expenseModel.setDate(innerSubObj.getString("date"));
                         expenseModel.setSpentOn(innerSubObj.getString("spentOn"));
                         expenseModel.setAmount(innerSubObj.getString("amount"));
-//                            expenseModel.setType(innerSubObj.getString("type"));
-                        if (j % 2 == 0) {
-                            expenseModel.setType("personal");
-                        } else {
-                            expenseModel.setType("group");
-                        }
-
+                        expenseModel.setType(innerSubObj.getString("type"));
                         expenseModel.setSelected(false);
                         monthTotal += Float.parseFloat(innerSubObj.getString("amount"));
                         expenseArray.add(expenseModel);
                     }
+                    Collections.sort(expenseArray, new Comparator<ExpenseModel>() {
+                        public int compare(ExpenseModel o1, ExpenseModel o2) {
+                            return o2.getRealDate().compareTo(o1.getRealDate());
+                        }
+                    });
 
                     month.setMonthExpense(String.valueOf(monthTotal));
                     monthParentArray.add(month);
@@ -429,6 +422,7 @@ public class PersonalExpenseActivity extends AppCompatActivity implements
             JSONObject postObject = new JSONObject();
             postObject.put("type", "personal");
             postObject.put("userId", userId);
+            postObject.put("userName", userName);
             postObject.put("data", itemsArray);
             String url = AppController.getInstance().getString(R.string.domain)
                     + "/addExpense";
@@ -498,6 +492,11 @@ public class PersonalExpenseActivity extends AppCompatActivity implements
 //                Log.e("TAG", listDataChild.get(monthParentArray.get(groupPosition).getName()).get(childPosition).getId());
 //                Log.e("TAG", "delete list: " + deleteList.toString());
                 break;
+            case R.id.imageView_type:
+                if ("group".equalsIgnoreCase(listDataChild.get(monthParentArray.get(groupPosition).getName()).get(childPosition).getType())) {
+                    Toast.makeText(PersonalExpenseActivity.this, listDataChild.get(monthParentArray.get(groupPosition).getName()).get(childPosition).getType(), Toast.LENGTH_SHORT).show();
+                }
+                break;
             default:
                 throw new IllegalStateException("Unexpected click event");
         }
@@ -558,8 +557,8 @@ public class PersonalExpenseActivity extends AppCompatActivity implements
             textView_spentOn = itemView.findViewById(R.id.textView_spentOn);
             linearlayout_child = itemView.findViewById(R.id.linearlayout_child);
             imageView_type = itemView.findViewById(R.id.imageView_type);
-            ;
             linearlayout_child.setOnClickListener(clickListener);
+            imageView_type.setOnClickListener(clickListener);
         }
     }
 
@@ -604,13 +603,13 @@ public class PersonalExpenseActivity extends AppCompatActivity implements
 
         @Override
         public MyGroupViewHolder onCreateGroupViewHolder(ViewGroup parent, int viewType) {
-            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.month_view_, parent, false);
+            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.view_month, parent, false);
             return new MyGroupViewHolder(v);
         }
 
         @Override
         public MyChildViewHolder onCreateChildViewHolder(ViewGroup parent, int viewType) {
-            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.expense_view_, parent, false);
+            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.view_expense, parent, false);
             return new MyChildViewHolder(v, mItemOnClickListener);
         }
 
@@ -651,6 +650,15 @@ public class PersonalExpenseActivity extends AppCompatActivity implements
             } else {
                 holder.imageView_type.setImageResource(R.drawable.group_default);
             }
+
+            if (listDataChild.get(monthParentArray.get(groupPosition).getName()).get(childPosition).getSelected()) {
+                holder.linearlayout_child.setBackgroundColor(ContextCompat.getColor(PersonalExpenseActivity.this,
+                        R.color.red_shade));
+            } else {
+                holder.linearlayout_child.setBackgroundColor(ContextCompat.getColor(PersonalExpenseActivity.this,
+                        R.color.white));
+            }
+
         }
 
         @Override

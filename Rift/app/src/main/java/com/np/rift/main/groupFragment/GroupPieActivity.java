@@ -48,7 +48,11 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.InputStream;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
 
 
 public class GroupPieActivity extends AppCompatActivity implements OnChartValueSelectedListener,
@@ -58,11 +62,22 @@ public class GroupPieActivity extends AppCompatActivity implements OnChartValueS
     View linearlayout_main;
     ArrayList<GroupModel> pieCharList;
     float totalExpense;
+    float averageExpense;
+    ArrayList<String> settledDetails;
+    ArrayList<Float> actualContribution;
+    ArrayList<String> users;
+    DecimalFormat df = new DecimalFormat("0.00");
+
+    JSONArray finalArray, memberExpArray;
+    JSONObject finalSettleObject;
+
     TextView textView_groupName, textView_expense, textView_more;
     RelativeLayout relative_more, relative_graph;
     Button button_refresh;
     AVLoadingIndicatorView progress_default;
     int totalMembers;
+    JSONArray chartArray;
+    boolean settled;
     private PieChart mChart;
 
     @Override
@@ -94,7 +109,6 @@ public class GroupPieActivity extends AppCompatActivity implements OnChartValueS
         textView_more = (TextView) findViewById(R.id.textView_more);
 
         textView_groupName.setText("Total Expense");
-        textView_expense.setText(group_expense);
         textView_more.setText("View expenses in detail");
 
         mChart = (PieChart) findViewById(R.id.chart_pie);
@@ -130,18 +144,18 @@ public class GroupPieActivity extends AppCompatActivity implements OnChartValueS
         }
     }
 
-    private void showSnackBar(String message) {
-        final Snackbar _snackbar = Snackbar.make(relative_graph, message, Snackbar.LENGTH_LONG);
-        _snackbar.setAction("Got it", new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                _snackbar.dismiss();
-            }
-        }).show();
-    }
+//    private void showSnackBar(String message) {
+//        final Snackbar _snackbar = Snackbar.make(relative_graph, message, Snackbar.LENGTH_LONG);
+//        _snackbar.setAction("Got it", new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                _snackbar.dismiss();
+//            }
+//        }).show();
+//    }
 
     public void createDialog(final String from) {
-        String title, body;
+        String title = "", body = "";
         if ("Exit".equals(from)) {
             title = "Exit Group";
             if (totalMembers == 1) {
@@ -150,7 +164,7 @@ public class GroupPieActivity extends AppCompatActivity implements OnChartValueS
                 body = "Are you sure you want to exit and delete " + group_name + "?";
             }
 
-        } else {
+        } else if ("Settle".equalsIgnoreCase(from)) {
             title = "Settle Expense";
             body = "Are you sure you want to settle expenses on " + group_name + "?";
         }
@@ -163,13 +177,17 @@ public class GroupPieActivity extends AppCompatActivity implements OnChartValueS
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         if ("Exit".equals(from)) {
-//                            RequestExit();
+                            RequestExit();
                             HomeActivity.isDeleted = true;
                             dialog.dismiss();
-
                             finish();
                         } else {
-
+                            try {
+                                progress(true);
+                                Settle();
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
                         }
                     }
                 })
@@ -180,6 +198,107 @@ public class GroupPieActivity extends AppCompatActivity implements OnChartValueS
                 })
                 .show();
     }
+
+    private void Settle() {
+        try {
+            JSONObject memberExp = null;
+            memberExpArray = new JSONArray();
+            settledDetails = new ArrayList<>();
+            users = new ArrayList<>();
+            actualContribution = new ArrayList<>();
+            averageExpense = totalExpense / (float) totalMembers;
+
+            for (int i = 0; i < pieCharList.size(); i++) {
+                memberExp = new JSONObject();
+                memberExp.put("userName", pieCharList.get(i).getGroupMembers());
+                memberExp.put("userExpense", pieCharList.get(i).getExpenses());
+                users.add(pieCharList.get(i).getGroupMembers());
+                actualContribution.add(pieCharList.get(i).getExpenses() - averageExpense);
+                memberExpArray.put(memberExp);
+            }
+            finalArray = new JSONArray();
+            finalSettleObject = new JSONObject();
+            finalSettleObject.put("settle", true);
+            finalSettleObject.put("groupId", group_id);
+            finalSettleObject.put("totalExpense", totalExpense);
+            finalSettleObject.put("averageExpense", averageExpense);
+            finalSettleObject.put("settledBy", AppController.getUserName());
+            finalSettleObject.put("settledOn", new SimpleDateFormat("yyyy-MM-dd HH:mm").format(Calendar.getInstance().getTime()));
+
+            CheckPendingCalculation(actualContribution, users);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void CheckPendingCalculation(ArrayList<Float> actualContribution, ArrayList<String> users) {
+        if (!VerifyExpense(actualContribution))
+            BreakExpense(actualContribution, users);
+        else {
+            try {
+                finalSettleObject.put("membersExpense", memberExpArray);
+                finalSettleObject.put("settledExpense", finalArray);
+                String url = AppController.getInstance().getString(R.string.domain);
+//                String url = AppController.getInstance().getString(R.string.domain) + "/settle?groupId=" + group_id;
+//                new ServerPostRequest(this, "SETTLE_CONFIRM").execute(url, finalSettleObject.toString());
+                dummySettled(finalSettleObject);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private boolean VerifyExpense(List<Float> actualExp) {
+        for (Float anActualExp : actualExp) {
+            int intVal = Math.round(anActualExp);
+            if (Math.round(intVal) != 0) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private void BreakExpense(ArrayList<Float> actualExp, ArrayList<String> users) {
+        JSONObject jsonObject = new JSONObject();
+        float smallest = actualExp.get(0);
+        float largest = actualExp.get(0);
+        String smallestHolder = users.get(0);
+        String largestHolder = users.get(0);
+        int smallPosition = 0, largePosition = 0;
+
+        for (int i = 1; i < actualExp.size(); i++) {
+            if (actualExp.get(i) > largest) {
+                largest = actualExp.get(i);
+                largestHolder = users.get(i);
+                largePosition = i;
+            } else if (actualExp.get(i) < smallest) {
+                smallest = actualExp.get(i);
+                smallestHolder = users.get(i);
+                smallPosition = i;
+            }
+        }
+
+        try {
+            if (Math.abs(smallest) > largest) {
+                jsonObject.put("from", smallestHolder);
+                jsonObject.put("to", largestHolder);
+                jsonObject.put("amount", df.format(largest));
+                actualExp.set(largePosition, (float) 0);
+                actualExp.set(smallPosition, largest - Math.abs(smallest));
+            } else {
+                jsonObject.put("from", smallestHolder);
+                jsonObject.put("to", largestHolder);
+                jsonObject.put("amount", df.format(Math.abs(smallest)));
+                actualExp.set(smallPosition, (float) 0);
+                actualExp.set(largePosition, (largest - Math.abs(smallest)));
+            }
+            finalArray.put(jsonObject);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        CheckPendingCalculation(actualExp, users);
+    }
+
 
     private void RequestExit() {
         progress(true);
@@ -235,9 +354,9 @@ public class GroupPieActivity extends AppCompatActivity implements OnChartValueS
 
     private void RequestGroupInfo(String group_id) {
         progress(true);
-        parseResponse(getJSON());
-        String url = "" + "/getGroupDetails?groupId=" + group_id;
-//        new ServerGetRequest(this, "GET_GROUP_INFO").execute(url);
+//        parseResponse(getJSON());
+        String url = AppController.getInstance().getString(R.string.domain) + "/getGroupDetails?groupId=" + group_id;
+        new ServerGetRequest(this, "GET_GROUP_INFO").execute(url);
     }
 
     @Override
@@ -288,11 +407,15 @@ public class GroupPieActivity extends AppCompatActivity implements OnChartValueS
             fragment.setArguments(bundle);
             fragment.show(getSupportFragmentManager(), fragment.getTag());
         } else if (item.getItemId() == R.id.menu_exit) {
-            createDialog("Exit");
+            if (settled) {
+                createDialog("Exit");
+            } else {
+                showSnackBar("Group should be settled before you can exit it", "OK");
+            }
         } else if (item.getItemId() == R.id.menu_history) {
             Toast.makeText(this, "History", Toast.LENGTH_SHORT).show();
         } else if (item.getItemId() == R.id.menu_settle) {
-            Toast.makeText(this, "Settle", Toast.LENGTH_SHORT).show();
+            createDialog("Settle");
         }
         return false;
     }
@@ -301,21 +424,30 @@ public class GroupPieActivity extends AppCompatActivity implements OnChartValueS
         progress(false);
         try {
             Log.e("TAG", "parseResponse: " + response);
-            pieCharList = new ArrayList<>();
             JSONObject responseObject = new JSONObject(response);
-            totalMembers = responseObject.getInt("totalMembers");
-            JSONArray chartArray = responseObject.getJSONArray("chartObject");
+            String status = responseObject.getString("status");
+            settled = responseObject.getBoolean("settled");
+            if ("success".equalsIgnoreCase(status)) {
+                totalMembers = responseObject.getInt("totalMembers");
+                pieCharList = new ArrayList<>();
 
-            for (int i = 0; i < chartArray.length(); i++) {
-                GroupModel groupModel = new GroupModel();
-                JSONObject membersObject = chartArray.getJSONObject(i);
-                groupModel.setMembersId(membersObject.getString("userId"));
-                groupModel.setGroupMembers(membersObject.getString("userName"));
-                groupModel.setExpenses((float) membersObject.getInt("expenses"));
-                totalExpense += totalExpense + (float) membersObject.getInt("expenses");
-                pieCharList.add(groupModel);
+                totalExpense = responseObject.getInt("totalExpense");
+                textView_expense.setText("" + totalExpense);
+
+                chartArray = responseObject.getJSONArray("chartObject");
+
+                for (int i = 0; i < chartArray.length(); i++) {
+                    GroupModel groupModel = new GroupModel();
+                    JSONObject membersObject = chartArray.getJSONObject(i);
+                    groupModel.setMembersId(membersObject.getString("userId"));
+                    groupModel.setGroupMembers(membersObject.getString("userName"));
+                    groupModel.setExpenses((float) membersObject.getInt("expenses"));
+//                    totalExpense += totalExpense + (float) membersObject.getInt("expenses");
+                    pieCharList.add(groupModel);
+                }
                 initPie(pieCharList);
-
+            } else {
+                String errorMessage = responseObject.getString("errorMessage");
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -325,7 +457,7 @@ public class GroupPieActivity extends AppCompatActivity implements OnChartValueS
     private void RenderPieChart(ArrayList<GroupModel> pieCharList) {
         ArrayList<PieEntry> entries = new ArrayList<>();
 
-        for (int i = 1; i < pieCharList.size(); i++) {
+        for (int i = 0; i < pieCharList.size(); i++) {
             entries.add(new PieEntry(pieCharList.get(i).getExpenses(),
                     pieCharList.get(i).getGroupMembers()));
         }
@@ -333,8 +465,6 @@ public class GroupPieActivity extends AppCompatActivity implements OnChartValueS
         dataSet.setSliceSpace(3f);
         dataSet.setSelectionShift(5f);
         dataSet.getXValuePosition();
-
-        // add a lot of colors
 
         ArrayList<Integer> colors = new ArrayList<>();
 
@@ -357,7 +487,6 @@ public class GroupPieActivity extends AppCompatActivity implements OnChartValueS
 
         dataSet.setColors(colors);
         dataSet.setSelectionShift(12f);
-
 
         dataSet.setValueLinePart1OffsetPercentage(80.f);
         dataSet.setValueLinePart1Length(0.2f);
@@ -388,7 +517,7 @@ public class GroupPieActivity extends AppCompatActivity implements OnChartValueS
     private String getJSON() {
         String json = null;
         try {
-            InputStream is = AppController.getContext().getAssets().open("group_details.json");
+            InputStream is = AppController.getContext().getAssets().open("group_detail.json");
             int size = is.available();
             byte[] buffer = new byte[size];
             is.read(buffer);
@@ -402,6 +531,7 @@ public class GroupPieActivity extends AppCompatActivity implements OnChartValueS
 
     public void AddItems(JSONArray items) {
         showSnackBar(AppController.getInstance().getString(R.string.updating), "OK");
+        Log.e("TAG", "addItems GroupPieActivity");
         PostItems(items);
     }
 
@@ -410,6 +540,7 @@ public class GroupPieActivity extends AppCompatActivity implements OnChartValueS
             JSONObject postObject = new JSONObject();
             postObject.put("type", "group");
             postObject.put("userId", AppController.getUserId());
+            postObject.put("userName", AppController.getUserName());
             postObject.put("groupId", group_id);
             postObject.put("data", itemsArray);
             String url = AppController.getInstance().getString(R.string.domain)
@@ -425,7 +556,8 @@ public class GroupPieActivity extends AppCompatActivity implements OnChartValueS
     @Override
     public void getPostResult(String response, String requestCode, int responseCode) {
         progress(false);
-        if (response != null && !response.isEmpty()) {
+        if (response != null && !response.equalsIgnoreCase("null")
+                && !response.isEmpty()) {
             if ("REQUEST_EXIT".equalsIgnoreCase(requestCode)) {
                 try {
                     JSONObject responseObject = new JSONObject(response);
@@ -435,12 +567,11 @@ public class GroupPieActivity extends AppCompatActivity implements OnChartValueS
                         finish();
                     } else {
                         String errorMessage = responseObject.getString("errorMessage");
-                        showSnackBar(errorMessage);
+                        showSnackBar(errorMessage, "OK");
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-
             } else if ("GET_GROUP_INFO".equalsIgnoreCase(requestCode)) {
                 try {
                     JSONObject responseObject = new JSONObject(response);
@@ -456,10 +587,62 @@ public class GroupPieActivity extends AppCompatActivity implements OnChartValueS
                     progress(false);
                     e.printStackTrace();
                 }
+            } else if ("ADD_ITEM".equalsIgnoreCase(requestCode)) {
+                try {
+                    JSONObject responseObject = new JSONObject(response);
+                    String status = responseObject.getString("status");
+                    progress(false);
+                    if ("success".equals(status)) {
+                        RequestGroupInfo(group_id);
+                    } else {
+                        String errorMessage = responseObject.getString("errorMessage");
+                        showSnackBar(errorMessage, "OK");
+                    }
+                } catch (Exception e) {
+                    progress(false);
+                    e.printStackTrace();
+                }
+            } else if ("SETTLE_CONFIRM".equalsIgnoreCase(requestCode)) {
+                try {
+                    JSONObject responseObject = new JSONObject(response);
+                    String status = responseObject.getString("status");
+                    progress(false);
+                    if ("success".equalsIgnoreCase(status)) {
+                        Intent intent = new Intent(GroupPieActivity.this, SettledActivity.class);
+                        finalSettleObject.put("status", "success");
+                        intent.putExtra("response", finalSettleObject.toString());
+                        intent.putExtra("group_name", group_name);
+                        finish();
+                    } else {
+                        String errorMessage = responseObject.getString("errorMessage");
+                        showSnackBar(errorMessage, "OK");
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    progress(false);
+                }
             }
         } else {
             progress(false);
             showSnackBar(AppController.getInstance().getString(R.string.something_went_wrong), "OK");
+        }
+    }
+
+    public void dummySettled(JSONObject responseObject) {
+        try {
+//            JSONObject responseObject = new JSONObject(response);
+//            String status = responseObject.getString("status");
+            progress(false);
+//            if ("success".equalsIgnoreCase(status)) {
+            Intent intent = new Intent(GroupPieActivity.this, SettledActivity.class);
+            finalSettleObject.put("status", "success");
+            intent.putExtra("response", finalSettleObject.toString());
+            intent.putExtra("group_name", group_name);
+            startActivity(intent);
+            finish();
+        } catch (Exception e) {
+            e.printStackTrace();
+            progress(false);
         }
     }
 }

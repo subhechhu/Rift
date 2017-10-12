@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 import com.np.rift.R;
 import com.np.rift.connection.NetworkCheck;
+import com.np.rift.main.groupFragment.GroupExpenseActivity;
 import com.np.rift.main.groupFragment.GroupPieActivity;
 
 import org.json.JSONArray;
@@ -111,7 +112,7 @@ public class AddExpFragment extends BottomSheetDialogFragment {
                     }
                 } else {
                     if ("group".equalsIgnoreCase(forActivity)) {
-
+                        ((GroupExpenseActivity) getActivity()).noInternet();
                     } else {
                         ((PersonalExpenseActivity) getActivity()).noInternet();
                     }

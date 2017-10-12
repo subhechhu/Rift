@@ -113,7 +113,7 @@ public class HomeActivity extends AppCompatActivity implements ServerGetRequest.
         bottomNavigation.setOnMenuItemClickListener(new BottomNavigation.OnMenuItemSelectionListener() {
             @Override
             public void onMenuItemSelect(@IdRes int i, int i1, boolean b) {
-                Log.e("TAG", "subhechhu , il: " + i1);
+//                Log.e("TAG", "subhechhu , il: " + i1);
                 if (i1 == 2) {
                     bottomNavigation.getBadgeProvider().remove(R.id.action_notification);
                 }
@@ -134,7 +134,7 @@ public class HomeActivity extends AppCompatActivity implements ServerGetRequest.
 
             @Override
             public void onPageSelected(int position) {
-                Log.e("TAG", "subhechhu , position: " + position);
+//                Log.e("TAG", "subhechhu , position: " + position);
                 if (position == 2) {
                     bottomNavigation.getBadgeProvider().remove(R.id.action_notification);
                 }
@@ -174,13 +174,6 @@ public class HomeActivity extends AppCompatActivity implements ServerGetRequest.
                 new IntentFilter(Config.PUSH_NOTIFICATION));
         // clear the notification area when the app is opened
         NotificationUtils.clearNotifications(getApplicationContext());
-
-        Log.e("TAG", "onResume()");
-        if (isDeleted) {
-            isDeleted = false;
-            adapter.notifyDataSetChanged();
-        }
-
     }
 
     @Override

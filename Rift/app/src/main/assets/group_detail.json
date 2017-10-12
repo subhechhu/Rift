@@ -1,0 +1,23 @@
+{
+  "status": "success",
+  "groupId": "420944",
+  "totalMembers": 3,
+  "totalExpense": 1900,
+  "chartObject": [
+    {
+      "userId": "05602",
+      "userName": "vasantha",
+      "expenses": 1050
+    },
+    {
+      "userId": "04345",
+      "userName": "subhechhu",
+      "expenses": 850
+    },
+    {
+      "userId": "04445",
+      "userName": "sandeep",
+      "expenses": 800
+    }
+  ]
+}

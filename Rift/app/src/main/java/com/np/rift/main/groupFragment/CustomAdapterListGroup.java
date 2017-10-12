@@ -30,7 +30,7 @@ class CustomAdapterListGroup extends RecyclerView.Adapter<CustomAdapterListGroup
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.group_view, parent, false);
+                .inflate(R.layout.view_group, parent, false);
         return new MyViewHolder(itemView);
     }
 
@@ -53,6 +53,7 @@ class CustomAdapterListGroup extends RecyclerView.Adapter<CustomAdapterListGroup
             @Override
             public void onClick(View view) {
                 Intent intent;
+//                intent = new Intent(context, SettledActivity.class);
                 if (details.isSettled) {
                     intent = new Intent(context, SettledActivity.class);
                 } else {
