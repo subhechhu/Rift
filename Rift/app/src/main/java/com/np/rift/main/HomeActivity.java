@@ -32,7 +32,6 @@ import com.np.rift.init.LoginActivity;
 import com.np.rift.main.groupFragment.JoinGroupFragment;
 import com.np.rift.main.menuOptions.AboutFragment;
 import com.np.rift.main.menuOptions.EditFragment;
-import com.np.rift.serverRequest.ServerGetRequest;
 import com.np.rift.util.SharedPrefUtil;
 import com.wang.avi.AVLoadingIndicatorView;
 
@@ -46,10 +45,10 @@ import it.sephiroth.android.library.bottomnavigation.BottomNavigation;
  * Created by subhechhu on 9/5/2017.
  */
 
-public class HomeActivity extends AppCompatActivity implements ServerGetRequest.Response,
-        JoinGroupFragment.RefreshGroup {
+public class HomeActivity extends AppCompatActivity implements JoinGroupFragment.RefreshGroup {
     final static int FRAGMENT_COUNT = 3;
     public static boolean isDeleted = false;
+    public static boolean settled = false;
     private final String TAG = getClass().getSimpleName();
     TextView textView_user, textView_exp;
     View linearlayout_main;
@@ -164,6 +163,11 @@ public class HomeActivity extends AppCompatActivity implements ServerGetRequest.
     @Override
     protected void onResume() {
         super.onResume();
+
+        if (settled && viewPager.getCurrentItem() == 1) {
+            settled = false;
+            showLongSnackBar("Group Settled. Please Refresh to view the changes");
+        }
         // register FCM registration complete receiver
         LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
                 new IntentFilter(Config.REGISTRATION_COMPLETE));
@@ -180,22 +184,6 @@ public class HomeActivity extends AppCompatActivity implements ServerGetRequest.
     protected void onPause() {
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mRegistrationBroadcastReceiver);
         super.onPause();
-    }
-
-
-    private void GetTotalExpense() {
-        String url = AppController.getInstance().getString(R.string.domain) + "/getTotalExp?userId=" + userId;
-        new ServerGetRequest(this, "GET_EXPENSE").execute(url);
-    }
-
-    @Override
-    public void getGetResult(String response, String requestCode, int responseCode) {
-        if (response != null && !response.isEmpty()) {
-
-        } else {
-            Progress(false);
-            showSnackBar("Something went wrong. Please Try Again!!!");
-        }
     }
 
     private void showSnackBar(String message) {

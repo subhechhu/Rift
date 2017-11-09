@@ -140,6 +140,6 @@ public class JoinGroupFragment extends BottomSheetDialogFragment implements Serv
     }
 
     public interface RefreshGroup {
-        public void refreshGroup(String message);
+        void refreshGroup(String message);
     }
 }

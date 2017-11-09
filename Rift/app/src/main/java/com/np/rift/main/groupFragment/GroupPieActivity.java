@@ -69,7 +69,7 @@ public class GroupPieActivity extends AppCompatActivity implements OnChartValueS
     DecimalFormat df = new DecimalFormat("0.00");
 
     JSONArray finalArray, memberExpArray;
-    JSONObject finalSettleObject;
+    JSONObject finalSettleObject, settleddata;
 
     TextView textView_groupName, textView_expense, textView_more;
     RelativeLayout relative_more, relative_graph;
@@ -201,7 +201,7 @@ public class GroupPieActivity extends AppCompatActivity implements OnChartValueS
 
     private void Settle() {
         try {
-            JSONObject memberExp = null;
+            JSONObject memberExp;
             memberExpArray = new JSONArray();
             settledDetails = new ArrayList<>();
             users = new ArrayList<>();
@@ -218,12 +218,13 @@ public class GroupPieActivity extends AppCompatActivity implements OnChartValueS
             }
             finalArray = new JSONArray();
             finalSettleObject = new JSONObject();
+            settleddata = new JSONObject();
             finalSettleObject.put("settle", true);
-            finalSettleObject.put("groupId", group_id);
-            finalSettleObject.put("totalExpense", totalExpense);
-            finalSettleObject.put("averageExpense", averageExpense);
-            finalSettleObject.put("settledBy", AppController.getUserName());
-            finalSettleObject.put("settledOn", new SimpleDateFormat("yyyy-MM-dd HH:mm").format(Calendar.getInstance().getTime()));
+            settleddata.put("groupId", group_id);
+            settleddata.put("totalExpense", totalExpense);
+            settleddata.put("averageExpense", averageExpense);
+            settleddata.put("settledBy", AppController.getUserName());
+            settleddata.put("settledOn", new SimpleDateFormat("yyyy-MM-dd").format(Calendar.getInstance().getTime()));
 
             CheckPendingCalculation(actualContribution, users);
         } catch (Exception e) {
@@ -236,12 +237,12 @@ public class GroupPieActivity extends AppCompatActivity implements OnChartValueS
             BreakExpense(actualContribution, users);
         else {
             try {
-                finalSettleObject.put("membersExpense", memberExpArray);
-                finalSettleObject.put("settledExpense", finalArray);
-                String url = AppController.getInstance().getString(R.string.domain);
-//                String url = AppController.getInstance().getString(R.string.domain) + "/settle?groupId=" + group_id;
-//                new ServerPostRequest(this, "SETTLE_CONFIRM").execute(url, finalSettleObject.toString());
-                dummySettled(finalSettleObject);
+                settleddata.put("membersExpense", memberExpArray);
+                settleddata.put("settledExpense", finalArray);
+//                String url = AppController.getInstance().getString(R.string.domain);
+                String url = AppController.getInstance().getString(R.string.domain) + "/settleExpenses";
+                new ServerPostRequest(this, "SETTLE_CONFIRM").execute(url, finalSettleObject.toString());
+//                dummySettled(finalSettleObject);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -608,10 +609,17 @@ public class GroupPieActivity extends AppCompatActivity implements OnChartValueS
                     String status = responseObject.getString("status");
                     progress(false);
                     if ("success".equalsIgnoreCase(status)) {
+
+                        HomeActivity.settled = true;
+
                         Intent intent = new Intent(GroupPieActivity.this, SettledActivity.class);
-                        finalSettleObject.put("status", "success");
-                        intent.putExtra("response", finalSettleObject.toString());
+//                        finalSettleObject.put("status", "success");
+//                        finalSettleObject.put("settleddata",settleddata);
+//                        intent.putExtra("response", finalSettleObject.toString());
                         intent.putExtra("group_name", group_name);
+                        intent.putExtra("group_id", group_id);
+                        intent.putExtra("group_expense", group_expense);
+                        startActivity(intent);
                         finish();
                     } else {
                         String errorMessage = responseObject.getString("errorMessage");

@@ -204,7 +204,7 @@ public class MainGroupFragment extends Fragment implements ServerGetRequest.Resp
                     groupModel.setGroupId(groupObj.getString("groupId"));
                     groupModel.setGroupName(groupObj.getString("groupName").toLowerCase());
                     groupModel.setMemberContribution(groupObj.getString("userExpense"));
-                    groupModel.setGroupExpense(groupObj.getString("groupExpense"));
+//                    groupModel.setGroupExpense(groupObj.getString("groupExpense"));
                     groupModel.setSettled(groupObj.getBoolean("settled"));
                     groupArrayList.add(groupModel);
                 }

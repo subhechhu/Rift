@@ -35,7 +35,7 @@ public class SettledActivity extends AppCompatActivity implements ServerGetReque
 
     String group_name, group_id, group_expense;
 
-    TextView textView_total, textView_average, textView_settledOn, textView_settledBy;
+    TextView textView_total, textView_average, textView_settledOn, textView_settledBy, textView_;
     LinearLayout linearlayout_body, linearlayout_end, linearlayout_main;
     String response;
 
@@ -45,7 +45,7 @@ public class SettledActivity extends AppCompatActivity implements ServerGetReque
 
         setContentView(R.layout.activity_settled);
 
-        Log.e("TAG","onCreate Settled()");
+        Log.e("TAG", "onCreate Settled()");
 
         response = getIntent().getStringExtra("response");
         group_name = getIntent().getStringExtra("group_name");
@@ -54,7 +54,7 @@ public class SettledActivity extends AppCompatActivity implements ServerGetReque
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        setTitle("Test");
+        setTitle("Settled");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
@@ -66,10 +66,11 @@ public class SettledActivity extends AppCompatActivity implements ServerGetReque
         textView_average = (TextView) findViewById(R.id.textView_average);
         textView_settledOn = (TextView) findViewById(R.id.textView_settledOn);
         textView_settledBy = (TextView) findViewById(R.id.textView_settledBy);
+        textView_ = (TextView) findViewById(R.id.textView__);
 
-        textView_total.setText(group_expense);
-        ParseJson(response);
-//        GetSettledInfo();
+//        ParseJson(response);
+        Log.e("TAG", "group_id: " + group_id);
+        GetSettledInfo();
 
     }
 
@@ -116,28 +117,36 @@ public class SettledActivity extends AppCompatActivity implements ServerGetReque
 
     private void GetSettledInfo() {
         String url = AppController.getInstance().getString(R.string.domain) +
-                "/getSettledInfo?groupId" + group_id;
-//        new ServerGetRequest(this, "GET_SETTLED").execute(url);
+                "/getSettledInfo?groupId=" + group_id;
+        new ServerGetRequest(this, "GET_SETTLED").execute(url);
 
     }
 
     private void ParseJson(String json) {
         try {
-            Log.e("TAG","json: "+json);
+            Log.e("TAG", "json: " + json);
             JSONObject responseObject = new JSONObject(json);
             String status = responseObject.getString("status");
             if ("success".equals(status)) {
-                String settledBy = responseObject.getString("settledBy");
-                String settledOn = responseObject.getString("settledOn");
+                JSONObject settledDataObject = responseObject.getJSONObject("settleddata");
 
-                String totalExpense = responseObject.getString("totalExpense");
-                String averageExpense = responseObject.getString("averageExpense");
+                String settledBy = settledDataObject.getString("settledBy");
+                String settledOn = settledDataObject.getString("settledOn");
+                group_id = settledDataObject.getString("groupId");
 
-                JSONArray membersExpense = responseObject.getJSONArray("membersExpense");
-                JSONArray settledExpense = responseObject.getJSONArray("settledExpense");
+                String totalExpense = settledDataObject.getString("totalExpense");
+                String averageExpense = settledDataObject.getString("averageExpense");
 
-                Log.e("TAG","settledBy:"+settledBy);
-                Log.e("TAG","settledOn:"+settledOn);
+                JSONArray membersExpense = settledDataObject.getJSONArray("membersExpense");
+                JSONArray settledExpense = settledDataObject.getJSONArray("settledExpense");
+
+                Log.e("TAG", "settledBy:" + settledBy);
+                Log.e("TAG", "settledOn:" + settledOn);
+
+
+                Log.e("TAG", "membersExpense:" + membersExpense);
+                Log.e("TAG", "settledExpense:" + settledExpense);
+                Log.e("TAG", "settledExpense.length():" + settledExpense.length());
 
                 textView_settledBy.setText(settledBy);
                 textView_settledOn.setText(settledOn);
@@ -152,6 +161,9 @@ public class SettledActivity extends AppCompatActivity implements ServerGetReque
                     RenderExpense(member, expense);
                 }
 
+                if (settledExpense.length() == 0) {
+                    textView_.setText("Expense is settled among the members");
+                }
                 for (int j = 0; j < settledExpense.length(); j++) {
                     JSONObject settledObject = settledExpense.getJSONObject(j);
                     String from = settledObject.getString("from");
@@ -216,7 +228,6 @@ public class SettledActivity extends AppCompatActivity implements ServerGetReque
             textView_from.setText(from);
             textView_to.setText(to);
             textView_expense.setText(amount);
-
         }
         linearlayout_end.addView(memberExpense);
     }

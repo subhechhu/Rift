@@ -61,8 +61,9 @@ public class UserRegistration extends AppCompatActivity implements ServerPostReq
             public void onClick(View view) {
                 if (!editText_userEmail.getText().toString().isEmpty()
                         && !editText_userName.getText().toString().isEmpty()) {
+                    String username = editText_userName.getText().toString().substring(0, 1).toUpperCase() + editText_userName.getText().toString().substring(1);
                     if (android.util.Patterns.EMAIL_ADDRESS.matcher(editText_userEmail.getText().toString()).matches()) {
-                        RegisterUser(editText_userEmail.getText().toString(), editText_userName.getText().toString());
+                        RegisterUser(editText_userEmail.getText().toString(), username);
                     } else {
                         showSnackBar("Invalid Email.");
                     }
