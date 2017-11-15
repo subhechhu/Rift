@@ -202,7 +202,7 @@ public class MainGroupFragment extends Fragment implements ServerGetRequest.Resp
                     GroupModel groupModel = new GroupModel();
                     JSONObject groupObj = groupListArray.getJSONObject(a);
                     groupModel.setGroupId(groupObj.getString("groupId"));
-                    groupModel.setGroupName(groupObj.getString("groupName").toLowerCase());
+                    groupModel.setGroupName(groupObj.getString("groupName"));
                     groupModel.setMemberContribution(groupObj.getString("userExpense"));
 //                    groupModel.setGroupExpense(groupObj.getString("groupExpense"));
                     groupModel.setSettled(groupObj.getBoolean("settled"));
@@ -225,9 +225,9 @@ public class MainGroupFragment extends Fragment implements ServerGetRequest.Resp
                     customAdapterGroup.notifyDataSetChanged();
                 }
 
-                if (1 == vp.getCurrentItem()) {
-                    showSnackBar("Groups Updated");
-                }
+//                if (1 == vp.getCurrentItem()) {
+//                    showSnackBar("Groups Updated");
+//                }
             } else {
                 Log.e("TAG", "vp.getCurrentItem(): " + vp.getCurrentItem());
                 textView_empty.setVisibility(View.VISIBLE);
@@ -271,9 +271,9 @@ public class MainGroupFragment extends Fragment implements ServerGetRequest.Resp
     @Override
     public void onResume() {
         super.onResume();
-        Log.e("TAG", "onResume mainGrpFragment");
+
+        //Called when group is exited.
         if (HomeActivity.isDeleted) {
-            showSnackBar("Exiting Group");
             HomeActivity.isDeleted = false;
             getGroups();
         }

@@ -12,11 +12,13 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.LineChart;
@@ -63,7 +65,7 @@ public class MainPersonalFragment extends Fragment implements OnChartGestureList
     int fragmentValue;
 
     TextView textView_total, textView_recent, texrView_month, textView_error;
-    View relative_main,relative_error, linear_main;
+    View relative_main, relative_error, linear_main;
     AVLoadingIndicatorView progress_default;
 
     ArrayList<Entry> values;
@@ -78,6 +80,8 @@ public class MainPersonalFragment extends Fragment implements OnChartGestureList
     HashMap<Integer, Integer> filteredMap = new HashMap<>();
     Date date = new Date();
     SharedPrefUtil sharedPrefUtil;
+    ViewPager vp;
+    Button button_refresh;
     private LineChart mChart;
 
     @Override
@@ -106,6 +110,17 @@ public class MainPersonalFragment extends Fragment implements OnChartGestureList
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View fragmentView = inflater.inflate(R.layout.fragment_personal, container, false);
         fab_add = fragmentView.findViewById(R.id.fab_add);
+        button_refresh = fragmentView.findViewById(R.id.button_refresh);
+
+        vp = (ViewPager) getActivity().findViewById(R.id.viewPager);
+
+        button_refresh.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                vp.getAdapter().notifyDataSetChanged();
+
+            }
+        });
 
         String currentMonth = format_month.format(date);
         getTotalMonthDate();
@@ -122,7 +137,7 @@ public class MainPersonalFragment extends Fragment implements OnChartGestureList
 
         mChart = fragmentView.findViewById(R.id.chart_line);
         mChart.setNoDataText("Please Add The Expenses To See The Graph");
-        mChart.setNoDataTextColor(ContextCompat.getColor(getActivity(),R.color.colorPrimaryDark));
+        mChart.setNoDataTextColor(ContextCompat.getColor(getActivity(), R.color.colorPrimaryDark));
 
 
         values = new ArrayList<>();
@@ -394,6 +409,7 @@ public class MainPersonalFragment extends Fragment implements OnChartGestureList
     @Override
     public void getGetResult(String response, String requestCode, int responseCode) {
         progress(false);
+        button_refresh.setVisibility(View.VISIBLE);
         if (response != null && !response.isEmpty()) {
             linear_main.setVisibility(View.VISIBLE);
             relative_error.setVisibility(View.GONE);

@@ -131,8 +131,19 @@
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:visibility="visible"
+        android:layout_margin="10dp"
         app:indicatorColor="@color/colorPrimary"
         app:indicatorName="PacmanIndicator"/>
+    <Button
+        android:id="@+id/button_refresh"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:layout_alignParentEnd="true"
+        android:layout_margin="20dp"
+        android:visibility="invisible"
+        android:background="@drawable/refresh_green"/>
+
+
 
 
 </RelativeLayout>

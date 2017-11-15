@@ -1,5 +1,7 @@
 package com.np.rift.main.groupFragment;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -14,13 +16,16 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.np.rift.AppController;
 import com.np.rift.R;
+import com.np.rift.main.HomeActivity;
 import com.np.rift.main.menuOptions.EditFragment;
 import com.np.rift.serverRequest.ServerGetRequest;
+import com.wang.avi.AVLoadingIndicatorView;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -38,6 +43,9 @@ public class SettledActivity extends AppCompatActivity implements ServerGetReque
     TextView textView_total, textView_average, textView_settledOn, textView_settledBy, textView_;
     LinearLayout linearlayout_body, linearlayout_end, linearlayout_main;
     String response;
+    int totalMembers;
+    AVLoadingIndicatorView progress_default;
+    RelativeLayout relativeLayout;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -46,6 +54,9 @@ public class SettledActivity extends AppCompatActivity implements ServerGetReque
         setContentView(R.layout.activity_settled);
 
         Log.e("TAG", "onCreate Settled()");
+
+        progress_default = (AVLoadingIndicatorView) findViewById(R.id.progress_default);
+        relativeLayout = (RelativeLayout) findViewById(R.id.relativeLayout);
 
         response = getIntent().getStringExtra("response");
         group_name = getIntent().getStringExtra("group_name");
@@ -84,10 +95,9 @@ public class SettledActivity extends AppCompatActivity implements ServerGetReque
         menuItem_exit = menu.findItem(R.id.menu_exit);
         menuItem_settle = menu.findItem(R.id.menu_settle);
 
-        menuItem_exit.setVisible(false);
+        menuItem_exit.setVisible(true);
         menuItem_settle.setVisible(false);
         return super.onPrepareOptionsMenu(menu);
-
     }
 
     @Override
@@ -111,13 +121,60 @@ public class SettledActivity extends AppCompatActivity implements ServerGetReque
             BottomSheetDialogFragment fragment = new EditFragment();
             fragment.setArguments(bundle);
             fragment.show(getSupportFragmentManager(), fragment.getTag());
+        } else if (item.getItemId() == R.id.menu_exit) {
+            createDialog("Exit");
+
         }
         return false;
     }
 
-    private void GetSettledInfo() {
+    public void createDialog(final String from) {
+        String title = "", body = "";
+        if ("Exit".equals(from)) {
+            title = "Exit Group";
+            if (totalMembers == 1) {
+                body = "Are you sure you want to exit " + group_name + "?";
+            } else {
+                body = "Are you sure you want to exit and delete " + group_name + "?";
+            }
+
+        }
+        AlertDialog.Builder builder;
+
+        builder = new AlertDialog.Builder(this);
+        builder.setTitle(title)
+                .setMessage(body)
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        if ("Exit".equals(from)) {
+                            RequestExit();
+                            HomeActivity.isDeleted = true;
+                            dialog.dismiss();
+                            finish();
+                        }
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                })
+                .show();
+    }
+
+    private void RequestExit() {
+        progress(true);
         String url = AppController.getInstance().getString(R.string.domain) +
-                "/getSettledInfo?groupId=" + group_id;
+                "/removeUser?userId=" + AppController.getUserId() +
+                "&groupId=" + group_id;
+        new ServerGetRequest(this, "REQUEST_EXIT").execute(url);
+    }
+
+    private void GetSettledInfo() {
+        Log.e("TAG", "geySettledInfo");
+        progress(true);
+        String url = AppController.getInstance().getString(R.string.domain) +
+                "/getSettleInfo?groupId=" + group_id;
         new ServerGetRequest(this, "GET_SETTLED").execute(url);
 
     }
@@ -128,8 +185,8 @@ public class SettledActivity extends AppCompatActivity implements ServerGetReque
             JSONObject responseObject = new JSONObject(json);
             String status = responseObject.getString("status");
             if ("success".equals(status)) {
+                relativeLayout.setVisibility(View.VISIBLE);
                 JSONObject settledDataObject = responseObject.getJSONObject("settleddata");
-
                 String settledBy = settledDataObject.getString("settledBy");
                 String settledOn = settledDataObject.getString("settledOn");
                 group_id = settledDataObject.getString("groupId");
@@ -140,9 +197,10 @@ public class SettledActivity extends AppCompatActivity implements ServerGetReque
                 JSONArray membersExpense = settledDataObject.getJSONArray("membersExpense");
                 JSONArray settledExpense = settledDataObject.getJSONArray("settledExpense");
 
+                totalMembers = membersExpense.length();
+
                 Log.e("TAG", "settledBy:" + settledBy);
                 Log.e("TAG", "settledOn:" + settledOn);
-
 
                 Log.e("TAG", "membersExpense:" + membersExpense);
                 Log.e("TAG", "settledExpense:" + settledExpense);
@@ -173,11 +231,20 @@ public class SettledActivity extends AppCompatActivity implements ServerGetReque
                 }
 
             } else {
+                relativeLayout.setVisibility(View.INVISIBLE);
                 String errorMessage = responseObject.getString("errorMessage");
                 showSnackBar(errorMessage);
             }
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    private void progress(boolean show) {
+        if (show) {
+            progress_default.setVisibility(View.VISIBLE);
+        } else {
+            progress_default.setVisibility(View.INVISIBLE);
         }
     }
 
@@ -200,6 +267,7 @@ public class SettledActivity extends AppCompatActivity implements ServerGetReque
     @Override
     public void getGetResult(String response, String requestCode, int responseCode) {
         if (response != null && !response.isEmpty()) {
+            progress(false);
             ParseJson(response);
         } else {
             showSnackBar(AppController.getInstance().getString(R.string.something_went_wrong));

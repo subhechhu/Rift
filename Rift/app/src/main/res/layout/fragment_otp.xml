@@ -32,8 +32,9 @@
         android:background="@drawable/border"
         android:ems="10"
         android:hint="@string/enter_otp"
-        android:textColor="@android:color/tab_indicator_text"
-        android:padding="10dp"/>
+        android:inputType="numberSigned"
+        android:padding="10dp"
+        android:textColor="@android:color/tab_indicator_text"/>
 
 
     <Button

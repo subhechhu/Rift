@@ -66,7 +66,7 @@
     <string name="logout">Logout</string>
     <string name="about_app">RIFT, an Expense Tracking application, helps you to track your expenses. It too lets you settle the expenses among your friends automatically.</string>
     <string name="refresh_here"><u>Refresh Here!!</u></string>
-    <string name="notification">Notification</string>
+    <string name="Activities">Activities</string>
     <string name="refresh">Tap to Refresh !!</string>
     <string name="swipe_and_refresh">Swipe and Refresh !!!</string>
 </resources>

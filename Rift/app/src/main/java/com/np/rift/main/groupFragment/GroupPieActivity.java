@@ -239,6 +239,8 @@ public class GroupPieActivity extends AppCompatActivity implements OnChartValueS
             try {
                 settleddata.put("membersExpense", memberExpArray);
                 settleddata.put("settledExpense", finalArray);
+                finalSettleObject.put("settleddata",settleddata);
+                Log.e("TAG", "finalSettleObject: " + finalSettleObject);
 //                String url = AppController.getInstance().getString(R.string.domain);
                 String url = AppController.getInstance().getString(R.string.domain) + "/settleExpenses";
                 new ServerPostRequest(this, "SETTLE_CONFIRM").execute(url, finalSettleObject.toString());
@@ -417,6 +419,15 @@ public class GroupPieActivity extends AppCompatActivity implements OnChartValueS
             Toast.makeText(this, "History", Toast.LENGTH_SHORT).show();
         } else if (item.getItemId() == R.id.menu_settle) {
             createDialog("Settle");
+        }else if( item.getItemId() == R.id.menu_share){
+                Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
+                sharingIntent.setType("text/plain");
+            String shareBodyText = "Hi!! You have been invited to join a group by "+AppController.getUserName()
+                    +"\nGroup Name- *"+group_name+"*\nGroup ID- *"+group_id+"*\n\nLet's Rift!!";
+//                String shareBodyText = "Hi!.You have been invited by to join group *"+group_name
+//                        +"* having id *"+group_id+"* by "+AppController.getUserName()+"\nLet's Rift!!";
+                sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareBodyText);
+                startActivity(Intent.createChooser(sharingIntent, "Shearing Option"));
         }
         return false;
     }
@@ -531,7 +542,7 @@ public class GroupPieActivity extends AppCompatActivity implements OnChartValueS
     }
 
     public void AddItems(JSONArray items) {
-        showSnackBar(AppController.getInstance().getString(R.string.updating), "OK");
+//        showSnackBar(AppController.getInstance().getString(R.string.updating), "OK");
         Log.e("TAG", "addItems GroupPieActivity");
         PostItems(items);
     }
@@ -615,7 +626,7 @@ public class GroupPieActivity extends AppCompatActivity implements OnChartValueS
                         Intent intent = new Intent(GroupPieActivity.this, SettledActivity.class);
 //                        finalSettleObject.put("status", "success");
 //                        finalSettleObject.put("settleddata",settleddata);
-//                        intent.putExtra("response", finalSettleObject.toString());
+                        intent.putExtra("response", finalSettleObject.toString());
                         intent.putExtra("group_name", group_name);
                         intent.putExtra("group_id", group_id);
                         intent.putExtra("group_expense", group_expense);

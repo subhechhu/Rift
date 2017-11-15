@@ -62,9 +62,18 @@ public class LoginActivity extends AppCompatActivity implements ServerGetRequest
         if (fromUserReg) {
             Bundle bundle = new Bundle();
             bundle.putString("email", getIntent().getStringExtra("email"));
-            BottomSheetDialogFragment fragment = new OTPFragment();
+            final BottomSheetDialogFragment fragment = new OTPFragment();
             fragment.setArguments(bundle);
             fragment.show(getSupportFragmentManager(), fragment.getTag());
+
+            Snackbar _snackbar = Snackbar.make(linearlayout_main,"", Snackbar.LENGTH_INDEFINITE);
+            _snackbar.setAction("Enter OTP", new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    fragment.show(getSupportFragmentManager(), fragment.getTag());
+                }
+            }).show();
+
         }
 
         checkBox_autoLogin = (AnimateCheckBox) findViewById(R.id.checkBox_autoLogin);
@@ -178,9 +187,18 @@ public class LoginActivity extends AppCompatActivity implements ServerGetRequest
                         Progress(false);
                         Bundle bundle = new Bundle();
                         bundle.putString("email", editText_email.getText().toString());
-                        BottomSheetDialogFragment fragment = new OTPFragment();
+                        final BottomSheetDialogFragment fragment = new OTPFragment();
                         fragment.setArguments(bundle);
                         fragment.show(getSupportFragmentManager(), fragment.getTag());
+
+                        Snackbar _snackbar = Snackbar.make(linearlayout_main,"", Snackbar.LENGTH_INDEFINITE);
+                        _snackbar.setAction("Enter OTP", new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                fragment.show(getSupportFragmentManager(), fragment.getTag());
+                            }
+                        }).show();
+
                     } else {
                         Progress(false);
                         String errorMessage = responseObject.getString("errorMessage");

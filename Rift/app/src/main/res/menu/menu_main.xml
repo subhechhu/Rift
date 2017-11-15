@@ -3,9 +3,6 @@
     <item
         android:id="@+id/edit_profile"
         android:title="@string/edit_profile" />
-    <item
-        android:id="@+id/share"
-        android:title="@string/share"/>
 
     <item
         android:id="@+id/about"

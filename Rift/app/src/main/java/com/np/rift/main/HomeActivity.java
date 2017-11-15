@@ -163,11 +163,14 @@ public class HomeActivity extends AppCompatActivity implements JoinGroupFragment
     @Override
     protected void onResume() {
         super.onResume();
+//        if (settled && viewPager.getCurrentItem() == 1) {
+//            settled = false;
+//            viewPager.getAdapter().notifyDataSetChanged();
+////            showSnackBar("Group Settled");
+//        }
 
-        if (settled && viewPager.getCurrentItem() == 1) {
-            settled = false;
-            showLongSnackBar("Group Settled. Please Refresh to view the changes");
-        }
+        viewPager.getAdapter().notifyDataSetChanged();
+
         // register FCM registration complete receiver
         LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
                 new IntentFilter(Config.REGISTRATION_COMPLETE));
@@ -243,14 +246,6 @@ public class HomeActivity extends AppCompatActivity implements JoinGroupFragment
                 BottomSheetDialogFragment aboutFragment = new AboutFragment();
                 aboutFragment.show(getSupportFragmentManager(), aboutFragment.getTag());
                 break;
-            case R.id.share:
-                Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
-                sharingIntent.setType("text/plain");
-                String shareBodyText = "Hey!! Check out Rift, a cool app to track your personal as well as your group expenses\n\n" +
-                        "https://play.google.com/store/apps/details?id=com.subhechhu.automessage";
-                sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareBodyText);
-                startActivity(Intent.createChooser(sharingIntent, "Shearing Option"));
-                break;
             case R.id.edit_profile:
                 Bundle bundle = new Bundle();
                 bundle.putString("for", "profile");
@@ -266,7 +261,8 @@ public class HomeActivity extends AppCompatActivity implements JoinGroupFragment
 
     @Override
     public void refreshGroup(String message) {
-        showLongSnackBar(message);
+        viewPager.getAdapter().notifyDataSetChanged();
+        showSnackBar(message);
     }
 
     public Fragment getFragment() {

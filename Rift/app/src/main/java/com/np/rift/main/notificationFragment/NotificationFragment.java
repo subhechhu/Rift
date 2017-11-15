@@ -187,9 +187,9 @@ public class NotificationFragment extends Fragment implements ServerGetRequest.R
                 } else {
                     customAdapterNotification.notifyDataSetChanged();
                 }
-                if (1 == vp.getCurrentItem()) {
-                    showSnackBar("Groups Updated");
-                }
+//                if (1 == vp.getCurrentItem()) {
+//                    showSnackBar("Groups Updated");
+//                }
             } else {
                 textView_empty.setVisibility(View.VISIBLE);
                 String errorMessage = responseObject.getString("errorMessage");

@@ -21,5 +21,5 @@
         android:id="@+id/action_notification"
         android:color="@color/color_tab_3"
         android:icon="@drawable/notification"
-        android:title="@string/notification" />
+        android:title="@string/Activities" />
 </menu>

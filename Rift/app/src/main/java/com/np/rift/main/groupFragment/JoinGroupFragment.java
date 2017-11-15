@@ -83,7 +83,7 @@ public class JoinGroupFragment extends BottomSheetDialogFragment implements Serv
                             jsonObject.put("groupPurpose", editText_groupPurpose.getText().toString());
                             jsonObject.put("userId", AppController.getUserId());
                             jsonObject.put("userName", AppController.getUserName());
-                            jsonObject.put("settled", false);
+                            jsonObject.put("settled", true);
 
                             RequestJoin("ADD_GROUP", url, jsonObject);
                         } catch (Exception e) {
@@ -122,7 +122,7 @@ public class JoinGroupFragment extends BottomSheetDialogFragment implements Serv
                 String status=responseObject.getString("status");
                 if("success".equalsIgnoreCase(status)){
                     getDialog().dismiss();
-                    refreshGroup.refreshGroup("Group added. Please refresh to view the changes");
+                    refreshGroup.refreshGroup("Group added.");
                 }else {
                     String errorMsg=responseObject.getString("errorMessage");
                     textView_message.setText(errorMsg);
