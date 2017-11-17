@@ -38,7 +38,7 @@ import java.io.InputStream;
 
 public class SettledActivity extends AppCompatActivity implements ServerGetRequest.Response {
 
-    String group_name, group_id, group_expense;
+    String group_name, group_id, group_expense, settleId;
 
     TextView textView_total, textView_average, textView_settledOn, textView_settledBy, textView_;
     LinearLayout linearlayout_body, linearlayout_end, linearlayout_main;
@@ -46,6 +46,7 @@ public class SettledActivity extends AppCompatActivity implements ServerGetReque
     int totalMembers;
     AVLoadingIndicatorView progress_default;
     RelativeLayout relativeLayout;
+    String from;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -58,10 +59,7 @@ public class SettledActivity extends AppCompatActivity implements ServerGetReque
         progress_default = (AVLoadingIndicatorView) findViewById(R.id.progress_default);
         relativeLayout = (RelativeLayout) findViewById(R.id.relativeLayout);
 
-        response = getIntent().getStringExtra("response");
-        group_name = getIntent().getStringExtra("group_name");
-        group_id = getIntent().getStringExtra("group_id");
-        group_expense = getIntent().getStringExtra("group_expense");
+        from = getIntent().getStringExtra("from");
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -80,8 +78,17 @@ public class SettledActivity extends AppCompatActivity implements ServerGetReque
         textView_ = (TextView) findViewById(R.id.textView__);
 
 //        ParseJson(response);
-        Log.e("TAG", "group_id: " + group_id);
-        GetSettledInfo();
+
+        if("settle".equalsIgnoreCase(from)){
+            response = getIntent().getStringExtra("response");
+            group_name = getIntent().getStringExtra("group_name");
+            group_id = getIntent().getStringExtra("group_id");
+            group_expense = getIntent().getStringExtra("group_expense");
+            GetSettledInfo();
+        }else {
+            settleId= getIntent().getStringExtra("settleId");
+            GetHistoryInfo();
+        }
 
     }
 
@@ -171,11 +178,18 @@ public class SettledActivity extends AppCompatActivity implements ServerGetReque
     }
 
     private void GetSettledInfo() {
-        Log.e("TAG", "geySettledInfo");
         progress(true);
         String url = AppController.getInstance().getString(R.string.domain) +
                 "/getSettleInfo?groupId=" + group_id;
         new ServerGetRequest(this, "GET_SETTLED").execute(url);
+
+    }
+
+    private void GetHistoryInfo() {
+        progress(true);
+        String url = AppController.getInstance().getString(R.string.domain) +
+                "/getSettleHistoryDetail?_id=" + settleId;
+        new ServerGetRequest(this, "GET_HISTORY").execute(url);
 
     }
 
@@ -198,13 +212,6 @@ public class SettledActivity extends AppCompatActivity implements ServerGetReque
                 JSONArray settledExpense = settledDataObject.getJSONArray("settledExpense");
 
                 totalMembers = membersExpense.length();
-
-                Log.e("TAG", "settledBy:" + settledBy);
-                Log.e("TAG", "settledOn:" + settledOn);
-
-                Log.e("TAG", "membersExpense:" + membersExpense);
-                Log.e("TAG", "settledExpense:" + settledExpense);
-                Log.e("TAG", "settledExpense.length():" + settledExpense.length());
 
                 textView_settledBy.setText(settledBy);
                 textView_settledOn.setText(settledOn);
@@ -266,8 +273,8 @@ public class SettledActivity extends AppCompatActivity implements ServerGetReque
 
     @Override
     public void getGetResult(String response, String requestCode, int responseCode) {
+        progress(false);
         if (response != null && !response.isEmpty()) {
-            progress(false);
             ParseJson(response);
         } else {
             showSnackBar(AppController.getInstance().getString(R.string.something_went_wrong));

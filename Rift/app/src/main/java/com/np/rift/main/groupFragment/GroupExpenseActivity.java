@@ -1,19 +1,3 @@
-/*
- *    Copyright (C) 2016 Haruki Hasegawa
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *        http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
- */
-
 package com.np.rift.main.groupFragment;
 
 import android.graphics.drawable.Drawable;
@@ -74,9 +58,9 @@ public class GroupExpenseActivity extends AppCompatActivity implements
     RecyclerViewExpandableItemManager expMgr;
     RecyclerView recyclerView;
     GroupExpenseActivity.MyAdapter adapter;
-    ArrayList<MonthModel> monthParentArray;
+    ArrayList<MonthModel> userParentArray;
     ArrayList<ExpenseModel> expenseArray;
-    String userId, userName;
+    String groupId, groupName;
     LinkedHashMap<String, List<ExpenseModel>> listDataChild;
     SharedPrefUtil sharedPrefUtil;
     TextView textView_empty;
@@ -116,8 +100,8 @@ public class GroupExpenseActivity extends AppCompatActivity implements
         setContentView(R.layout.activity_personal_expense);
 
         sharedPrefUtil = new SharedPrefUtil();
-        userId = sharedPrefUtil.getSharedPreferenceString(AppController.getContext(), "userId", "000");
-        userName = sharedPrefUtil.getSharedPreferenceString(AppController.getContext(), "userName", "abc");
+        groupId = getIntent().getStringExtra("groupId");
+        groupName = getIntent().getStringExtra("groupName");
 
         container = findViewById(R.id.container);
         progress_default = (AVLoadingIndicatorView) findViewById(R.id.progress_default);
@@ -171,7 +155,7 @@ public class GroupExpenseActivity extends AppCompatActivity implements
     private void GetExpenseDetails() {
         if (NetworkCheck.isInternetAvailable()) {
             String url = AppController.getInstance().getString(R.string.domain)
-                    + "/getPersonalExpense?userId=" + userId;
+                    + "/getGroupExpense?groupId=" + groupId;
             progress(true);
             new ServerGetRequest(this, "GET_EXPENSES").execute(url);
         } else {
@@ -232,10 +216,10 @@ public class GroupExpenseActivity extends AppCompatActivity implements
             String status = responseObject.getString("status");
             if ("success".equalsIgnoreCase(status)) {
                 JSONArray expenseDetailsArray = responseObject.getJSONArray("expenseDetails");
-                monthParentArray = new ArrayList<>();
+                userParentArray = new ArrayList<>();
                 listDataChild = new LinkedHashMap<>();
 
-                monthParentArray.clear();
+                userParentArray.clear();
                 listDataChild.clear();
 
                 if (expenseDetailsArray.length() == 0) {
@@ -247,11 +231,11 @@ public class GroupExpenseActivity extends AppCompatActivity implements
                     MonthModel month = new MonthModel();
                     JSONObject monthObject = expenseDetailsArray.getJSONObject(i);
 
-                    String mMonth = monthObject.getString("month");
+                    String mMonth = monthObject.getString("userName");
                     mMonth = mMonth.substring(0, 3);
 
-                    month.setName(monthObject.getString("month"));
-//                    month.setMonthDate((Date) monthObject.get("month"));
+                    month.setName(monthObject.getString("userName"));
+//                    month.setDate((Date) monthObject.get("month"));
 
                     JSONArray expensesSubArray = monthObject.getJSONArray("expenses");
                     expenseArray = new ArrayList<>();
@@ -261,27 +245,24 @@ public class GroupExpenseActivity extends AppCompatActivity implements
                         JSONObject innerSubObj =
                                 expensesSubArray.getJSONObject(j);
                         expenseModel.setRealDate(format_toGet.parse(innerSubObj.getString("date")));
-                        expenseModel.setId(innerSubObj.getString("expId"));
+//                        expenseModel.setId(innerSubObj.getString("expId"));
+
                         expenseModel.setDate(innerSubObj.getString("date"));
                         expenseModel.setSpentOn(innerSubObj.getString("spentOn"));
                         expenseModel.setAmount(innerSubObj.getString("amount"));
-//                            expenseModel.setType(innerSubObj.getString("type"));
-                        if (j % 2 == 0) {
-                            expenseModel.setType("personal");
-                        } else {
-                            expenseModel.setType("group");
-                        }
+//                        expenseModel.setUserId(innerSubObj.getString("userId"));
+
+                        expenseModel.setType("group");
 
                         expenseModel.setSelected(false);
                         monthTotal += Float.parseFloat(innerSubObj.getString("amount"));
                         expenseArray.add(expenseModel);
                     }
 
-                    month.setMonthExpense(String.valueOf(monthTotal));
+                    month.setExpense(String.valueOf(monthTotal));
                     Log.e("TAG", "muyymonth: " + month.toString());
-                    monthParentArray.add(month);
-
-                    listDataChild.put(monthParentArray.get(i).getName(), expenseArray);
+                    userParentArray.add(month);
+                    listDataChild.put(userParentArray.get(i).getName(), expenseArray);
                 }
 
                 expMgr = new RecyclerViewExpandableItemManager(null);
@@ -430,8 +411,8 @@ public class GroupExpenseActivity extends AppCompatActivity implements
         try {
             JSONObject postObject = new JSONObject();
             postObject.put("type", "group");
-            postObject.put("userId", userId);
-            postObject.put("userName", userName);
+            postObject.put("groupId", groupId);
+            postObject.put("groupName", groupName);
             postObject.put("data", itemsArray);
             String url = AppController.getInstance().getString(R.string.domain)
                     + "/addExpense";
@@ -474,9 +455,13 @@ public class GroupExpenseActivity extends AppCompatActivity implements
 
         switch (v.getId()) {
             case R.id.linearlayout_child:
-                if (listDataChild.get(monthParentArray.get(groupPosition).getName()).get(childPosition).getSelected()) {
-                    deleteList.remove(listDataChild.get(monthParentArray.get(groupPosition).getName()).get(childPosition).getId());
-                    listDataChild.get(monthParentArray.get(groupPosition).getName()).get(childPosition).setSelected(false);
+                Log.e("TAGGG", "getId: " + listDataChild.get(userParentArray.get(groupPosition).getName()).get(childPosition).getUserId());
+                Log.e("TAGGG", "user getId: " + AppController.getUserId());
+
+//                if(listDataChild.get(userParentArray.get(groupPosition).getName()).get(childPosition).getId().equalsIgnoreCase())
+                if (listDataChild.get(userParentArray.get(groupPosition).getName()).get(childPosition).getSelected()) {
+                    deleteList.remove(listDataChild.get(userParentArray.get(groupPosition).getName()).get(childPosition).getId());
+                    listDataChild.get(userParentArray.get(groupPosition).getName()).get(childPosition).setSelected(false);
                     linearlayout_child.setBackgroundColor(ContextCompat.getColor(GroupExpenseActivity.this, R.color.white));
                     selected--;
                     if (selected == 0) {
@@ -487,8 +472,8 @@ public class GroupExpenseActivity extends AppCompatActivity implements
                         _snackbar.setText(selected + " items");
                     }
                 } else {
-                    deleteList.add(listDataChild.get(monthParentArray.get(groupPosition).getName()).get(childPosition).getId());
-                    listDataChild.get(monthParentArray.get(groupPosition).getName()).get(childPosition).setSelected(true);
+                    deleteList.add(listDataChild.get(userParentArray.get(groupPosition).getName()).get(childPosition).getId());
+                    listDataChild.get(userParentArray.get(groupPosition).getName()).get(childPosition).setSelected(true);
                     linearlayout_child.setBackgroundColor(ContextCompat.getColor(GroupExpenseActivity.this, R.color.red_shade));
                     if (selected == 0) {
                         selected++;
@@ -532,7 +517,7 @@ public class GroupExpenseActivity extends AppCompatActivity implements
             this.spentOn = spentOn;
             this.amount = amount;
             this.type = type;
-            this.selected=selected;
+            this.selected = selected;
         }
     }
 
@@ -552,7 +537,7 @@ public class GroupExpenseActivity extends AppCompatActivity implements
     static class MyChildViewHolder extends AbstractExpandableItemViewHolder {
         TextView textView_date, textView_amount, textView_spentOn;
         LinearLayout linearlayout_child;
-        ImageView imageView_type;
+//        ImageView imageView_type;
 
         MyChildViewHolder(View itemView, View.OnClickListener clickListener) {
             super(itemView);
@@ -560,7 +545,7 @@ public class GroupExpenseActivity extends AppCompatActivity implements
             textView_amount = itemView.findViewById(R.id.textView_amount);
             textView_spentOn = itemView.findViewById(R.id.textView_spentOn);
             linearlayout_child = itemView.findViewById(R.id.linearlayout_child);
-            imageView_type = itemView.findViewById(R.id.imageView_type);
+//            imageView_type = itemView.findViewById(R.id.imageView_type);
             linearlayout_child.setOnClickListener(clickListener);
         }
     }
@@ -571,10 +556,10 @@ public class GroupExpenseActivity extends AppCompatActivity implements
         MyAdapter() {
             setHasStableIds(true); // this is required for expandable feature.
             mItems = new ArrayList<>();
-            for (int i = 0; i < monthParentArray.size(); i++) {
-                GroupExpenseActivity.MyGroupItem group = new GroupExpenseActivity.MyGroupItem(i, monthParentArray.get(i).getName(),
-                        monthParentArray.get(i).getMonthExpense());
-                List<ExpenseModel> list = listDataChild.get(monthParentArray.get(i).getName());
+            for (int i = 0; i < userParentArray.size(); i++) {
+                GroupExpenseActivity.MyGroupItem group = new GroupExpenseActivity.MyGroupItem(i, userParentArray.get(i).getName(),
+                        userParentArray.get(i).getExpense());
+                List<ExpenseModel> list = listDataChild.get(userParentArray.get(i).getName());
                 for (int j = 0; j < list.size(); j++) {
                     group.children.add(new GroupExpenseActivity.MyChildItem(j, list.get(j).getDate(),
                             list.get(j).getSpentOn(), list.get(j).getAmount(),
@@ -649,19 +634,20 @@ public class GroupExpenseActivity extends AppCompatActivity implements
             holder.textView_date.setText(child.date);
             holder.textView_amount.setText(child.amount);
             holder.textView_spentOn.setText(child.spentOn);
-            if (child.type.equalsIgnoreCase("personal")) {
-                holder.imageView_type.setImageResource(R.drawable.user_default);
-            } else {
-                holder.imageView_type.setImageResource(R.drawable.group_default);
-            }
+//            holder.imageView_type.setVisibility(View.INVISIBLE);
+//            if (child.type.equalsIgnoreCase("personal")) {
+//                holder.imageView_type.setImageResource(R.drawable.user_default);
+//            } else {
+//                holder.imageView_type.setImageResource(R.drawable.group_default);
+//            }
 
-            if(listDataChild.get(monthParentArray.get(groupPosition).getName()).get(childPosition).getSelected()){
-                holder.linearlayout_child.setBackgroundColor(ContextCompat.getColor(GroupExpenseActivity.this,
-                        R.color.red_shade));
-            }else {
-                holder.linearlayout_child.setBackgroundColor(ContextCompat.getColor(GroupExpenseActivity.this,
-                        R.color.white));
-            }
+//            if (listDataChild.get(userParentArray.get(groupPosition).getName()).get(childPosition).getSelected()) {
+//                holder.linearlayout_child.setBackgroundColor(ContextCompat.getColor(GroupExpenseActivity.this,
+//                        R.color.red_shade));
+//            } else {
+//                holder.linearlayout_child.setBackgroundColor(ContextCompat.getColor(GroupExpenseActivity.this,
+//                        R.color.white));
+//            }
         }
 
         @Override

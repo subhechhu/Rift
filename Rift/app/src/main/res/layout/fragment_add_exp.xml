@@ -13,7 +13,6 @@
         android:ems="10"
         android:hint="@string/spent_on"
         android:textColor="@android:color/tab_indicator_text"
-        android:inputType="textEmailAddress"
         android:padding="10dp"/>
 
     <LinearLayout

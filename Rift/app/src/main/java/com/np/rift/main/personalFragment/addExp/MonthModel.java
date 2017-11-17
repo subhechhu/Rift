@@ -1,15 +1,13 @@
 package com.np.rift.main.personalFragment.addExp;
 
 
-import java.util.Comparator;
 import java.util.Date;
-import java.util.Map;
 
 public class MonthModel {
     private String name;
     private int monthNumber;
-    private String monthExpense;
-    private Date monthDate;
+    private String expense;
+    private Date date;
 
 
     public int getMonthNumber() {
@@ -20,12 +18,12 @@ public class MonthModel {
         this.monthNumber = monthNumber;
     }
 
-    public String getMonthExpense() {
-        return monthExpense;
+    public String getExpense() {
+        return expense;
     }
 
-    public void setMonthExpense(String monthExpense) {
-        this.monthExpense = monthExpense;
+    public void setExpense(String expense) {
+        this.expense = expense;
     }
 
     public String getName() {
@@ -36,12 +34,12 @@ public class MonthModel {
         this.name = name;
     }
 
-    public Date getMonthDate() {
-        return monthDate;
+    public Date getDate() {
+        return date;
     }
 
-    public void setMonthDate(Date monthDate) {
-        this.monthDate = monthDate;
+    public void setDate(Date date) {
+        this.date = date;
     }
 
     @Override
@@ -49,7 +47,7 @@ public class MonthModel {
         return "MonthModel{" +
                 "name='" + name + '\'' +
                 ", monthNumber=" + monthNumber +
-                ", monthExpense='" + monthExpense + '\'' +
+                ", expense='" + expense + '\'' +
                 '}';
     }
 }

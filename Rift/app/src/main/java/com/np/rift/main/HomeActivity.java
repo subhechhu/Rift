@@ -169,8 +169,7 @@ public class HomeActivity extends AppCompatActivity implements JoinGroupFragment
 ////            showSnackBar("Group Settled");
 //        }
 
-        viewPager.getAdapter().notifyDataSetChanged();
-
+//        viewPager.getAdapter().notifyDataSetChanged();
         // register FCM registration complete receiver
         LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
                 new IntentFilter(Config.REGISTRATION_COMPLETE));

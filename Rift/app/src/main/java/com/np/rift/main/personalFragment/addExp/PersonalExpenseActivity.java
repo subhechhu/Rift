@@ -268,7 +268,7 @@ public class PersonalExpenseActivity extends AppCompatActivity implements
                         }
                     });
 
-                    month.setMonthExpense(String.valueOf(monthTotal));
+                    month.setExpense(String.valueOf(monthTotal));
                     monthParentArray.add(month);
 
                     listDataChild.put(monthParentArray.get(i).getName(), expenseArray);
@@ -333,7 +333,7 @@ public class PersonalExpenseActivity extends AppCompatActivity implements
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         menu.clear();
-        MenuItem menuItem_exit, menuItem_settle, menuItem_history, menuItem_edit;
+        MenuItem menuItem_exit, menuItem_settle, menuItem_history, menuItem_edit,menu_share;
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_add, menu);
 
@@ -341,11 +341,14 @@ public class PersonalExpenseActivity extends AppCompatActivity implements
         menuItem_settle = menu.findItem(R.id.menu_settle);
         menuItem_history = menu.findItem(R.id.menu_history);
         menuItem_edit = menu.findItem(R.id.menu_edit);
+        menu_share = menu.findItem(R.id.menu_share);
 
         menuItem_exit.setVisible(false);
         menuItem_edit.setVisible(false);
         menuItem_settle.setVisible(false);
         menuItem_history.setVisible(false);
+        menu_share.setVisible(false);
+
         return super.onPrepareOptionsMenu(menu);
     }
 
@@ -492,11 +495,6 @@ public class PersonalExpenseActivity extends AppCompatActivity implements
 //                Log.e("TAG", listDataChild.get(monthParentArray.get(groupPosition).getName()).get(childPosition).getId());
 //                Log.e("TAG", "delete list: " + deleteList.toString());
                 break;
-            case R.id.imageView_type:
-                if ("group".equalsIgnoreCase(listDataChild.get(monthParentArray.get(groupPosition).getName()).get(childPosition).getType())) {
-                    Toast.makeText(PersonalExpenseActivity.this, listDataChild.get(monthParentArray.get(groupPosition).getName()).get(childPosition).getType(), Toast.LENGTH_SHORT).show();
-                }
-                break;
             default:
                 throw new IllegalStateException("Unexpected click event");
         }
@@ -548,7 +546,7 @@ public class PersonalExpenseActivity extends AppCompatActivity implements
     static class MyChildViewHolder extends AbstractExpandableItemViewHolder {
         TextView textView_date, textView_amount, textView_spentOn;
         LinearLayout linearlayout_child;
-        ImageView imageView_type;
+//        ImageView imageView_type;
 
         MyChildViewHolder(View itemView, View.OnClickListener clickListener) {
             super(itemView);
@@ -556,9 +554,9 @@ public class PersonalExpenseActivity extends AppCompatActivity implements
             textView_amount = itemView.findViewById(R.id.textView_amount);
             textView_spentOn = itemView.findViewById(R.id.textView_spentOn);
             linearlayout_child = itemView.findViewById(R.id.linearlayout_child);
-            imageView_type = itemView.findViewById(R.id.imageView_type);
+//            imageView_type = itemView.findViewById(R.id.imageView_type);
             linearlayout_child.setOnClickListener(clickListener);
-            imageView_type.setOnClickListener(clickListener);
+//            imageView_type.setOnClickListener(clickListener);
         }
     }
 
@@ -570,7 +568,7 @@ public class PersonalExpenseActivity extends AppCompatActivity implements
             mItems = new ArrayList<>();
             for (int i = 0; i < monthParentArray.size(); i++) {
                 MyGroupItem group = new MyGroupItem(i, monthParentArray.get(i).getName(),
-                        monthParentArray.get(i).getMonthExpense());
+                        monthParentArray.get(i).getExpense());
                 List<ExpenseModel> list = listDataChild.get(monthParentArray.get(i).getName());
                 for (int j = 0; j < list.size(); j++) {
                     group.children.add(new MyChildItem(j, list.get(j).getDate(),
@@ -645,11 +643,11 @@ public class PersonalExpenseActivity extends AppCompatActivity implements
             holder.textView_date.setText(child.date);
             holder.textView_amount.setText(child.amount);
             holder.textView_spentOn.setText(child.spentOn);
-            if (child.type.equalsIgnoreCase("personal")) {
-                holder.imageView_type.setImageResource(R.drawable.user_default);
-            } else {
-                holder.imageView_type.setImageResource(R.drawable.group_default);
-            }
+//            if (child.type.equalsIgnoreCase("personal")) {
+//                holder.imageView_type.setImageResource(R.drawable.user_default);
+//            } else {
+//                holder.imageView_type.setImageResource(R.drawable.group_default);
+//            }
 
             if (listDataChild.get(monthParentArray.get(groupPosition).getName()).get(childPosition).getSelected()) {
                 holder.linearlayout_child.setBackgroundColor(ContextCompat.getColor(PersonalExpenseActivity.this,

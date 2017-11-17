@@ -11,6 +11,7 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.np.rift.R;
 import com.np.rift.connection.NetworkCheck;
@@ -35,7 +36,7 @@ public class AddExpFragment extends BottomSheetDialogFragment {
     EditText editText_productName, editText_productAmount;
     TextView textView_date;
     Button proceed;
-    Calendar calendar = Calendar.getInstance();
+    Calendar calendar = Calendar.getInstance(), calendar_current;
     DatePickerDialog datePickerDialog;
     JSONArray itemsArray = new JSONArray();
     View contentView;
@@ -59,10 +60,10 @@ public class AddExpFragment extends BottomSheetDialogFragment {
 
         dateToShow = format_toshow.format(calendar.getTime());
         dateToSend = format_toSend.format(calendar.getTime());
+
         textView_date.setText(dateToShow);
 
         textView_date.setOnClickListener(new View.OnClickListener() {
-            final long today_date = System.currentTimeMillis() + 3000;
             int mYear, mMonth, mDay;
 
             @Override
@@ -77,13 +78,16 @@ public class AddExpFragment extends BottomSheetDialogFragment {
                             public void onDateSet(DatePicker view, int year,
                                                   int monthOfYear, int dayOfMonth) {
                                 calendar.set(year, monthOfYear, dayOfMonth);
+                                calendar_current = Calendar.getInstance();
+                                if (calendar_current.before(calendar)) {
+                                    Toast.makeText(getActivity(), "Invalid Time Selected", Toast.LENGTH_SHORT).show();
+                                } else {
+                                    Date date = calendar.getTime();
+                                    dateToSend = format_toSend.format(date);
+                                    dateToShow = format_toshow.format(date);
 
-                                Date date = calendar.getTime();
-                                dateToSend = format_toSend.format(date);
-                                dateToShow = format_toshow.format(date);
-
-                                datePickerDialog.getDatePicker().setMaxDate(new Date().getTime());
-                                textView_date.setText(dateToShow);
+                                    textView_date.setText(dateToShow);
+                                }
                             }
                         }, mYear, mMonth, mDay);
                 datePickerDialog.getDatePicker().setMaxDate(System.currentTimeMillis());
@@ -97,7 +101,7 @@ public class AddExpFragment extends BottomSheetDialogFragment {
                 if (NetworkCheck.isInternetAvailable()) {
                     if (editText_productAmount.getText().toString().isEmpty() ||
                             editText_productName.getText().toString().isEmpty()) {
-                        showSnackBar("Fields cannot be empty");
+                        Toast.makeText(getActivity(), "Fields cannot be empty", Toast.LENGTH_SHORT).show();
                     } else {
                         try {
                             JSONObject itemObject = new JSONObject();

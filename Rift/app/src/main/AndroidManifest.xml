@@ -20,6 +20,7 @@
         <activity android:name=".main.groupFragment.GroupExpenseActivity"/>
         <activity android:name=".main.groupFragment.SettledActivity"/>
         <activity android:name=".infoScreen.InfoActivity"/>
+        <activity android:name=".main.groupFragment.HistoryActivity"/>
         <activity android:name=".SplashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>

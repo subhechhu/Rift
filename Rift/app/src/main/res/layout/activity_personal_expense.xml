@@ -38,6 +38,7 @@
                 android:layout_height="match_parent"
                 android:visibility="gone"/>
 
+
             <TextView
                 android:id="@+id/textView_empty"
                 android:layout_width="match_parent"
@@ -49,7 +50,6 @@
                 android:textStyle="bold"
                 android:visibility="gone"/>
 
-
             <com.wang.avi.AVLoadingIndicatorView
                 android:id="@+id/progress_default"
                 style="@style/AVLoadingIndicatorView"
@@ -59,6 +59,32 @@
                 android:layout_margin="10dp"
                 app:indicatorColor="@color/colorPrimary"
                 app:indicatorName="PacmanIndicator"/>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_alignParentBottom="true"
+                android:layout_centerHorizontal="true"
+                android:id="@+id/linear_buttons">
+
+                <android.support.design.widget.FloatingActionButton
+                    android:id="@+id/fab_delete"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:srcCompat="@drawable/remove"
+                    android:background="@color/RED"
+                    android:layout_margin="10dp"/>
+
+                <android.support.design.widget.FloatingActionButton
+                    android:id="@+id/fab_edit"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:srcCompat="@drawable/edit"
+                    android:layout_margin="10dp"/>
+
+            </LinearLayout>
         </RelativeLayout>
     </android.support.v4.widget.SwipeRefreshLayout>
+
 </LinearLayout>

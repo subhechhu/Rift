@@ -225,7 +225,7 @@ public class MainPersonalFragment extends Fragment implements OnChartGestureList
         super.onResume();
         Log.e("TAG", "onResume mainPersonal");
         if (sharedPrefUtil.getSharedPreferenceBoolean(AppController.getContext(), "refreshGraph", false)) {
-            showSnackBar("Updating The Expense", "OK");
+//            showSnackBar("Updating The Expense", "OK");
             values.clear();
             dataSets.clear();
             getTotalMonthDate();
@@ -251,6 +251,8 @@ public class MainPersonalFragment extends Fragment implements OnChartGestureList
         mChart.setDragEnabled(true);
         mChart.setScaleEnabled(true);
         mChart.setPinchZoom(true);
+
+        Log.e("TAG", "mv: " + mv);
 
         if (mv == null) {
             mv = new MyMarkerView(getActivity(), R.layout.view_custom_marker);

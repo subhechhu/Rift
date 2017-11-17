@@ -5,10 +5,35 @@ package com.np.rift.main.groupFragment;
  */
 
 public class GroupModel {
-    String groupId, groupName, memberContribution, groupMembers, membersId, groupExpense;
+    String groupId, groupName, memberContribution, groupMembers, membersId, groupExpense, settleId,
+            settleBy, settledOn;
     float expenses;
     int memberCount;
     boolean isSettled;
+
+    public String getSettleId() {
+        return settleId;
+    }
+
+    public void setSettleId(String settleId) {
+        this.settleId = settleId;
+    }
+
+    public String getSettleBy() {
+        return settleBy;
+    }
+
+    public void setSettleBy(String settleBy) {
+        this.settleBy = settleBy;
+    }
+
+    public String getSettledOn() {
+        return settledOn;
+    }
+
+    public void setSettledOn(String settledOn) {
+        this.settledOn = settledOn;
+    }
 
     public String getGroupExpense() {
         return groupExpense;
@@ -91,6 +116,9 @@ public class GroupModel {
                 ", groupMembers='" + groupMembers + '\'' +
                 ", membersId='" + membersId + '\'' +
                 ", groupExpense='" + groupExpense + '\'' +
+                ", settleId='" + settleId + '\'' +
+                ", settleBy='" + settleBy + '\'' +
+                ", settledOn='" + settledOn + '\'' +
                 ", expenses=" + expenses +
                 ", memberCount=" + memberCount +
                 ", isSettled=" + isSettled +

@@ -5,10 +5,18 @@ import java.util.Date;
 
 public class ExpenseModel {
     //    String name, price, description, productId; //to be deleted
-    String id, date, spentOn, amount, type;
+    String id, date, spentOn, amount, type, userId;
     Boolean selected;
     Date realDate;
 
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
 
     public String getType() {
         return type;
@@ -74,6 +82,7 @@ public class ExpenseModel {
                 ", spentOn='" + spentOn + '\'' +
                 ", amount='" + amount + '\'' +
                 ", type='" + type + '\'' +
+                ", userId='" + userId + '\'' +
                 ", selected=" + selected +
                 ", realDate=" + realDate +
                 '}';
