@@ -13,10 +13,12 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.np.rift.AppController;
 import com.np.rift.R;
 import com.np.rift.connection.NetworkCheck;
 import com.np.rift.main.groupFragment.GroupExpenseActivity;
 import com.np.rift.main.groupFragment.GroupPieActivity;
+import com.np.rift.util.SharedPrefUtil;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -144,29 +146,28 @@ public class AddExpFragment extends BottomSheetDialogFragment {
     private void createDialog(final Dialog bottomDialog) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle("Confirmation")
-                .setMessage("Do you want to add more items?")
+                .setMessage("Do you want to add arrow_more items?")
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         editText_productName.setText("");
                         editText_productAmount.setText("");
                         dialog.dismiss();
                     }
-                })
-                .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        editText_productName.setText("");
-                        editText_productAmount.setText("");
-                        dialog.dismiss();
-                        if ("group".equalsIgnoreCase(forActivity)) {
-                            isSent = true;
-                            ((GroupPieActivity) getActivity()).AddItems(itemsArray);
-                        } else {
-                            isSent = true;
-                            ((PersonalExpenseActivity) getActivity()).AddItems(itemsArray);
-                        }
-                        bottomDialog.dismiss();
-                    }
-                })
+                }).setNegativeButton("No", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                editText_productName.setText("");
+                editText_productAmount.setText("");
+                dialog.dismiss();
+                if ("group".equalsIgnoreCase(forActivity)) {
+                    isSent = true;
+                    ((GroupPieActivity) getActivity()).AddItems(itemsArray);
+                } else {
+                    isSent = true;
+                    ((PersonalExpenseActivity) getActivity()).AddItems(itemsArray);
+                }
+                bottomDialog.dismiss();
+            }
+        })
                 .show();
     }
 

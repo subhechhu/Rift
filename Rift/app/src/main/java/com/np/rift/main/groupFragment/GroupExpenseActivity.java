@@ -3,9 +3,9 @@ package com.np.rift.main.groupFragment;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.design.widget.BottomSheetDialogFragment;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -18,9 +18,12 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.h6ah4i.android.widget.advrecyclerview.expandable.ExpandableItemConstants;
 import com.h6ah4i.android.widget.advrecyclerview.expandable.RecyclerViewExpandableItemManager;
@@ -36,6 +39,7 @@ import com.np.rift.main.personalFragment.addExp.ExpenseModel;
 import com.np.rift.main.personalFragment.addExp.MonthModel;
 import com.np.rift.serverRequest.ServerGetRequest;
 import com.np.rift.serverRequest.ServerPostRequest;
+import com.np.rift.util.MyBounceInterpolator;
 import com.np.rift.util.SharedPrefUtil;
 import com.wang.avi.AVLoadingIndicatorView;
 
@@ -45,6 +49,8 @@ import org.json.JSONObject;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -68,10 +74,15 @@ public class GroupExpenseActivity extends AppCompatActivity implements
     View container;
     AVLoadingIndicatorView progress_default;
     int selected = 0;
+    LinearLayout linear_buttons;
 
     ArrayList<String> deleteList = new ArrayList<>();
 
     Snackbar _snackbar;
+    Animation myAnim;
+    MyBounceInterpolator interpolator;
+
+    FloatingActionButton fab_delete, fab_edit;
 
     View.OnClickListener mItemOnClickListener = new View.OnClickListener() {
         @Override
@@ -103,8 +114,15 @@ public class GroupExpenseActivity extends AppCompatActivity implements
         groupId = getIntent().getStringExtra("groupId");
         groupName = getIntent().getStringExtra("groupName");
 
+        fab_delete = (FloatingActionButton) findViewById(R.id.fab_delete);
+        fab_edit = (FloatingActionButton) findViewById(R.id.fab_edit);
+
         container = findViewById(R.id.container);
         progress_default = (AVLoadingIndicatorView) findViewById(R.id.progress_default);
+        linear_buttons = (LinearLayout) findViewById(R.id.linear_buttons);
+
+        myAnim = AnimationUtils.loadAnimation(this, R.anim.bounce);
+        interpolator = new MyBounceInterpolator(0.2, 20);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -113,8 +131,8 @@ public class GroupExpenseActivity extends AppCompatActivity implements
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
-        SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeRefreshLayout);
-        swipeRefreshLayout.setEnabled(false);
+//        SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeRefreshLayout);
+//        swipeRefreshLayout.setEnabled(false);
 
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         textView_empty = (TextView) findViewById(R.id.textView_empty);
@@ -123,6 +141,35 @@ public class GroupExpenseActivity extends AppCompatActivity implements
 //        ParseJson(getJSON());
         GetExpenseDetails();
 
+        fab_edit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (selected > 1) {
+                    Toast.makeText(GroupExpenseActivity.this, "Cannot edit arrow_more than 1 expense", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(GroupExpenseActivity.this, "Edit Coming soon", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        fab_delete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (NetworkCheck.isInternetAvailable()) {
+                    if (selected > 1) {
+                        Toast.makeText(GroupExpenseActivity.this, "Delete Coming soon", Toast.LENGTH_SHORT).show();
+                    } else {
+//                        selected = 0;
+                        Toast.makeText(GroupExpenseActivity.this, "Delete Coming soon", Toast.LENGTH_SHORT).show();
+//                        deleteRequest();
+                    }
+                } else {
+                    noInternet();
+                }
+
+
+            }
+        });
 
         textView_empty.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -130,6 +177,14 @@ public class GroupExpenseActivity extends AppCompatActivity implements
                 GetExpenseDetails();
             }
         });
+    }
+
+    public void bounceAnimation() {
+        if (linear_buttons.getVisibility() == View.GONE) {
+            linear_buttons.setVisibility(View.VISIBLE);
+            myAnim.setInterpolator(interpolator);
+            linear_buttons.startAnimation(myAnim);
+        }
     }
 
     public void noInternet() {
@@ -167,6 +222,7 @@ public class GroupExpenseActivity extends AppCompatActivity implements
     @Override
     public void getGetResult(String response, String requestCode, int responseCode) {
         if (response != null && !response.isEmpty()) {
+            Log.e("TAG", "resppnse: " + response);
             if ("GET_EXPENSES".equals(requestCode)) {
                 try {
                     progress(false);
@@ -232,8 +288,7 @@ public class GroupExpenseActivity extends AppCompatActivity implements
                     JSONObject monthObject = expenseDetailsArray.getJSONObject(i);
 
                     String mMonth = monthObject.getString("userName");
-                    mMonth = mMonth.substring(0, 3);
-
+//                    mMonth = mMonth.substring(0, 3);
                     month.setName(monthObject.getString("userName"));
 //                    month.setDate((Date) monthObject.get("month"));
 
@@ -245,12 +300,11 @@ public class GroupExpenseActivity extends AppCompatActivity implements
                         JSONObject innerSubObj =
                                 expensesSubArray.getJSONObject(j);
                         expenseModel.setRealDate(format_toGet.parse(innerSubObj.getString("date")));
-//                        expenseModel.setId(innerSubObj.getString("expId"));
-
+                        expenseModel.setId(innerSubObj.getString("expId"));
                         expenseModel.setDate(innerSubObj.getString("date"));
                         expenseModel.setSpentOn(innerSubObj.getString("spentOn"));
                         expenseModel.setAmount(innerSubObj.getString("amount"));
-//                        expenseModel.setUserId(innerSubObj.getString("userId"));
+                        expenseModel.setUserId(innerSubObj.getString("userId"));
 
                         expenseModel.setType("group");
 
@@ -258,9 +312,13 @@ public class GroupExpenseActivity extends AppCompatActivity implements
                         monthTotal += Float.parseFloat(innerSubObj.getString("amount"));
                         expenseArray.add(expenseModel);
                     }
+                    Collections.sort(expenseArray, new Comparator<ExpenseModel>() {
+                        public int compare(ExpenseModel o1, ExpenseModel o2) {
+                            return o2.getRealDate().compareTo(o1.getRealDate());
+                        }
+                    });
 
                     month.setExpense(String.valueOf(monthTotal));
-                    Log.e("TAG", "muyymonth: " + month.toString());
                     userParentArray.add(month);
                     listDataChild.put(userParentArray.get(i).getName(), expenseArray);
                 }
@@ -289,6 +347,7 @@ public class GroupExpenseActivity extends AppCompatActivity implements
                 progress(false);
                 if ("success".equals(status)) {
                     sharedPrefUtil.setSharedPreferenceBoolean(AppController.getContext(), "refreshGraph", true);
+                    sharedPrefUtil.getSharedPreferenceBoolean(AppController.getContext(), "refreshGroup", true);
                     GetExpenseDetails();
                 } else {
                     String errorMessage = responseObject.getString("errorMessage");
@@ -455,33 +514,42 @@ public class GroupExpenseActivity extends AppCompatActivity implements
 
         switch (v.getId()) {
             case R.id.linearlayout_child:
-                Log.e("TAGGG", "getId: " + listDataChild.get(userParentArray.get(groupPosition).getName()).get(childPosition).getUserId());
-                Log.e("TAGGG", "user getId: " + AppController.getUserId());
-
-//                if(listDataChild.get(userParentArray.get(groupPosition).getName()).get(childPosition).getId().equalsIgnoreCase())
-                if (listDataChild.get(userParentArray.get(groupPosition).getName()).get(childPosition).getSelected()) {
-                    deleteList.remove(listDataChild.get(userParentArray.get(groupPosition).getName()).get(childPosition).getId());
-                    listDataChild.get(userParentArray.get(groupPosition).getName()).get(childPosition).setSelected(false);
-                    linearlayout_child.setBackgroundColor(ContextCompat.getColor(GroupExpenseActivity.this, R.color.white));
-                    selected--;
-                    if (selected == 0) {
-                        _snackbar.dismiss();
-                    } else if (selected == 1) {
-                        _snackbar.setText(selected + " item");
+                if (listDataChild.get(userParentArray.get(groupPosition).getName()).get(childPosition).getUserId().equalsIgnoreCase(AppController.getUserId())) {
+                    if (listDataChild.get(userParentArray.get(groupPosition).getName()).get(childPosition).getSelected()) {
+                        deleteList.remove(listDataChild.get(userParentArray.get(groupPosition).getName()).get(childPosition).getId());
+                        listDataChild.get(userParentArray.get(groupPosition).getName()).get(childPosition).setSelected(false);
+                        linearlayout_child.setBackgroundColor(ContextCompat.getColor(GroupExpenseActivity.this, R.color.white));
+                        selected--;
+                        if (selected == 0) {
+                            linear_buttons.setVisibility(View.GONE);
+//                            _snackbar.dismiss();
+                        }
+//                        else if (selected == 1) {
+//                            linear_buttons.setVisibility(View.VISIBLE);
+//                            _snackbar.setText(selected + " item");
+//                        }
+                        else {
+                            bounceAnimation();
+//                            _snackbar.setText(selected + " items");
+                        }
                     } else {
-                        _snackbar.setText(selected + " items");
+                        deleteList.add(listDataChild.get(userParentArray.get(groupPosition).getName()).get(childPosition).getId());
+                        listDataChild.get(userParentArray.get(groupPosition).getName()).get(childPosition).setSelected(true);
+                        linearlayout_child.setBackgroundColor(ContextCompat.getColor(GroupExpenseActivity.this, R.color.red_shade));
+                        if (selected >= 0) {
+                            selected++;
+                            bounceAnimation();
+//                            showSnackBar(selected + " item", "Delete");
+                        }
+//                        else if (selected > 0) {
+//                            selected++;
+//                            _snackbar.setText(selected + " items");
+//                        }
                     }
                 } else {
-                    deleteList.add(listDataChild.get(userParentArray.get(groupPosition).getName()).get(childPosition).getId());
-                    listDataChild.get(userParentArray.get(groupPosition).getName()).get(childPosition).setSelected(true);
-                    linearlayout_child.setBackgroundColor(ContextCompat.getColor(GroupExpenseActivity.this, R.color.red_shade));
-                    if (selected == 0) {
-                        selected++;
-                        showSnackBar(selected + " item", "Delete");
-                    } else if (selected > 0) {
-                        selected++;
-                        _snackbar.setText(selected + " items");
-                    }
+                    Toast.makeText(GroupExpenseActivity.this, "Mind your own business " +
+                            "" + AppController.getUserName() + "?? :P \n" +
+                            "Please ask " + userParentArray.get(groupPosition).getName() + " to delete this", Toast.LENGTH_SHORT).show();
                 }
                 break;
             default:
@@ -616,10 +684,10 @@ public class GroupExpenseActivity extends AppCompatActivity implements
                 Drawable img_arrow;
                 if ((expandState & GroupExpenseActivity.Expandable.STATE_FLAG_IS_EXPANDED) != 0) {
                     textColor = ContextCompat.getColor(GroupExpenseActivity.this, R.color.colorAccent);
-                    img_arrow = ContextCompat.getDrawable(GroupExpenseActivity.this, R.drawable.arrow_up);
+                    img_arrow = ContextCompat.getDrawable(GroupExpenseActivity.this, R.drawable.arrow_more);
                 } else {
                     textColor = ContextCompat.getColor(GroupExpenseActivity.this, R.color.colorPrimaryDark);
-                    img_arrow = ContextCompat.getDrawable(GroupExpenseActivity.this, R.drawable.arrow_down);
+                    img_arrow = ContextCompat.getDrawable(GroupExpenseActivity.this, R.drawable.arrow_less);
                 }
                 holder.textView_monthName.setTextColor(textColor);
                 holder.textView_monthAmt.setTextColor(textColor);

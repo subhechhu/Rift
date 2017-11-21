@@ -23,14 +23,19 @@
             app:titleTextColor="@android:color/white"/>
     </android.support.design.widget.AppBarLayout>
 
-    <android.support.v4.widget.SwipeRefreshLayout
-        android:id="@+id/swipeRefreshLayout"
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <!--<android.support.v4.widget.SwipeRefreshLayout-->
+        <!--android:id="@+id/swipeRefreshLayout"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent">-->
+
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:layout_alignParentBottom="true">
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/recycler_view"
@@ -59,32 +64,35 @@
                 android:layout_margin="10dp"
                 app:indicatorColor="@color/colorPrimary"
                 app:indicatorName="PacmanIndicator"/>
+        </RelativeLayout>
+        <!--</android.support.v4.widget.SwipeRefreshLayout>-->
 
-            <LinearLayout
+        <LinearLayout
+            android:id="@+id/linear_buttons"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:visibility="gone">
+
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/fab_delete"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_alignParentBottom="true"
-                android:layout_centerHorizontal="true"
-                android:id="@+id/linear_buttons">
+                android:layout_margin="10dp"
+                android:background="@color/RED"
+                app:srcCompat="@drawable/remove"/>
 
-                <android.support.design.widget.FloatingActionButton
-                    android:id="@+id/fab_delete"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:srcCompat="@drawable/remove"
-                    android:background="@color/RED"
-                    android:layout_margin="10dp"/>
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/fab_edit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                app:srcCompat="@drawable/edit"/>
 
-                <android.support.design.widget.FloatingActionButton
-                    android:id="@+id/fab_edit"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:srcCompat="@drawable/edit"
-                    android:layout_margin="10dp"/>
-
-            </LinearLayout>
-        </RelativeLayout>
-    </android.support.v4.widget.SwipeRefreshLayout>
+        </LinearLayout>
+    </RelativeLayout>
 
 </LinearLayout>

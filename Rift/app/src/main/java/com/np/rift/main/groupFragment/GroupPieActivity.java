@@ -53,6 +53,7 @@ import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.List;
 
 
@@ -80,6 +81,7 @@ public class GroupPieActivity extends AppCompatActivity implements OnChartValueS
     JSONArray chartArray;
     boolean settled;
     SharedPrefUtil sharedPrefUtil;
+    String via;
     private PieChart mChart;
 
     @Override
@@ -93,6 +95,10 @@ public class GroupPieActivity extends AppCompatActivity implements OnChartValueS
         group_name = getIntent().getStringExtra("group_name");
         group_id = getIntent().getStringExtra("group_id");
         group_expense = getIntent().getStringExtra("group_expense");
+        via = getIntent().getStringExtra("from");
+        if ("Settle".equalsIgnoreCase(via)) {
+            AddFragment();
+        }
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -182,7 +188,6 @@ public class GroupPieActivity extends AppCompatActivity implements OnChartValueS
                     public void onClick(DialogInterface dialog, int which) {
                         if ("Exit".equals(from)) {
                             RequestExit();
-                            HomeActivity.isDeleted = true;
                             dialog.dismiss();
                             finish();
                         } else {
@@ -225,6 +230,8 @@ public class GroupPieActivity extends AppCompatActivity implements OnChartValueS
             settleddata = new JSONObject();
             finalSettleObject.put("settle", true);
             settleddata.put("groupId", group_id);
+            settleddata.put("userId", AppController.getUserId());
+            settleddata.put("groupName", group_name);
             settleddata.put("totalExpense", totalExpense);
             settleddata.put("averageExpense", averageExpense);
             settleddata.put("settledBy", AppController.getUserName());
@@ -311,7 +318,7 @@ public class GroupPieActivity extends AppCompatActivity implements OnChartValueS
         progress(true);
         String url = AppController.getInstance().getString(R.string.domain) +
                 "/removeUser?userId=" + AppController.getUserId() +
-                "&groupId=" + group_id;
+                "&groupId=" + group_id + "&groupName=" + group_name + "&userName=" + AppController.getUserName();
         new ServerGetRequest(this, "REQUEST_EXIT").execute(url);
     }
 
@@ -400,11 +407,7 @@ public class GroupPieActivity extends AppCompatActivity implements OnChartValueS
         if (item.getItemId() == android.R.id.home) {
             finish();
         } else if (item.getItemId() == R.id.menu_add) {
-            Bundle bundle = new Bundle();
-            bundle.putString("for", "group");
-            BottomSheetDialogFragment fragment = new AddExpFragment();
-            fragment.setArguments(bundle);
-            fragment.show(getSupportFragmentManager(), fragment.getTag());
+            AddFragment();
             return true;
         } else if (item.getItemId() == R.id.menu_edit) {
             Bundle bundle = new Bundle();
@@ -430,13 +433,22 @@ public class GroupPieActivity extends AppCompatActivity implements OnChartValueS
             Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
             sharingIntent.setType("text/plain");
             String shareBodyText = "Hi!! You have been invited to join a group by " + AppController.getUserName()
-                    + "\nGroup Name- *" + group_name + "*\nGroup ID- *" + group_id + "*\n\nLet's Rift!!";
+                    + "\nGroup Name- *" + group_name + "*\nGroup ID- *" + group_id + "*\n\nLet's Rift!!\n\n\n" +
+                    "https://play.google.com/store/apps/details?id=com.np.rift";
 //                String shareBodyText = "Hi!.You have been invited by to join group *"+group_name
 //                        +"* having id *"+group_id+"* by "+AppController.getUserName()+"\nLet's Rift!!";
             sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareBodyText);
             startActivity(Intent.createChooser(sharingIntent, "Shearing Option"));
         }
         return false;
+    }
+
+    private void AddFragment() {
+        Bundle bundle = new Bundle();
+        bundle.putString("for", "group");
+        BottomSheetDialogFragment fragment = new AddExpFragment();
+        fragment.setArguments(bundle);
+        fragment.show(getSupportFragmentManager(), fragment.getTag());
     }
 
     private void parseResponse(String response) {
@@ -504,6 +516,8 @@ public class GroupPieActivity extends AppCompatActivity implements OnChartValueS
         for (int c : ColorTemplate.VORDIPLOM_COLORS)
             colors.add(c);
 
+        Collections.shuffle(colors);
+
         dataSet.setColors(colors);
         dataSet.setSelectionShift(12f);
 
@@ -549,7 +563,6 @@ public class GroupPieActivity extends AppCompatActivity implements OnChartValueS
     }
 
     public void AddItems(JSONArray items) {
-//        showSnackBar(AppController.getInstance().getString(R.string.updating), "OK");
         Log.e("TAG", "addItems GroupPieActivity");
         PostItems(items);
     }
@@ -561,6 +574,7 @@ public class GroupPieActivity extends AppCompatActivity implements OnChartValueS
             postObject.put("userId", AppController.getUserId());
             postObject.put("userName", AppController.getUserName());
             postObject.put("groupId", group_id);
+            postObject.put("groupName", group_name);
             postObject.put("data", itemsArray);
             String url = AppController.getInstance().getString(R.string.domain)
                     + "/addExpense";
@@ -582,7 +596,7 @@ public class GroupPieActivity extends AppCompatActivity implements OnChartValueS
                     JSONObject responseObject = new JSONObject(response);
                     String status = responseObject.getString("status");
                     if ("success".equalsIgnoreCase(status)) {
-                        HomeActivity.isDeleted = true;
+                        sharedPrefUtil.setSharedPreferenceBoolean(AppController.getContext(), "refreshGroup", true);
                         finish();
                     } else {
                         String errorMessage = responseObject.getString("errorMessage");
@@ -613,6 +627,7 @@ public class GroupPieActivity extends AppCompatActivity implements OnChartValueS
                     progress(false);
                     if ("success".equals(status)) {
                         sharedPrefUtil.setSharedPreferenceBoolean(AppController.getContext(), "refreshGraph", true);
+                        sharedPrefUtil.setSharedPreferenceBoolean(AppController.getContext(), "refreshGroup", true);
                         RequestGroupInfo(group_id);
                     } else {
                         String errorMessage = responseObject.getString("errorMessage");

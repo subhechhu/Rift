@@ -18,13 +18,12 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.np.rift.AppController;
 import com.np.rift.R;
-import com.np.rift.main.HomeActivity;
 import com.np.rift.main.menuOptions.EditFragment;
 import com.np.rift.serverRequest.ServerGetRequest;
+import com.np.rift.util.SharedPrefUtil;
 import com.wang.avi.AVLoadingIndicatorView;
 
 import org.json.JSONArray;
@@ -48,6 +47,8 @@ public class SettledActivity extends AppCompatActivity implements ServerGetReque
     RelativeLayout relativeLayout;
     String from;
 
+    SharedPrefUtil sharedPrefUtil;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,10 +57,15 @@ public class SettledActivity extends AppCompatActivity implements ServerGetReque
 
         Log.e("TAG", "onCreate Settled()");
 
+        sharedPrefUtil = new SharedPrefUtil();
+
         progress_default = (AVLoadingIndicatorView) findViewById(R.id.progress_default);
         relativeLayout = (RelativeLayout) findViewById(R.id.relativeLayout);
 
         from = getIntent().getStringExtra("from");
+        if (from == null) {
+            from = "Settle";
+        }
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -77,16 +83,18 @@ public class SettledActivity extends AppCompatActivity implements ServerGetReque
         textView_settledBy = (TextView) findViewById(R.id.textView_settledBy);
         textView_ = (TextView) findViewById(R.id.textView__);
 
-//        ParseJson(response);
+        //To show last settle or history
+        //If from= settle then last settle is shown else history is shown
+        //Done this way as history has different api
 
-        if("settle".equalsIgnoreCase(from)){
+        if ("settle".equalsIgnoreCase(from)) {
             response = getIntent().getStringExtra("response");
             group_name = getIntent().getStringExtra("group_name");
             group_id = getIntent().getStringExtra("group_id");
             group_expense = getIntent().getStringExtra("group_expense");
             GetSettledInfo();
-        }else {
-            settleId= getIntent().getStringExtra("settleId");
+        } else {
+            settleId = getIntent().getStringExtra("settleId");
             GetHistoryInfo();
         }
 
@@ -117,17 +125,28 @@ public class SettledActivity extends AppCompatActivity implements ServerGetReque
             intent.putExtra("group_name", group_name);
             intent.putExtra("group_id", group_id);
             intent.putExtra("group_expense", group_expense);
+            intent.putExtra("from", "Settle");
             startActivity(intent);
             finish();
             return true;
         } else if (item.getItemId() == R.id.menu_history) {
-            Toast.makeText(this, "History", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(SettledActivity.this, HistoryActivity.class);
+            intent.putExtra("groupId", group_id);
+            startActivity(intent);
         } else if (item.getItemId() == R.id.menu_edit) {
             Bundle bundle = new Bundle();
             bundle.putString("for", "group");
             BottomSheetDialogFragment fragment = new EditFragment();
             fragment.setArguments(bundle);
             fragment.show(getSupportFragmentManager(), fragment.getTag());
+        } else if (item.getItemId() == R.id.menu_share) {
+            Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
+            sharingIntent.setType("text/plain");
+            String shareBodyText = "Hi!! You have been invited to join a group by " + AppController.getUserName()
+                    + "\nGroup Name- *" + group_name + "*\nGroup ID- *" + group_id + "*\n\nLet's Rift!!\n\n\n" +
+                    "https://play.google.com/store/apps/details?id=com.np.rift";
+            sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareBodyText);
+            startActivity(Intent.createChooser(sharingIntent, "Shearing Option"));
         } else if (item.getItemId() == R.id.menu_exit) {
             createDialog("Exit");
 
@@ -155,7 +174,8 @@ public class SettledActivity extends AppCompatActivity implements ServerGetReque
                     public void onClick(DialogInterface dialog, int which) {
                         if ("Exit".equals(from)) {
                             RequestExit();
-                            HomeActivity.isDeleted = true;
+                            sharedPrefUtil.setSharedPreferenceBoolean(AppController.getContext(), "refreshGroup", true);
+//                            HomeActivity.isDeleted = true;
                             dialog.dismiss();
                             finish();
                         }
@@ -200,6 +220,7 @@ public class SettledActivity extends AppCompatActivity implements ServerGetReque
             String status = responseObject.getString("status");
             if ("success".equals(status)) {
                 relativeLayout.setVisibility(View.VISIBLE);
+                sharedPrefUtil.setSharedPreferenceBoolean(AppController.getContext(), "refreshGroup", true);
                 JSONObject settledDataObject = responseObject.getJSONObject("settleddata");
                 String settledBy = settledDataObject.getString("settledBy");
                 String settledOn = settledDataObject.getString("settledOn");
@@ -236,7 +257,6 @@ public class SettledActivity extends AppCompatActivity implements ServerGetReque
                     String amount = settledObject.getString("amount");
                     RenderSettled(from, amount, to);
                 }
-
             } else {
                 relativeLayout.setVisibility(View.INVISIBLE);
                 String errorMessage = responseObject.getString("errorMessage");
@@ -275,7 +295,22 @@ public class SettledActivity extends AppCompatActivity implements ServerGetReque
     public void getGetResult(String response, String requestCode, int responseCode) {
         progress(false);
         if (response != null && !response.isEmpty()) {
-            ParseJson(response);
+            if ("REQUEST_EXIT".equalsIgnoreCase(requestCode)) {
+                try {
+                    JSONObject responseObject = new JSONObject(response);
+                    String status = responseObject.getString("status");
+                    if ("success".equalsIgnoreCase(status)) {
+                        finish();
+                    } else {
+                        String errorMessage = responseObject.getString("errorMessage");
+                        showSnackBar(errorMessage);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            } else if ("GET_SETTLED".equalsIgnoreCase(requestCode) || "GET_HISTORY".equalsIgnoreCase(requestCode)) {
+                ParseJson(response);
+            }
         } else {
             showSnackBar(AppController.getInstance().getString(R.string.something_went_wrong));
         }
@@ -320,7 +355,7 @@ public class SettledActivity extends AppCompatActivity implements ServerGetReque
     }
 
     private void showSnackBar(String message) {
-        final Snackbar _snackbar = Snackbar.make(linearlayout_main, message, Snackbar.LENGTH_LONG);
+        final Snackbar _snackbar = Snackbar.make(linearlayout_main, message, Snackbar.LENGTH_INDEFINITE);
         _snackbar.setAction("OK", new View.OnClickListener() {
             @Override
             public void onClick(View view) {

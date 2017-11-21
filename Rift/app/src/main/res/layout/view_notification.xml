@@ -3,31 +3,20 @@
               android:id="@+id/linearlayout_child"
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
-              android:elevation="1dp"
-              android:orientation="horizontal"
-              android:padding="10dp"
-              android:layout_marginTop="2dp"
-              android:layout_marginBottom="1dp"
               android:layout_marginEnd="2dp"
               android:layout_marginStart="2dp"
-    android:background="@color/colorPrimary_shade_">
-    <ImageView
-        android:id="@+id/textView_groupMembers"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_margin="2dp"
-        android:gravity="center_horizontal"
-        android:src="@drawable/group_default"
-        android:padding="5dp"
-        android:textSize="15sp"
-        android:contentDescription="@string/group"/>
+              android:padding="5dp"
+              android:layout_marginBottom="2dp"
+              android:orientation="vertical"
+              android:background="@color/white">
 
     <TextView
-        android:id="@+id/textView_groupID"
-        android:layout_width="wrap_content"
+        android:id="@+id/textView_group"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="2dp"
-        android:padding="5dp"
+        android:padding="10dp"
         android:text="@string/personal_data"
         android:textSize="17sp"/>
+
 </LinearLayout>

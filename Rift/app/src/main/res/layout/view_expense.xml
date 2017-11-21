@@ -68,7 +68,7 @@
                 android:layout_marginStart="2dp"
                 android:layout_toStartOf="@id/textView_amount"
                 android:contentDescription="@string/calendar"
-                android:src="@drawable/currency"/>
+                android:src="@drawable/money"/>
         </RelativeLayout>
     </LinearLayout>
 

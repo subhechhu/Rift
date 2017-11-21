@@ -30,7 +30,7 @@ public class ConnectionLost extends DialogFragment {
                 ViewGroup.LayoutParams.WRAP_CONTENT);
 
         dialog.show();
-        Button button_ok = (Button) dialog.findViewById(R.id.button_ok);
+        Button button_ok = dialog.findViewById(R.id.button_ok);
         button_ok.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

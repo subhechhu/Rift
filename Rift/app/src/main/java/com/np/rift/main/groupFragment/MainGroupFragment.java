@@ -23,8 +23,8 @@ import android.widget.TextView;
 
 import com.np.rift.AppController;
 import com.np.rift.R;
-import com.np.rift.main.HomeActivity;
 import com.np.rift.serverRequest.ServerGetRequest;
+import com.np.rift.util.SharedPrefUtil;
 import com.wang.avi.AVLoadingIndicatorView;
 
 import org.json.JSONArray;
@@ -58,6 +58,8 @@ public class MainGroupFragment extends Fragment implements ServerGetRequest.Resp
     TextView textView_empty;
     LinearLayout linearlayout_main;
 
+    SharedPrefUtil sharedPrefUtil;
+
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -75,6 +77,7 @@ public class MainGroupFragment extends Fragment implements ServerGetRequest.Resp
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         fragmentValue = getArguments() != null ? getArguments().getInt("val") : 1;
+        sharedPrefUtil = new SharedPrefUtil();
     }
 
     @Nullable
@@ -197,6 +200,9 @@ public class MainGroupFragment extends Fragment implements ServerGetRequest.Resp
             groupArrayList = new ArrayList<>();
             String status = responseObject.getString("status");
             if ("success".equalsIgnoreCase(status)) {
+                if (recycler_view.getVisibility() == View.INVISIBLE) {
+                    recycler_view.setVisibility(View.VISIBLE);
+                }
                 JSONArray groupListArray = responseObject.getJSONArray("groupList");
                 for (int a = 0; a < groupListArray.length(); a++) {
                     GroupModel groupModel = new GroupModel();
@@ -231,6 +237,7 @@ public class MainGroupFragment extends Fragment implements ServerGetRequest.Resp
             } else {
                 Log.e("TAG", "vp.getCurrentItem(): " + vp.getCurrentItem());
                 textView_empty.setVisibility(View.VISIBLE);
+                recycler_view.setVisibility(View.INVISIBLE);
                 String errorMessage = responseObject.getString("errorMessage");
                 if (1 == vp.getCurrentItem()) {
                     showSnackBar(errorMessage);
@@ -272,10 +279,16 @@ public class MainGroupFragment extends Fragment implements ServerGetRequest.Resp
     public void onResume() {
         super.onResume();
 
+        Log.e("TAG", "sharedPrefUtil.getSharedPreferenceBoolean(AppController.getContext(), \"refreshGroup\", false): "
+                + sharedPrefUtil.getSharedPreferenceBoolean(AppController.getContext(), "refreshGroup", false));
         //Called when group is exited.
-        if (HomeActivity.isDeleted) {
-            HomeActivity.isDeleted = false;
+        if (sharedPrefUtil.getSharedPreferenceBoolean(AppController.getContext(), "refreshGroup", false)) {
+            sharedPrefUtil.setSharedPreferenceBoolean(AppController.getContext(), "refreshGroup", false);
             getGroups();
         }
+//        if (HomeActivity.isDeleted) {
+//            HomeActivity.isDeleted = false;
+//            getGroups();
+//        }
     }
 }

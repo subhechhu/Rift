@@ -77,6 +77,7 @@ public class LoginActivity extends AppCompatActivity implements ServerGetRequest
         }
 
         checkBox_autoLogin = (AnimateCheckBox) findViewById(R.id.checkBox_autoLogin);
+        checkBox_autoLogin.setChecked(true);
         editText_email = (EditText) findViewById(R.id.editText_email);
         button_proceed = (Button) findViewById(R.id.button_proceed);
         texView_autoLogin = (TextView) findViewById(R.id.texView_autoLogin);

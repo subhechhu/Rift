@@ -84,7 +84,7 @@ class CustomAdapterListGroup extends RecyclerView.Adapter<CustomAdapterListGroup
 
             this.setIsRecyclable(false);
 
-            textView_groupID = view.findViewById(R.id.textView_groupID);
+            textView_groupID = view.findViewById(R.id.textView_group);
             textView_userExpense = itemView.findViewById(R.id.textView_groupMembers);
             textView_groupName = itemView.findViewById(R.id.textView_groupName);
             linearlayout_child = itemView.findViewById(R.id.linearlayout_child);

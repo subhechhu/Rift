@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -18,7 +19,6 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.np.rift.AppController;
 import com.np.rift.R;
@@ -45,6 +45,8 @@ public class HistoryActivity extends AppCompatActivity implements ServerGetReque
     ArrayList<GroupModel> groupModelArrayList;
     AVLoadingIndicatorView progress_default;
 
+    LinearLayout linear_parent;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,6 +59,8 @@ public class HistoryActivity extends AppCompatActivity implements ServerGetReque
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         String groupId = getIntent().getStringExtra("groupId");
+
+        linear_parent = (LinearLayout) findViewById(R.id.linear_parent);
 
         progress_default = (AVLoadingIndicatorView) findViewById(R.id.progress_default);
         recycler_view = (RecyclerView) findViewById(R.id.recycler_view);
@@ -116,14 +120,27 @@ public class HistoryActivity extends AppCompatActivity implements ServerGetReque
                     }
 
                 } else {
-                    Toast.makeText(HistoryActivity.this, "Something went wrong. Please try again!",
-                            Toast.LENGTH_SHORT).show();
+                    String errorMessage = responseObject.getString("errorMessage");
+                    showSnackBar(errorMessage);
                 }
+            } else {
+                showSnackBar("Something went wrong. Please try again!");
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
+    private void showSnackBar(String message) {
+        final Snackbar _snackbar = Snackbar.make(linear_parent, message, Snackbar.LENGTH_INDEFINITE);
+        _snackbar.setAction("OK", new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                _snackbar.dismiss();
+            }
+        }).show();
+    }
+
 
     //===================================================================================================================================
 //===================================================================================================================================
@@ -192,7 +209,7 @@ public class HistoryActivity extends AppCompatActivity implements ServerGetReque
 
                 this.setIsRecyclable(false);
 
-                textView_settleBy = view.findViewById(R.id.textView_groupID);
+                textView_settleBy = view.findViewById(R.id.textView_group);
                 textView_settleDate = itemView.findViewById(R.id.textView_groupName);
                 linearlayout_child = itemView.findViewById(R.id.linearlayout_child);
                 relative_contribute = itemView.findViewById(R.id.relative_contribute);

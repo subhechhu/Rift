@@ -19,6 +19,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.LineChart;
@@ -82,7 +83,8 @@ public class MainPersonalFragment extends Fragment implements OnChartGestureList
     SharedPrefUtil sharedPrefUtil;
     ViewPager vp;
     Button button_refresh;
-    private LineChart mChart;
+    LinearLayout linear_month;
+    LineChart mChart;
 
     @Override
     public void onAttach(Context context) {
@@ -112,13 +114,26 @@ public class MainPersonalFragment extends Fragment implements OnChartGestureList
         fab_add = fragmentView.findViewById(R.id.fab_add);
         button_refresh = fragmentView.findViewById(R.id.button_refresh);
 
-        vp = (ViewPager) getActivity().findViewById(R.id.viewPager);
+        vp = getActivity().findViewById(R.id.viewPager);
 
         button_refresh.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 vp.getAdapter().notifyDataSetChanged();
 
+            }
+        });
+
+        linear_month= fragmentView.findViewById(R.id.linear_month);
+        linear_month.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (NetworkCheck.isInternetAvailable()) {
+                    startActivity(new Intent(mActivity, PersonalExpenseActivity.class));
+                } else {
+                    showSnackBarInternet("No Internet");
+                    ((HomeActivity) getActivity()).noInternet();
+                }
             }
         });
 

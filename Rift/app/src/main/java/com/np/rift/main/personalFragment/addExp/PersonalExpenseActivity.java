@@ -19,9 +19,9 @@ package com.np.rift.main.personalFragment.addExp;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.design.widget.BottomSheetDialogFragment;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -34,6 +34,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -50,6 +52,7 @@ import com.np.rift.connection.ConnectionLost;
 import com.np.rift.connection.NetworkCheck;
 import com.np.rift.serverRequest.ServerGetRequest;
 import com.np.rift.serverRequest.ServerPostRequest;
+import com.np.rift.util.MyBounceInterpolator;
 import com.np.rift.util.SharedPrefUtil;
 import com.wang.avi.AVLoadingIndicatorView;
 
@@ -75,7 +78,7 @@ public class PersonalExpenseActivity extends AppCompatActivity implements
     MyAdapter adapter;
     ArrayList<MonthModel> monthParentArray;
     ArrayList<ExpenseModel> expenseArray;
-    String userId,userName;
+    String userId, userName;
     LinkedHashMap<String, List<ExpenseModel>> listDataChild;
     SharedPrefUtil sharedPrefUtil;
     TextView textView_empty;
@@ -85,8 +88,13 @@ public class PersonalExpenseActivity extends AppCompatActivity implements
     int selected = 0;
 
     ArrayList<String> deleteList = new ArrayList<>();
-
     Snackbar _snackbar;
+    LinearLayout linear_buttons;
+
+    Animation myAnim;
+    MyBounceInterpolator interpolator;
+    FloatingActionButton fab_delete, fab_edit;
+
 
     View.OnClickListener mItemOnClickListener = new View.OnClickListener() {
         @Override
@@ -123,12 +131,19 @@ public class PersonalExpenseActivity extends AppCompatActivity implements
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         setTitle("Expense");
-
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
-        SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeRefreshLayout);
-        swipeRefreshLayout.setEnabled(false);
+        linear_buttons = (LinearLayout) findViewById(R.id.linear_buttons);
+
+        fab_delete = (FloatingActionButton) findViewById(R.id.fab_delete);
+        fab_edit = (FloatingActionButton) findViewById(R.id.fab_edit);
+
+//        SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeRefreshLayout);
+//        swipeRefreshLayout.setEnabled(false);
+
+        myAnim = AnimationUtils.loadAnimation(this, R.anim.bounce);
+        interpolator = new MyBounceInterpolator(0.2, 20);
 
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         textView_empty = (TextView) findViewById(R.id.textView_empty);
@@ -138,12 +153,48 @@ public class PersonalExpenseActivity extends AppCompatActivity implements
         GetExpenseDetails();
 
 
+        fab_edit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (selected > 1) {
+                    Toast.makeText(PersonalExpenseActivity.this, "Cannot edit arrow_more than 1 expense", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(PersonalExpenseActivity.this, "Ask Vasanta about it ", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        fab_delete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (NetworkCheck.isInternetAvailable()) {
+                    if (selected > 1) {
+                        Toast.makeText(PersonalExpenseActivity.this, "Sandeep is stupid for not " +
+                                "making this feature", Toast.LENGTH_SHORT).show();
+                    } else {
+                        selected = 0;
+                        deleteRequest();
+                    }
+                } else {
+                    noInternet();
+                }
+            }
+        });
+
         textView_empty.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 GetExpenseDetails();
             }
         });
+    }
+
+    public void bounceAnimation() {
+        if (linear_buttons.getVisibility() == View.GONE) {
+            linear_buttons.setVisibility(View.VISIBLE);
+            myAnim.setInterpolator(interpolator);
+            linear_buttons.startAnimation(myAnim);
+        }
     }
 
     public void noInternet() {
@@ -199,6 +250,7 @@ public class PersonalExpenseActivity extends AppCompatActivity implements
                     if ("Success".equalsIgnoreCase(status)) {
                         GetExpenseDetails();
                         showSnackBar("Expenses has been deleted", "OK");
+                        linear_buttons.setVisibility(View.GONE);
                         GetExpenseDetails();
                     } else {
                         String errorMessage = responseObject.getString("errorMessage");
@@ -230,6 +282,9 @@ public class PersonalExpenseActivity extends AppCompatActivity implements
             JSONObject responseObject = new JSONObject(response);
             String status = responseObject.getString("status");
             if ("success".equalsIgnoreCase(status)) {
+                if(recyclerView.getVisibility()==View.INVISIBLE){
+                    recyclerView.setVisibility(View.VISIBLE);
+                }
                 JSONArray expenseDetailsArray = responseObject.getJSONArray("expenseDetails");
                 monthParentArray = new ArrayList<>();
                 listDataChild = new LinkedHashMap<>();
@@ -280,8 +335,10 @@ public class PersonalExpenseActivity extends AppCompatActivity implements
                 ((SimpleItemAnimator) recyclerView.getItemAnimator()).setSupportsChangeAnimations(false);
                 expMgr.attachRecyclerView(recyclerView);
             } else {
+                recyclerView.setVisibility(View.INVISIBLE);
                 String errorMessage = responseObject.getString("errorMessage");
                 showSnackBar(errorMessage, "OK");
+
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -333,7 +390,7 @@ public class PersonalExpenseActivity extends AppCompatActivity implements
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         menu.clear();
-        MenuItem menuItem_exit, menuItem_settle, menuItem_history, menuItem_edit,menu_share;
+        MenuItem menuItem_exit, menuItem_settle, menuItem_history, menuItem_edit, menu_share;
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_add, menu);
 
@@ -468,29 +525,37 @@ public class PersonalExpenseActivity extends AppCompatActivity implements
 
         switch (v.getId()) {
             case R.id.linearlayout_child:
+
                 if (listDataChild.get(monthParentArray.get(groupPosition).getName()).get(childPosition).getSelected()) {
                     deleteList.remove(listDataChild.get(monthParentArray.get(groupPosition).getName()).get(childPosition).getId());
                     listDataChild.get(monthParentArray.get(groupPosition).getName()).get(childPosition).setSelected(false);
                     linearlayout_child.setBackgroundColor(ContextCompat.getColor(PersonalExpenseActivity.this, R.color.white));
                     selected--;
                     if (selected == 0) {
-                        _snackbar.dismiss();
-                    } else if (selected == 1) {
-                        _snackbar.setText(selected + " item");
-                    } else {
-                        _snackbar.setText(selected + " items");
+                        linear_buttons.setVisibility(View.GONE);
+//                        _snackbar.dismiss();
+                    }
+//                    else if (selected == 1) {
+//
+//                        _snackbar.setText(selected + " item");
+//                    }
+                    else {
+                        bounceAnimation();
+//                        _snackbar.setText(selected + " items");
                     }
                 } else {
                     deleteList.add(listDataChild.get(monthParentArray.get(groupPosition).getName()).get(childPosition).getId());
                     listDataChild.get(monthParentArray.get(groupPosition).getName()).get(childPosition).setSelected(true);
                     linearlayout_child.setBackgroundColor(ContextCompat.getColor(PersonalExpenseActivity.this, R.color.red_shade));
-                    if (selected == 0) {
+                    if (selected >= 0) {
                         selected++;
-                        showSnackBar(selected + " item", "Delete");
-                    } else if (selected > 0) {
-                        selected++;
-                        _snackbar.setText(selected + " items");
+//                        showSnackBar(selected + " item", "Delete");
+                        bounceAnimation();
                     }
+//                    else if (selected > 0) {
+//                        selected++;
+//                        _snackbar.setText(selected + " items");
+//                    }
                 }
 //                Log.e("TAG", listDataChild.get(monthParentArray.get(groupPosition).getName()).get(childPosition).getId());
 //                Log.e("TAG", "delete list: " + deleteList.toString());
@@ -626,10 +691,10 @@ public class PersonalExpenseActivity extends AppCompatActivity implements
 
                 if ((expandState & Expandable.STATE_FLAG_IS_EXPANDED) != 0) {
                     textColor = ContextCompat.getColor(PersonalExpenseActivity.this, R.color.colorAccent);
-                    img_arrow = ContextCompat.getDrawable(PersonalExpenseActivity.this, R.drawable.arrow_up);
+                    img_arrow = ContextCompat.getDrawable(PersonalExpenseActivity.this, R.drawable.arrow_more);
                 } else {
                     textColor = ContextCompat.getColor(PersonalExpenseActivity.this, R.color.colorPrimaryDark);
-                    img_arrow = ContextCompat.getDrawable(PersonalExpenseActivity.this, R.drawable.arrow_down);
+                    img_arrow = ContextCompat.getDrawable(PersonalExpenseActivity.this, R.drawable.arrow_less);
                 }
                 holder.textView_monthName.setTextColor(textColor);
                 holder.textView_monthAmt.setTextColor(textColor);
@@ -643,11 +708,6 @@ public class PersonalExpenseActivity extends AppCompatActivity implements
             holder.textView_date.setText(child.date);
             holder.textView_amount.setText(child.amount);
             holder.textView_spentOn.setText(child.spentOn);
-//            if (child.type.equalsIgnoreCase("personal")) {
-//                holder.imageView_type.setImageResource(R.drawable.user_default);
-//            } else {
-//                holder.imageView_type.setImageResource(R.drawable.group_default);
-//            }
 
             if (listDataChild.get(monthParentArray.get(groupPosition).getName()).get(childPosition).getSelected()) {
                 holder.linearlayout_child.setBackgroundColor(ContextCompat.getColor(PersonalExpenseActivity.this,

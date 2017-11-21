@@ -1,0 +1,124 @@
+{
+  "status":"success",
+  "activities":[
+    {
+      "date": "Nov 20",
+      "actions": [
+        {
+          "userName": "Sandeep",
+          "groupName": "Buhahaha",
+          "action": "added Rs 30",
+          "userId":"12354",
+          "groupId":"45678"
+
+        },
+        {
+          "userName": "Sandeep",
+          "groupName": "buhahaha",
+          "action": "Settled the group",
+          "userId":"12354",
+          "groupId":"45678"
+        },
+        {
+          "userName": "Shubhechhu",
+          "groupName": "Rift",
+          "action": "Joined the group",
+          "userId":"12354",
+          "groupId":"45678"
+        }
+      ]
+    },
+    {
+      "date": "Nov 19",
+      "actions": [
+        {
+          "userName": "Mohit",
+          "groupName": "ghar",
+          "action": "Edited the expense Lunch",
+          "userId":"12354",
+          "groupId":"45678"
+        },
+        {
+          "userName": "Ashish",
+          "groupName": "ghar",
+          "action": "Edited the expense Lunch",
+          "userId":"12354",
+          "groupId":"45678"
+        },
+        {
+          "userName": "Ashish",
+          "groupName": "ghar",
+          "action": "Edited the expense Lunch",
+          "userId":"12354",
+          "groupId":"45678"
+        },
+        {
+          "userName": "Sandeep",
+          "groupName": "Joined the group",
+          "action": "ghar",
+          "userId":"12354",
+          "groupId":"45678"
+        },
+        {
+          "userName": "Subhechhu",
+          "groupName": "ghar",
+          "action": "Settled the group ghar",
+          "userId":"12354",
+          "groupId":"45678"
+        }
+      ]
+    },
+    {
+      "date": "Nov 18",
+      "actions": [
+        {
+          "userName": "Ashish",
+          "groupName": "ghar",
+          "action": "Edited the expense Lunch",
+          "userId":"12354",
+          "groupId":"45678"
+        },
+        {
+          "userName": "Sandeep",
+          "groupName": "Joined the group",
+          "action": "ghar",
+          "userId":"12354",
+          "groupId":"45678"
+        },
+        {
+          "userName": "Subhechhu",
+          "groupName": "ghar",
+          "action": "Settled the group ghar",
+          "userId":"12354",
+          "groupId":"45678"
+        }
+      ]
+    },
+    {
+      "date": "Nov 18",
+      "actions": [
+        {
+          "userName": "Ashish",
+          "groupName": "ghar",
+          "action": "Edited the expense Lunch",
+          "userId":"12354",
+          "groupId":"45678"
+        },
+        {
+          "userName": "Sandeep",
+          "groupName": "Joined the group",
+          "action": "ghar",
+          "userId":"12354",
+          "groupId":"45678"
+        },
+        {
+          "userName": "Subhechhu",
+          "groupName": "ghar",
+          "action": "Settled the group ghar",
+          "userId":"12354",
+          "groupId":"45678"
+        }
+      ]
+    }
+  ]
+}

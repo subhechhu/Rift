@@ -10,6 +10,7 @@
         android:layout_width="30dp"
         android:layout_height="30dp"
         android:layout_gravity="end"
+        android:visibility="invisible"
         android:background="@drawable/delete"/>
 
     <TextView
@@ -24,7 +25,6 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:layout_marginTop="5dp"
-        android:text="qweqwe"
         android:textColor="@color/colorPrimaryDark"/>
     <LinearLayout
         android:id="@+id/relative_copyleft"
