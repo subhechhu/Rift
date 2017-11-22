@@ -278,7 +278,7 @@ public class PersonalExpenseActivity extends AppCompatActivity implements
 
     private void ParseJson(String response) {
         try {
-            String date;
+//            String date;
             JSONObject responseObject = new JSONObject(response);
             String status = responseObject.getString("status");
             if ("success".equalsIgnoreCase(status)) {

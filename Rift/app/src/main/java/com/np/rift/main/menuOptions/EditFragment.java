@@ -29,7 +29,7 @@ public class EditFragment extends BottomSheetDialogFragment implements ServerPos
     AVLoadingIndicatorView progress_primary;
 
     View contentView;
-    String userName, userEmail;
+    String userName, userEmail, groupName;
     Button button_save;
 
     String forView;
@@ -57,9 +57,9 @@ public class EditFragment extends BottomSheetDialogFragment implements ServerPos
             editText_userEmail.setText(userEmail);
             editText_userName.setText(userName);
         } else {
-            userName = getArguments().getString("groupName");
-            editText_userName.setText(userName);
-            editText_userName.setHint("Group Name");
+            groupName = getArguments().getString("groupName");
+            editText_userEmail.setText(groupName);
+            editText_userEmail.setHint("Group Name");
         }
 
         button_save.setOnClickListener(new View.OnClickListener() {
@@ -101,7 +101,7 @@ public class EditFragment extends BottomSheetDialogFragment implements ServerPos
     }
 
     private void requestChangeDetails(String userEmail, String userName, String forView) {
-        String url = AppController.getInstance().getString(R.string.domain) + "/changeDetails";
+//        String url = AppController.getInstance().getString(R.string.domain) + "/changeDetails";
         try {
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("for", forView);

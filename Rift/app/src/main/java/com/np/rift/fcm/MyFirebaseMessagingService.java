@@ -60,8 +60,9 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             LocalBroadcastManager.getInstance(this).sendBroadcast(pushNotification);
 
             // play notification sound
-            NotificationUtils notificationUtils = new NotificationUtils(getApplicationContext());
+//            NotificationUtils notificationUtils = new NotificationUtils(getApplicationContext());
         } else {
+            Log.e("TAG", "app is in bg");
             // If the app is in background, firebase itself handles the notification
         }
     }
@@ -94,7 +95,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                 LocalBroadcastManager.getInstance(this).sendBroadcast(pushNotification);
 
                 // play notification sound
-                NotificationUtils notificationUtils = new NotificationUtils(getApplicationContext());
+//                NotificationUtils notificationUtils = new NotificationUtils(getApplicationContext());
             } else {
                 // app is in background, show the notification in notification tray
                 Intent resultIntent = new Intent(getApplicationContext(), HomeActivity.class);

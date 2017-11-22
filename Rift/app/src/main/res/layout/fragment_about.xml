@@ -49,4 +49,11 @@
             android:text="@string/rift_2017"
             android:textColor="@color/colorPrimaryDark"/>
     </LinearLayout>
+    <Button
+        android:id="@+id/button_clos"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_gravity="end"
+        android:visibility="invisible"
+        android:background="@drawable/delete"/>
 </LinearLayout>

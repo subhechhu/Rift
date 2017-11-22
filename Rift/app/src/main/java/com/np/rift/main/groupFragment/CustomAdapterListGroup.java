@@ -12,7 +12,6 @@ import android.widget.TextView;
 
 import com.np.rift.R;
 
-import java.util.HashSet;
 import java.util.List;
 
 
@@ -22,7 +21,7 @@ class CustomAdapterListGroup extends RecyclerView.Adapter<CustomAdapterListGroup
     private String TAG = getClass().getSimpleName();
 
     CustomAdapterListGroup(Context context, List<GroupModel> groupList) {
-        HashSet<String> checkSet = new HashSet<>();
+//        HashSet<String> checkSet = new HashSet<>();
         this.groupList = groupList;
         this.context = context;
     }

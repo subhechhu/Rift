@@ -131,7 +131,7 @@ public class LoginActivity extends AppCompatActivity implements ServerGetRequest
                         if (checkBox_autoLogin.isChecked()) {
                             sharedPrefUtil.setSharedPreferenceBoolean(AppController.getContext(), "rememberMe", true);
                         }
-                        GenerateOTP(editText_email.getText().toString());
+                        GenerateOTP(editText_email.getText().toString().toLowerCase());
                     }
                 } else {
                     NoInternet();

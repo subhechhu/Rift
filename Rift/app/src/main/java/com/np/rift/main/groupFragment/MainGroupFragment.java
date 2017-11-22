@@ -46,6 +46,7 @@ public class MainGroupFragment extends Fragment implements ServerGetRequest.Resp
     protected FragmentActivity mActivity;
     String TAG = getClass().getSimpleName();
     int fragmentValue;
+    String errorMessage;
 
     ArrayList<GroupModel> groupArrayList;
     RecyclerView recycler_view;
@@ -110,7 +111,11 @@ public class MainGroupFragment extends Fragment implements ServerGetRequest.Resp
         textView_empty.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                getGroups();
+                if ("Group not Found.Please Add/Join Group".equalsIgnoreCase(errorMessage)) {
+                    fabSpeedDial.openMenu();
+                } else {
+                    getGroups();
+                }
             }
         });
 
@@ -238,10 +243,11 @@ public class MainGroupFragment extends Fragment implements ServerGetRequest.Resp
                 Log.e("TAG", "vp.getCurrentItem(): " + vp.getCurrentItem());
                 textView_empty.setVisibility(View.VISIBLE);
                 recycler_view.setVisibility(View.INVISIBLE);
-                String errorMessage = responseObject.getString("errorMessage");
-                if (1 == vp.getCurrentItem()) {
-                    showSnackBar(errorMessage);
-                }
+                errorMessage = responseObject.getString("errorMessage");
+                textView_empty.setText(errorMessage);
+//                if (1 == vp.getCurrentItem()) {
+//                    showSnackBar(errorMessage);
+//                }
             }
 
         } catch (Exception e) {

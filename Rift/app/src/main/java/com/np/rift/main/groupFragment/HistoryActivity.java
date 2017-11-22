@@ -29,7 +29,6 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -142,7 +141,7 @@ public class HistoryActivity extends AppCompatActivity implements ServerGetReque
     }
 
 
-    //===================================================================================================================================
+//===================================================================================================================================
 //===================================================================================================================================
 //===============================================                           =========================================================
 //=============================================== CUSTOM ADAPER STARTS HERE =========================================================
@@ -151,13 +150,14 @@ public class HistoryActivity extends AppCompatActivity implements ServerGetReque
 //===================================================================================================================================
 //===================================================================================================================================
 //===================================================================================================================================
+
     class CustomAdapterListHistory extends RecyclerView.Adapter<CustomAdapterListHistory.MyViewHolder> {
         private final List<GroupModel> groupList;
         private final Context context;
         private String TAG = getClass().getSimpleName();
 
         CustomAdapterListHistory(Context context, List<GroupModel> groupList) {
-            HashSet<String> checkSet = new HashSet<>();
+//            HashSet<String> checkSet = new HashSet<>();
             this.groupList = groupList;
             this.context = context;
         }
@@ -179,14 +179,10 @@ public class HistoryActivity extends AppCompatActivity implements ServerGetReque
             holder.linearlayout_child.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-//                    Toast.makeText(context, "id: " + details.getSettleId(), Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent(HistoryActivity.this, SettledActivity.class);
-//                        finalSettleObject.put("status", "success");
-//                        finalSettleObject.put("settleddata",settleddata);
                     intent.putExtra("from", "history");
                     intent.putExtra("settleId", details.getSettleId());
                     startActivity(intent);
-//                    getDialog().dismiss();
                 }
             });
         }
@@ -206,9 +202,7 @@ public class HistoryActivity extends AppCompatActivity implements ServerGetReque
 
             MyViewHolder(View view) {
                 super(view);
-
                 this.setIsRecyclable(false);
-
                 textView_settleBy = view.findViewById(R.id.textView_group);
                 textView_settleDate = itemView.findViewById(R.id.textView_groupName);
                 linearlayout_child = itemView.findViewById(R.id.linearlayout_child);
@@ -216,7 +210,6 @@ public class HistoryActivity extends AppCompatActivity implements ServerGetReque
                 view_divider = itemView.findViewById(R.id.view_divider);
                 textView_userExpense = itemView.findViewById(R.id.textView_groupMembers);
                 view_divider.setBackgroundColor(ContextCompat.getColor(context, R.color.colorPrimaryDark));
-
             }
         }
     }

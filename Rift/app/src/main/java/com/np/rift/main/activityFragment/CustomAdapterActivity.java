@@ -10,17 +10,16 @@ import android.widget.TextView;
 
 import com.np.rift.R;
 
-import java.util.HashSet;
 import java.util.List;
 
 
 class CustomAdapterActivity extends RecyclerView.Adapter<CustomAdapterActivity.MyViewHolder> {
     private final List<ActivityModel> groupList;
-    private final Context context;
+    final Context context;
     private String TAG = getClass().getSimpleName();
 
     CustomAdapterActivity(Context context, List<ActivityModel> groupList) {
-        HashSet<String> checkSet = new HashSet<>();
+//        HashSet<String> checkSet = new HashSet<>();
         this.groupList = groupList;
         this.context = context;
     }

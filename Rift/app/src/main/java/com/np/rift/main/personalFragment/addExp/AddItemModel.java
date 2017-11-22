@@ -1,8 +1,8 @@
 package com.np.rift.main.personalFragment.addExp;
 
 public class AddItemModel {
-    String productId, productName, productPrice, date;
-    Boolean selected;
+    private String productId, productName, productPrice, date;
+    private Boolean selected;
 
     public String getProductId() {
         return productId;

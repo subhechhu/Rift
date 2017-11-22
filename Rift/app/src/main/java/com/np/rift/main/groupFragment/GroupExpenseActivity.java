@@ -267,7 +267,7 @@ public class GroupExpenseActivity extends AppCompatActivity implements
 
     private void ParseJson(String response) {
         try {
-            String date;
+//            String date;
             JSONObject responseObject = new JSONObject(response);
             String status = responseObject.getString("status");
             if ("success".equalsIgnoreCase(status)) {
@@ -287,7 +287,7 @@ public class GroupExpenseActivity extends AppCompatActivity implements
                     MonthModel month = new MonthModel();
                     JSONObject monthObject = expenseDetailsArray.getJSONObject(i);
 
-                    String mMonth = monthObject.getString("userName");
+//                    String mMonth = monthObject.getString("userName");
 //                    mMonth = mMonth.substring(0, 3);
                     month.setName(monthObject.getString("userName"));
 //                    month.setDate((Date) monthObject.get("month"));

@@ -4,8 +4,8 @@ package com.np.rift.main.activityFragment;
  * Created by subhechhu on 11/20/2017.
  */
 
-public class ActivityModel {
-    String userName, action, groupId, userId, groupName;
+class ActivityModel {
+    private String userName, action, groupId, userId, groupName;
 
     public String getAction() {
         return action;

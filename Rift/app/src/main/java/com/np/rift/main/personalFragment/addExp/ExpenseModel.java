@@ -5,9 +5,9 @@ import java.util.Date;
 
 public class ExpenseModel {
     //    String name, price, description, productId; //to be deleted
-    String id, date, spentOn, amount, type, userId;
-    Boolean selected;
-    Date realDate;
+    private String id, date, spentOn, amount, type, userId;
+    private Boolean selected;
+    private Date realDate;
 
 
     public String getUserId() {
