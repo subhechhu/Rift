@@ -235,7 +235,6 @@ public class MainGroupFragment extends Fragment implements ServerGetRequest.Resp
                 } else {
                     customAdapterGroup.notifyDataSetChanged();
                 }
-
 //                if (1 == vp.getCurrentItem()) {
 //                    showSnackBar("Groups Updated");
 //                }
@@ -284,6 +283,35 @@ public class MainGroupFragment extends Fragment implements ServerGetRequest.Resp
     @Override
     public void onResume() {
         super.onResume();
+
+        String referal_group = sharedPrefUtil.getSharedPreferenceString(AppController.getContext(), "referral", "subnone1");
+        Log.e("TAG", "subhechhu onResume, before referal_group: "+referal_group);
+
+//        referal_group="{\"groupId\":\"994265\", \"groupName\":\"test\"}";
+
+        try{
+            JSONObject jsonObject=new JSONObject(referal_group);
+            if(jsonObject.has("groupId")){
+                JSONObject referralObject= new JSONObject(referal_group);
+                String groupId= referralObject.getString("groupId");
+                String groupName= referralObject.getString("groupName");
+
+                sharedPrefUtil.setSharedPreferenceString(AppController.getContext(), "referral", "subnone1");
+
+                Log.e("TAG","subhechhu grpId: "+groupId);
+                Log.e("TAG","subhechhu grpName: "+groupName);
+
+                Bundle bundle = new Bundle();
+                BottomSheetDialogFragment fragment = new JoinGroupFragment();
+                bundle.putString("purpose", "Join");
+                bundle.putString("groupId", groupId);
+                bundle.putString("groupName", groupName);
+                fragment.setArguments(bundle);
+                fragment.show(getFragmentManager(), fragment.getTag());
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
 
         Log.e("TAG", "sharedPrefUtil.getSharedPreferenceBoolean(AppController.getContext(), \"refreshGroup\", false): "
                 + sharedPrefUtil.getSharedPreferenceBoolean(AppController.getContext(), "refreshGroup", false));

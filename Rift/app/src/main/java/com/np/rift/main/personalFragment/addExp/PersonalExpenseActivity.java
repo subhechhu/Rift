@@ -282,8 +282,9 @@ public class PersonalExpenseActivity extends AppCompatActivity implements
             JSONObject responseObject = new JSONObject(response);
             String status = responseObject.getString("status");
             if ("success".equalsIgnoreCase(status)) {
-                if(recyclerView.getVisibility()==View.INVISIBLE){
+                if (recyclerView.getVisibility() == View.INVISIBLE) {
                     recyclerView.setVisibility(View.VISIBLE);
+                    expMgr.expandGroup(0);
                 }
                 JSONArray expenseDetailsArray = responseObject.getJSONArray("expenseDetails");
                 monthParentArray = new ArrayList<>();

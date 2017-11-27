@@ -236,6 +236,7 @@ public class ActivityFragment extends Fragment implements ServerGetRequest.Respo
                 recycler_view.setAdapter(expMgr.createWrappedAdapter(adapter));
                 ((SimpleItemAnimator) recycler_view.getItemAnimator()).setSupportsChangeAnimations(false);
                 expMgr.attachRecyclerView(recycler_view);
+                expMgr.expandGroup(0);
             }
         } catch (Exception e) {
             e.printStackTrace();

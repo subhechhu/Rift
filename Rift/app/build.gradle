@@ -7,8 +7,8 @@ android {
         applicationId "com.np.rift"
         minSdkVersion 19
         targetSdkVersion 26
-        versionCode 5
-        versionName "1.0.4"
+        versionCode 10
+        versionName "1.0.9"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -27,6 +27,8 @@ dependencies {
     compile 'com.android.support:appcompat-v7:26.+'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
     testCompile 'junit:junit:4.12'
+
+    compile 'com.google.android.gms:play-services-analytics:9.6.0'
 
     compile 'com.android.support:design:26.+'
     compile 'com.android.support:recyclerview-v7:26.+'

@@ -434,7 +434,8 @@ public class GroupPieActivity extends AppCompatActivity implements OnChartValueS
             sharingIntent.setType("text/plain");
             String shareBodyText = "Hi!! You have been invited to join a group by " + AppController.getUserName()
                     + "\nGroup Name- *" + group_name + "*\nGroup ID- *" + group_id + "*\n\nLet's Rift!!\n\n\n" +
-                    "https://play.google.com/store/apps/details?id=com.np.rift";
+                    "https://play.google.com/store/apps/details?id=com.np.rift"+
+                    "&referrer=%7BgroupId%3D"+group_id+"%2C%20groupName%3D"+group_name+"%7D";
 //                String shareBodyText = "Hi!.You have been invited by to join group *"+group_name
 //                        +"* having id *"+group_id+"* by "+AppController.getUserName()+"\nLet's Rift!!";
             sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareBodyText);

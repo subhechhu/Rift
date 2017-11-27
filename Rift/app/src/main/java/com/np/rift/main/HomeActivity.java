@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.annotation.Nullable;
@@ -34,6 +35,8 @@ import com.np.rift.main.menuOptions.AboutFragment;
 import com.np.rift.main.menuOptions.EditFragment;
 import com.np.rift.util.SharedPrefUtil;
 import com.wang.avi.AVLoadingIndicatorView;
+
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -73,6 +76,10 @@ public class HomeActivity extends AppCompatActivity implements JoinGroupFragment
         userName = sharedPrefUtil.getSharedPreferenceString(AppController.getContext(), "userName", "user");
         userId = sharedPrefUtil.getSharedPreferenceString(AppController.getContext(), "userId", "000");
 
+        Intent intent = getIntent();
+        String action = intent.getAction();
+        Uri data = intent.getData();
+        Log.e("TAG", "data: " + data);
 
         displayFirebaseRegId();
 
@@ -145,6 +152,22 @@ public class HomeActivity extends AppCompatActivity implements JoinGroupFragment
 
             }
         });
+
+        String referal_group = sharedPrefUtil.getSharedPreferenceString(AppController.getContext(), "referral", "subnone1");
+        Log.e("TAG", "subhechhu before referal_group: "+referal_group);
+
+//        referal_group="{\"groupId\":\"994265\", \"groupName\":\"test\"}";
+
+        Log.e("TAG", "subhechhu after referal_group: "+referal_group);
+
+        try{
+            JSONObject jsonObject=new JSONObject(referal_group);
+            if(jsonObject.has("groupId")){
+                viewPager.setCurrentItem(1);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     public void noInternet() {

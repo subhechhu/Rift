@@ -193,7 +193,7 @@ public class SettledActivity extends AppCompatActivity implements ServerGetReque
         progress(true);
         String url = AppController.getInstance().getString(R.string.domain) +
                 "/removeUser?userId=" + AppController.getUserId() +
-                "&groupId=" + group_id;
+                "&groupId=" + group_id + "&groupName=" + group_name + "&userNam" + AppController.getUserName();
         new ServerGetRequest(this, "REQUEST_EXIT").execute(url);
     }
 

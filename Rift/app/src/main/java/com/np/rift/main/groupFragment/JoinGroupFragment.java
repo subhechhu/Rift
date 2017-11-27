@@ -26,6 +26,7 @@ public class JoinGroupFragment extends BottomSheetDialogFragment implements Serv
     TextView textView_message;
     Button button_proceed;
     String purpose;
+    String groupName, groupId;
     RefreshGroup refreshGroup;
 
     @Override
@@ -44,13 +45,27 @@ public class JoinGroupFragment extends BottomSheetDialogFragment implements Serv
         progress(false);
 
         purpose = getArguments().getString("purpose");
+        groupName = getArguments().getString("groupName");
+        groupId = getArguments().getString("groupId");
+
+        Log.e("TAG", "subhechhu groupName: "+groupName);
+        Log.e("TAG", "subhechhu groupId: "+groupId);
 
         textView_message = contentView.findViewById(R.id.textView_message);
 
         editText_groupName = contentView.findViewById(R.id.editText_groupName);
         editText_groupPurpose = contentView.findViewById(R.id.editText_groupPurpose);
-
         button_proceed = contentView.findViewById(R.id.button_proceed);
+
+        if ("Join".equals(purpose)
+                && groupName != null
+                && !groupName.equalsIgnoreCase("null")
+                && groupId != null
+                && !groupId.equalsIgnoreCase("null")) {
+            editText_groupName.setText(groupName);
+            editText_groupPurpose.setText(groupId);
+            button_proceed.performClick();
+        }
         button_proceed.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -117,18 +132,18 @@ public class JoinGroupFragment extends BottomSheetDialogFragment implements Serv
     public void getPostResult(String response, String requestCode, int responseCode) {
         if (response != null && !response.isEmpty()) {
             Log.e("TAG", "response: " + response);
-            try{
-                JSONObject responseObject=new JSONObject(response);
-                String status=responseObject.getString("status");
-                if("success".equalsIgnoreCase(status)){
+            try {
+                JSONObject responseObject = new JSONObject(response);
+                String status = responseObject.getString("status");
+                if ("success".equalsIgnoreCase(status)) {
                     getDialog().dismiss();
                     refreshGroup.refreshGroup("Group added.");
-                }else {
-                    String errorMsg=responseObject.getString("errorMessage");
+                } else {
+                    String errorMsg = responseObject.getString("errorMessage");
                     textView_message.setText(errorMsg);
                     textView_message.setTextColor(ContextCompat.getColor(getActivity(), R.color.RED));
                 }
-            }catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
             }
 
